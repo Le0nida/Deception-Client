@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema Definition</title>
+    <script th:src="@{/js/schemaDefiniton.js}"></script>
+</head>
+<body>
+
+<h2>Schema Definition</h2>
+<p>
+    Below are the entities that make up the schema at the core of the OpenAPI specification. <br>
+    Select the attributes of interest for each entity and save them. Finally, proceed to the next phase.
+</p>
+<p>
+    <b>WARNING:</b> In this demo version of the application, it is possible to save changes only once per entity.
+</p>
+
+    <div>
+        <h3>List of entities</h3>
+        <div th:each="item : ${checkboxList}">
+            <button th:id="${item}" class="checkboxes" onclick="handleLabelClick(this.id, this)">Open</button>
+            <input th:id="${item}" type="checkbox" class="pojoparent" disabled/>
+            <label th:for="${item}" th:id="${item}" th:text="${item}" class="checkboxes"></label>
+        </div>
+    </div>
+
+
+    <div class="nextstepbtn">
+        <button onclick="handleContinueButton()">
+            Continue
+        </button>
+    </div>
+    <div id="rightPanel"></div>
+</body>
+</html>

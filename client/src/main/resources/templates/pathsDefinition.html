@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Buttons</title>
+    <!-- Includi jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script th:src="@{/js/utils.js}"></script>
+    <script th:src="@{/js/pathsDefinition.js}"></script>
+    <script th:src="@{/js/operationBuilder.js}"></script>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Tags -->
+<div>
+    <h2>Tags</h2>
+
+    <div class="formInputText">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+        <br>
+        <label for="description">Description:</label>
+        <input type="text" id="description">
+        <br>
+        <button onclick="addTag()">Add Tag</button>
+    </div>
+
+    <!-- Lista di tag -->
+    <div id="tagValues" class="valueBtnList"></div>
+
+    <div class="nextstepbtn">
+        <button onclick="handleContinueButton()">
+            Continue
+        </button>
+    </div>
+</div>
+
+
+
+<!-- Paths -->
+<div id="tagSection" class="hidden">
+    <hr>
+    <h2>Paths</h2>
+    <h4 id="tagSelected"></h4>
+
+    <div class="formInputText">
+        <label for="newPath">Path:</label>
+        <input type="text" id="newPath">
+        <button onclick="addPath()">Add Path</button>
+    </div>
+
+    <!-- Lista di path -->
+    <div id="pathValues" class="valueBtnList"></div>
+
+</div>
+
+
+
+<!-- Operations -->
+<div id="pathSection" class="hidden">
+    <hr>
+    <h2>Operations</h2>
+    <h4 id="pathSelected"></h4>
+    <div class="formInputText">
+        <label for="newOperation">OperationID:</label>
+        <input type="text" id="newOperation">
+        <button onclick="addOperation()">Add Operation</button>
+    </div>
+
+
+    <!-- Lista di operazioni -->
+    <div id="operationsValues" class="valueBtnList"></div>
+
+
+</div>
+
+
+
+<!-- Operation Detail -->
+<div id="operationSection" class="hidden">
+    <hr>
+    <h2>Operation Detail</h2>
+    <h4 id="operationSelected"></h4>
+
+    <div id="apiConfiguration">
+        <label for="method">Method:</label>
+        <select id="method" name="method" onchange="setOperationMethod(this.selectedItem)">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+            <option value="OPTIONS">OPTIONS</option>
+            <option value="HEAD">HEAD</option>
+            <option value="PATCH">PATCH</option>
+            <option value="TRACE">TRACE</option>
+        </select>
+
+        <br>
+
+        <label for="operationSummary">Summary:</label>
+        <input type="text" id="operationSummary" name="summary" onchange="setOperationSummary(this.value)">
+
+        <br>
+
+        <label for="operationDescription">Description:</label>
+        <input type="text" id="operationDescription" name="description" onchange="setOperationDescription(this.value)">
+
+        <br>
+
+        <button id="parameters" onclick="buildParameters()">Parameters</button>
+        <button id="requestBody" onclick="buildRequest()">Request Body</button>
+        <button id="responses" onclick="buildResponses()">Add Response</button>
+        <button id="security" disabled>Security</button>
+        <button id="associatenewtag" onclick="associateNewTag()">Associate new tag</button>
+
+
+        <button onclick="finalSave()">SAVE OPERATION</button>
+
+    </div>
+</div>
+
+</body>
+</html>
