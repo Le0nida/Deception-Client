@@ -19,7 +19,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (confirmCRUD) {
-        initializeCRUD( ['User', 'Pet', 'Dog'])
+        const pojos = []
+        const allLabels = document.querySelectorAll('p[class="currentPojoElement"]');
+        allLabels.forEach(p => {
+            pojos.push(p.innerText)
+        });
+        initializeCRUD(pojos)
 
         initializeTagList();
     }
@@ -122,7 +127,7 @@ function initializeCRUD(entities) {
 
         // costruzione parametri
         const param = new Parameter();
-        param.name = `${ent}Id`
+        param.name = `${entLC}Id`
         param.intype = 'path'
         param.description = `Id of the ${ent} to return`
         param.required = true
@@ -154,7 +159,7 @@ function initializeCRUD(entities) {
 
         // costruzione parametri
         const paramDel = new Parameter();
-        paramDel.name = `${ent}Id`
+        paramDel.name = `${entLC}Id`
         paramDel.intype = 'path'
         paramDel.description = `Id of the ${ent} to delete`
         paramDel.required = true
@@ -224,7 +229,7 @@ function openOperationSection(operationValue) {
     else {
         const oap = window.operKeyJSONMap.get(operationValue)
         // valorizzazione dei campi
-        document.getElementById('method').selectedItem = oap.method.toUpperCase();
+        document.getElementById('method').value = oap.method.toUpperCase();
         document.getElementById('operationSummary').value = oap.summary
         document.getElementById('operationDescription').value = oap.description
     }

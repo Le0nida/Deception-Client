@@ -1,6 +1,8 @@
 package cybersec.deception.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Operation {
 
@@ -99,5 +101,19 @@ public class Operation {
                 ", responses=" + responses +
                 ", security=" + security +
                 '}';
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", id);
+        map.put("tags", tags);
+        map.put("method", method);
+        map.put("description", description);
+        map.put("summary", summary);
+        map.put("parameters", parameters);
+        map.put("requestBody", requestBody);
+        map.put("responses", responses);
+        map.put("security", security);
+        return map;
     }
 }

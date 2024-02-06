@@ -3,10 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Review Page</title>
+    <!-- Includi jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.0.0/dist/js-yaml.min.js"></script>
+    <script th:src="@{/js/reviewPage.js}"></script>
 </head>
 <body>
-    <h2>Review specifica OpenAPI 3.0</h2>
-    <pre th:text="${jsonFinale}">
+    <h2>Review OpenAPI specification</h2>
+    <!-- Pulsante di download -->
+    <a id="downloadButton" download="openApiSpecification.yaml">
+        <button>Download</button>
+    </a>
+
+    <!-- Pulsante di validazione -->
+    <button id="validationButton">Validazione</button>
+    <pre id="yamlContent" th:text="${finalYaml}">
 
     </pre>
 </body>

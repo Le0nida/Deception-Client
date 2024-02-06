@@ -62,7 +62,33 @@ function handleLabelClick(label, btn) {
     visualProcessing(label, btn);
 }
 
-function handleContinueButton(){
-    // TODO trasformare in POST e passare come apramtri anche i nomi dei PJO selezionati
-    window.location.href = "creazioneSpecifica?step=paths";
+function handleContinueButton() {
+    var pojos = [];
+    const allLabels = document.querySelectorAll('input[type="checkbox"]');
+    allLabels.forEach(l => {
+        if (l.checked === true) {
+            pojos.push(l.id);
+        }
+    });
+
+    // Creare un oggetto con i dati da inviare
+    var data = {
+        step: 'paths',
+        pojos: pojos
+    };
+
+    // Eseguire la richiesta POST con Ajax
+    $.ajax({
+        type: 'POST',
+        url: 'creazioneSpecifica',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function (response) {
+            // Gestire la risposta dal server, se necessario
+            window.location.href = 'pathsDefinition'
+        },
+        error: function (error) {
+            console.error('Error:', error);
+        }
+    });
 }

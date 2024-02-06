@@ -18,6 +18,15 @@
 </head>
 <body>
 
+
+<div style="display: none">
+    <h3>List of entities</h3>
+    <div th:each="item : ${currentPojoList}">
+        <p class="currentPojoElement" th:text="${item}"></p>
+    </div>
+</div>
+
+
 <!-- Tags -->
 <div>
     <h2>Tags</h2>

@@ -1,0 +1,70 @@
+- path: /paymentinfo
+  operations:
+  - !!cybersec.deception.model.Operation
+    description: Create a new PaymentInfo
+    id: createPaymentInfo
+    method: post
+    parameters: []
+    requestBody:
+      content:
+        schema:
+          format: null
+          items: []
+          reference: '#/components/schemas/PaymentInfo'
+          type: null
+        type: application/json
+      description: Create a new PaymentInfo
+      required: true
+    responses:
+    - content:
+        schema:
+          format: null
+          items: []
+          reference: '#/components/schemas/PaymentInfo'
+          type: null
+        type: application/json
+      description: Successful operation
+      statusCode: '200'
+    - content: {schema: null, type: null}
+      description: Invalid input
+      statusCode: '405'
+    security: []
+    summary: Create a new PaymentInfo
+    tags: [paymentinfo]
+  - !!cybersec.deception.model.Operation
+    description: Update an existent PaymentInfo by ID
+    id: updatePaymentInfo
+    method: put
+    parameters: []
+    requestBody:
+      content:
+        schema:
+          format: null
+          items: []
+          reference: '#/components/schemas/PaymentInfo'
+          type: null
+        type: application/json
+      description: Update an existent PaymentInfo
+      required: true
+    responses:
+    - content:
+        schema:
+          format: null
+          items: []
+          reference: '#/components/schemas/PaymentInfo'
+          type: null
+        type: application/json
+      description: Successful operation
+      statusCode: '200'
+    - content: {schema: null, type: null}
+      description: Invalid ID supplied
+      statusCode: '400'
+    - content: {schema: null, type: null}
+      description: PaymentInfo not found
+      statusCode: '404'
+    - content: {schema: null, type: null}
+      description: Validation exception
+      statusCode: '405'
+    security: []
+    summary: Update an existent PaymentInfo
+    tags: [paymentinfo]

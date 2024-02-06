@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Includi jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script th:src="@{/js/utils.js}"></script>
+    <script th:src="@{/js/classes.js}"></script>
+    <script th:src="@{/js/specificationInfos.js}"></script>
+    <title>API Specification Form</title>
+</head>
+<body>
+
+<h1>API Specification Form</h1>
+<div class="nextstepbtn">
+    <button onclick="handleContinueButton()">
+        Continue
+    </button>
+    <button onclick="handleContinueButton()">
+        Import
+    </button>
+</div>
+<div id="apiSpecForm">
+
+    <label for="openapi">OpenAPI Version:</label>
+    <input type="text" id="openapi" name="openapi">
+
+    <h2>Info</h2>
+    <label for="titleInfo">Title:</label>
+    <input type="text" id="titleInfo" name="title">
+
+    <label for="descriptionInfo">Description:</label>
+    <input type="text" id="descriptionInfo" name="description">
+
+    <label for="termsOfServiceInfo">Terms of Service:</label>
+    <input type="text" id="termsOfServiceInfo" name="termsOfService">
+
+    <label for="versionInfo">Version:</label>
+    <input type="text" id="versionInfo" name="version">
+
+    <h4>Contact</h4>
+    <label for="nameContact">Name:</label>
+    <input type="text" id="nameContact" name="name">
+
+    <label for="urlContact">URL:</label>
+    <input type="text" id="urlContact" name="url">
+
+    <label for="emailContact">E-mail:</label>
+    <input type="text" id="emailContact" name="email">
+
+
+    <!-- -------------------------------- -->
+
+    <h2>External Docs</h2>
+    <label for="externalDocsDescription">Description:</label>
+    <input type="text" id="externalDocsDescription" name="externalDocsDescription">
+
+    <label for="externalDocsUrl">URL:</label>
+    <input type="text" id="externalDocsUrl" name="externalDocsUrl">
+
+
+    <h2>Servers</h2>
+
+    <div id="addedServers"></div>
+
+    <label for="serverUrl">URL:</label>
+    <input type="text" id="serverUrl" name="serverUrl">
+
+    <label for="serverDescription">Description:</label>
+    <input type="text" id="serverDescription" name="serverDescription">
+
+    <button type="button" onclick="addServer()">Add Server</button>
+</div>
+
+</body>
+</html>

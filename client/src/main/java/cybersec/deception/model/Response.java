@@ -1,6 +1,8 @@
 package cybersec.deception.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Response {
 
@@ -39,5 +41,13 @@ public class Response {
                 ", description='" + description + '\'' +
                 ", content=" + content +
                 '}';
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("statusCode", statusCode);
+        map.put("description", description);
+        map.put("content", content != null ? content.toMap() : null);
+        return map;
     }
 }

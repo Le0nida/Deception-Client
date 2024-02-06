@@ -1,9 +1,12 @@
 package cybersec.deception.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Parameter {
 
     private String name;
-    private String inType;
+    private String intype;
     private String description;
     private boolean required;
     private boolean allowEmptyValue;
@@ -17,12 +20,12 @@ public class Parameter {
         this.name = name;
     }
 
-    public String getinType() {
-        return inType;
+    public String getIntype() {
+        return intype;
     }
 
-    public void setinType(String inType) {
-        this.inType = inType;
+    public void setIntype(String intype) {
+        this.intype = intype;
     }
 
     public String getDescription() {
@@ -61,11 +64,22 @@ public class Parameter {
     public String toString() {
         return "Parameter{" +
                 "name='" + name + '\'' +
-                ", inType='" + inType + '\'' +
+                ", intype='" + intype + '\'' +
                 ", description='" + description + '\'' +
                 ", required=" + required +
                 ", allowEmptyValue=" + allowEmptyValue +
                 ", schema=" + schema +
                 '}';
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", name);
+        map.put("intype", intype);
+        map.put("description", description);
+        map.put("required", required);
+        map.put("allowEmptyValue", allowEmptyValue);
+        map.put("schema", schema != null ? schema.toMap() : null);
+        return map;
     }
 }

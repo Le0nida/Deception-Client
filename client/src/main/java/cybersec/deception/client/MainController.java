@@ -1,116 +1,174 @@
 package cybersec.deception.client;
 
-import cybersec.deception.model.Path;
-import cybersec.deception.model.Tag;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import cybersec.deception.client.config.JwtTokenUtil;
+import cybersec.deception.client.services.EntitiesService;
+import cybersec.deception.client.utils.DatiCondivisi;
+import cybersec.deception.model.*;
+import cybersec.deception.client.services.YamlBuilderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
-class DatiCondivisi {
-    private Map<String, Object> dati = new HashMap<>();
-
-    public Object getDato(String contesto) {
-        return dati.get(contesto);
-    }
-
-    public void setDato(String contesto, Object dato) {
-        dati.put(contesto, dato);
-    }
-
-    public Map<String, Object> getDati() { return dati; }
-}
-
 @Controller
 public class MainController {
+
     @Autowired
     private ApplicationContext applicationContext;
 
+    private final YamlBuilderService yamlService;
+    private final EntitiesService entitiesService;
+    private final JwtTokenUtil jwtTokenUtil;
     private static List<String> pojoList;
     private static Map<String, String> pojoMap;
+
+    @Autowired
+    public MainController(YamlBuilderService yamlService, EntitiesService entitiesService, JwtTokenUtil jwtTokenUtil) {
+        this.yamlService = yamlService;
+        this.entitiesService = entitiesService;
+        this.jwtTokenUtil = jwtTokenUtil;
+    }
 
     @GetMapping("/")
     public String homePage(Model model) {
 
-        // TODO
-        // chiamata al demone per ottenere un JSON con tutte le entità
-        // uesto JSON va poi diviso in entità padre e passata una per una al modello
-        // model.addAttribute("entities", jsonString);
-        List<String> list = Arrays.asList("User", "Option2", "Option3");
+        // all'avvio resetto tutto
+        DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
+        datiCondivisi.clear();
 
-        String userString = "{\n" +
-                "  \"userId\": 123456,\n" +
-                "  \"username\": \"john_doe\",\n" +
-                "  \"password\": \"securepassword\",\n" +
-                "  \"firstName\": \"John\",\n" +
-                "  \"lastName\": \"Doe\",\n" +
-                "  \"gender\": \"male\",\n" +
-                "  \"email\": \"john.doe@example.com\",\n" +
-                "  \"ipAddress\": \"192.168.1.100\",\n" +
-                "  \"address\": {\n" +
-                "    \"street\": \"123 Main Street\",\n" +
-                "    \"city\": \"Anytown\",\n" +
-                "    \"state\": \"CA\",\n" +
-                "    \"indirizzo\": {\n" +
-                "      \"prova\": \"123 Main Street\"\n" +
-                "    },\n" +
-                "    \"zipCode\": \"12345\",\n" +
-                "    \"country\": \"USA\"\n" +
-                "  },\n" +
-                "  \"age\": 30,\n" +
-                "  \"isActive\": true\n" +
-                "}";
+        ResponseEntity<Map> response = this.entitiesService.retrieveAllEntities();
 
-        String fakeString = "{\n" +
-                "  \"fakeId\": 123456,\n" +
-                "  \"fakename\": \"john_doe\",\n" +
-                "  \"fakepwd\": \"securepassword\",\n" +
-                "  \"fakeName\": \"John\"\n" +
-                "}";
-
-        Map<String, String> map = new HashMap<>();
-        map.put("User", userString);
-        map.put("Option2", fakeString);
-        map.put("Option3", fakeString);
-
-        pojoMap = map;
-        pojoList = list;
-        return "index";
+        if (response.getStatusCode().is2xxSuccessful()) {
+            Map<String, String> map = response.getBody();
+            pojoMap = map;
+            pojoList = map.keySet().stream().toList();
+            return "index";
+        } else {
+            return "error";
+        }
     }
 
-    @GetMapping("/creazioneSpecifica")
-    public String showSpecCreationPage(@RequestParam(name = "step", required = false) String step, Model model) {
+    @PostMapping("/")
+    public String homePagePost(Model model) {
 
-        if (step.equals("pojo")) {
+        // Nel punto del codice in cui desideri ottenere lo username
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = "";
+        if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
+            username = ((org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal()).getUsername();
+            System.out.println("Username: " + username);
+        } else {
+            System.out.println("Utente non autenticato o informazioni non disponibili.");
+        }
+
+        // generazione token (login effettuato)
+        String token = jwtTokenUtil.generateToken(username);
+        model.addAttribute("securityToken", token);
+
+        // all'avvio resetto tutto
+        DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
+        datiCondivisi.clear();
+
+        ResponseEntity<Map> response = this.entitiesService.retrieveAllEntities();
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            Map<String, String> map = response.getBody();
+            pojoMap = map;
+            pojoList = map.keySet().stream().toList();
+            return "index";
+        } else {
+            return "error";
+        }
+    }
+
+
+    @GetMapping("/schemaDefinition")
+    public String schemaDefinition(Model model) {
+        model.addAttribute("checkboxList", pojoList);
+        return "schemaDefinition";
+    }
+
+    @GetMapping("/specificationInfos")
+    public String specificationInfos(Model model) {
+        return "specificationInfos";
+    }
+
+    @GetMapping("/pathsDefinition")
+    public String pathsDefinition(Model model) {
+        DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
+        List<String> currentPojoList = new ArrayList<>();
+        for (String currentPojoName : datiCondivisi.getDati().keySet().stream()
+                .filter(key -> key.startsWith("currentPojo"))
+                .collect(Collectors.toSet())) {
+
+            String pojoName = currentPojoName.replace("currentPojo", "");
+            if (((List<String>) datiCondivisi.getDato("selectedPojos")).contains(pojoName)){
+                model.addAttribute(pojoName, datiCondivisi.getDato(currentPojoName));
+                currentPojoList.add(pojoName);
+            }
+        }
+        model.addAttribute("currentPojoList", currentPojoList);
+        return "pathsDefinition";
+    }
+
+    @PostMapping("/creazioneSpecifica")
+    public String showSpecCreationPage(@RequestBody Map<String, Object> requestBody, Model model) {
+        String step = (String) requestBody.get("step");
+
+        if (step.equals("general")) {
             if (pojoList != null && !pojoList.isEmpty()) {
-                model.addAttribute("checkboxList", pojoList);
+                return "specificationInfos";
+            } else {
+                model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
+                return "errorpage";
+            }
+        } else if (step.equals("pojo")) {
+            if (requestBody.get("apiSpec") != null) {
+                // Creare un oggetto ObjectMapper
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                // Convertire la stringa JSON in un oggetto ApiSpec
+                ApiSpec apiSpec = null;
+                try {
+                    apiSpec = objectMapper.readValue(requestBody.get("apiSpec").toString(), ApiSpec.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+
+                System.out.println(apiSpec.toString());
+
+                DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
+                datiCondivisi.setDato("apiSpec", apiSpec);
+
                 return "schemaDefinition";
             } else {
                 model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
                 return "errorpage";
             }
         } else if (step.equals("paths")) {
+            List<String> pojos = (List<String>) requestBody.get("pojos");
+            System.out.println(pojos);
+
+
             DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
+            datiCondivisi.setDato("selectedPojos", pojos);
             if (datiCondivisi.getDati().keySet() != null && datiCondivisi.getDati().keySet().stream()
                     .filter(key -> key.startsWith("currentPojo"))
                     .collect(Collectors.toSet()).size() > 0) {
-
-                // TODO prendere solo i dati non anche le chaivi dei nomi
-                for (String currentPojoName : datiCondivisi.getDati().keySet().stream()
-                        .filter(key -> key.startsWith("currentPojo"))
-                        .collect(Collectors.toSet())) {
-                    model.addAttribute(currentPojoName, datiCondivisi.getDato(currentPojoName));
-                }
 
                 return "pathsDefinition";
             } else {
@@ -159,14 +217,43 @@ public class MainController {
         return ResponseEntity.ok("Modello aggiornato con successo");
     }
 
+    @PostMapping("/validazioneYaml")
+    public ResponseEntity<String> validazioneYaml(@RequestBody Map<String, String> data) {
+
+        String yaml = data.get("yaml");
+
+        // TODO
+
+        String otherProjectUrl = "http://localhost:8080/api/validateOpenAPISpec"; // Cambia l'URL con quello effettivo dell'altro progetto
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Esegui la chiamata HTTP per ottenere la mappa di contenuti
+        return null; //restTemplate.getForEntity(otherProjectUrl, String.class);
+    }
+
     @GetMapping("/reviewPage")
     public String reviewPage(Model model) {
 
         DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
-        model.addAttribute("jsonFinale", datiCondivisi.getDato("tagList"));
+        List<Tag> tags = (List<Tag>) datiCondivisi.getDato("tagList");
+        ApiSpec apiSpec = (ApiSpec) datiCondivisi.getDato("apiSpec");
+        apiSpec.setTags(tags);
+
+        List<String> selectedPojos = (List<String>) datiCondivisi.getDato("selectedPojos");
+        Map<String, String> map = new HashMap<>();
+        for (String name: selectedPojos) {
+            String pojoValue = (String) datiCondivisi.getDato("currentPojo"+name);
+            map.put(name, pojoValue);
+        }
+        String yamlComponents = this.entitiesService.defineYamlComponents(map);
+        String finalYamlSpec = this.yamlService.buildYaml(apiSpec, yamlComponents);
+
+        model.addAttribute("finalYaml", finalYamlSpec);
 
         return "reviewPage";
     }
+
+    // Metodo per convertire una lista di oggetti in YAML
 
     @PostMapping("/reviewSpec")
     public ResponseEntity<String> tagKeyDescMap(@RequestBody List<Tag> data) {

@@ -1,6 +1,7 @@
 package cybersec.deception.model;
 
 import java.util.List;
+import java.util.Map;
 
 public class Tag {
 
@@ -38,5 +39,9 @@ public class Tag {
                 ", description='" + description + '\'' +
                 ", paths=" + paths +
                 '}';
+    }
+
+    public Object toMap() {
+        return Map.of("name", name, "description", description);
     }
 }

@@ -1,6 +1,8 @@
 package cybersec.deception.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Schema {
 
@@ -49,5 +51,14 @@ public class Schema {
                 ", reference='" + reference + '\'' +
                 ", items=" + items +
                 '}';
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", type);
+        map.put("format", format);
+        map.put("reference", reference);
+        map.put("items", items);
+        return map;
     }
 }

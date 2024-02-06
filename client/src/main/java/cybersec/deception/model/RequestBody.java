@@ -1,6 +1,8 @@
 package cybersec.deception.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RequestBody {
 
@@ -39,5 +41,13 @@ public class RequestBody {
                 ", content=" + content +
                 ", required=" + required +
                 '}';
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("description", description);
+        map.put("content", content != null ? content.toMap() : null);
+        map.put("required", required);
+        return map;
     }
 }
