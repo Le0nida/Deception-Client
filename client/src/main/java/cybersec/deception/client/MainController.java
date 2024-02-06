@@ -3,115 +3,104 @@ package cybersec.deception.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cybersec.deception.client.services.EntitiesService;
-import cybersec.deception.client.utils.DatiCondivisi;
+import cybersec.deception.client.services.PersistenceService;
 import cybersec.deception.model.*;
 import cybersec.deception.client.services.YamlBuilderService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 public class MainController {
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
     private final YamlBuilderService yamlService;
     private final EntitiesService entitiesService;
+    private final PersistenceService persistenceService;
     private static List<String> pojoList;
     private static Map<String, String> pojoMap;
 
     @Autowired
-    public MainController(YamlBuilderService yamlService, EntitiesService entitiesService) {
+    public MainController(YamlBuilderService yamlService, EntitiesService entitiesService, PersistenceService persistenceService) {
         this.yamlService = yamlService;
         this.entitiesService = entitiesService;
+        this.persistenceService = persistenceService;
+    }
+
+    private String loginCheck(Model model, HttpSession session, String pageToReturn) {
+        String username = (String) session.getAttribute("username");
+        model.addAttribute("username", username);
+        if (username != null) {
+            model.addAttribute("username", username);
+            return pageToReturn;
+        } else {
+            return "redirect:/login";
+        }
     }
 
     @GetMapping("/")
-    public String homePage(Model model) {
+    public String homePage(Model model, HttpSession session) {
 
-        // all'avvio resetto tutto
-        DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
-        datiCondivisi.clear();
-
+        String returnPage = loginCheck(model, session, "index");
         ResponseEntity<Map> response = this.entitiesService.retrieveAllEntities();
 
+        List<String> files = this.persistenceService.retrieveAllFiles((String) session.getAttribute("username"));
+        model.addAttribute("yamlFiles", files);
         if (response.getStatusCode().is2xxSuccessful()) {
             Map<String, String> map = response.getBody();
             pojoMap = map;
             pojoList = map.keySet().stream().toList();
-            return "index";
+            return returnPage;
         } else {
             return "error";
         }
     }
-
-    @PostMapping("/")
-    public String homePagePost(Model model) {
-
-        // all'avvio resetto tutto
-        DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
-        datiCondivisi.clear();
-
-        ResponseEntity<Map> response = this.entitiesService.retrieveAllEntities();
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            Map<String, String> map = response.getBody();
-            pojoMap = map;
-            pojoList = map.keySet().stream().toList();
-            return "index";
-        } else {
-            return "error";
-        }
-    }
-
 
     @GetMapping("/schemaDefinition")
-    public String schemaDefinition(Model model) {
+    public String schemaDefinition(Model model, HttpSession session) {
         model.addAttribute("checkboxList", pojoList);
-        return "schemaDefinition";
+        return loginCheck(model, session, "schemaDefinition");
     }
 
     @GetMapping("/specificationInfos")
-    public String specificationInfos(Model model) {
-        return "specificationInfos";
+    public String specificationInfos(Model model, HttpSession session) {
+        return loginCheck(model, session, "specificationInfos");
     }
 
     @GetMapping("/pathsDefinition")
-    public String pathsDefinition(Model model) {
-        DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
+    public String pathsDefinition(Model model, HttpSession session) {
         List<String> currentPojoList = new ArrayList<>();
-        for (String currentPojoName : datiCondivisi.getDati().keySet().stream()
-                .filter(key -> key.startsWith("currentPojo"))
-                .collect(Collectors.toSet())) {
 
-            String pojoName = currentPojoName.replace("currentPojo", "");
-            if (((List<String>) datiCondivisi.getDato("selectedPojos")).contains(pojoName)){
-                model.addAttribute(pojoName, datiCondivisi.getDato(currentPojoName));
-                currentPojoList.add(pojoName);
+        List<String> selectedPojos = (List<String>) session.getAttribute("selectedPojos");
+
+        for (String currentPojoName : Collections.list(session.getAttributeNames())) {
+            if (currentPojoName.startsWith("currentPojo")) {
+                String pojoName = currentPojoName.replace("currentPojo", "");
+                if (selectedPojos != null && selectedPojos.contains(pojoName)) {
+                    model.addAttribute(pojoName, session.getAttribute(currentPojoName));
+                    currentPojoList.add(pojoName);
+                }
             }
         }
         model.addAttribute("currentPojoList", currentPojoList);
-        return "pathsDefinition";
+        return loginCheck(model, session, "pathDefinition");
     }
 
     @PostMapping("/creazioneSpecifica")
-    public String showSpecCreationPage(@RequestBody Map<String, Object> requestBody, Model model) {
+    public String showSpecCreationPage(@RequestBody Map<String, Object> requestBody, Model model, HttpSession session) {
         String step = (String) requestBody.get("step");
 
         if (step.equals("general")) {
             if (pojoList != null && !pojoList.isEmpty()) {
-                return "specificationInfos";
+                return loginCheck(model, session, "specificationInfos");
             } else {
                 model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
                 return "errorpage";
@@ -128,29 +117,18 @@ public class MainController {
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
-
-                System.out.println(apiSpec.toString());
-
-                DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
-                datiCondivisi.setDato("apiSpec", apiSpec);
-
-                return "schemaDefinition";
+                session.setAttribute("apiSpec", apiSpec);
+                return loginCheck(model, session, "schemaDefinition");
             } else {
                 model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
                 return "errorpage";
             }
         } else if (step.equals("paths")) {
             List<String> pojos = (List<String>) requestBody.get("pojos");
-            System.out.println(pojos);
 
-
-            DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
-            datiCondivisi.setDato("selectedPojos", pojos);
-            if (datiCondivisi.getDati().keySet() != null && datiCondivisi.getDati().keySet().stream()
-                    .filter(key -> key.startsWith("currentPojo"))
-                    .collect(Collectors.toSet()).size() > 0) {
-
-                return "pathsDefinition";
+            session.setAttribute("selectedPojos", pojos);
+            if (Collections.list(session.getAttributeNames()).stream().anyMatch(name -> name.startsWith("currentPojo"))) {
+                return loginCheck(model, session, "pathsDefinition");
             } else {
                 model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
                 return "errorpage";
@@ -161,39 +139,35 @@ public class MainController {
     }
 
     @GetMapping("/definizionePojo")
-    public String showDefinizionePojoPage(@RequestParam(name = "entityName", required = true) String paramName, Model model) {
+    public String showDefinizionePojoPage(@RequestParam(name = "entityName", required = true) String paramName, Model model, HttpSession session) {
         if (paramName != null) {
-            DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
             if (pojoMap.containsKey(paramName)) {
                 String currentPojoName = "currentPojo" + paramName;
                 model.addAttribute("currentPojoName", currentPojoName);
 
-                if (datiCondivisi.getDato(currentPojoName) == null) {
-                    datiCondivisi.setDato(currentPojoName, pojoMap.get(paramName));
+                if (session.getAttribute(currentPojoName) == null) {
+                    session.setAttribute(currentPojoName, pojoMap.get(paramName));
                     model.addAttribute(currentPojoName, pojoMap.get(paramName));
                 } else {
                     // il dato è già stato modificato
-                    model.addAttribute(currentPojoName, datiCondivisi.getDato(currentPojoName));
+                    model.addAttribute(currentPojoName, session.getAttribute(currentPojoName));
 
-                    if (datiCondivisi.getDato(currentPojoName) != pojoMap.get(paramName)) {
+                    if (session.getAttribute(currentPojoName) != pojoMap.get(paramName)) {
                         model.addAttribute("pojoEdited", true);
                     }
                 }
             }
         }
 
-        return "pojoBuilding";
+        return loginCheck(model, session, "pojoBuilding");
     }
 
     @PostMapping("/aggiornaModello")
-    public ResponseEntity<String> aggiornaModello(@RequestBody Map<String, String> data) {
+    public ResponseEntity<String> aggiornaModello(@RequestBody Map<String, String> data, HttpSession session) {
         // Ottieni il valore dal corpo della richiesta
         String valoreDaAggiornare = data.get("valoreDaAggiornare");
         String attributoDaAggiornare = data.get("attributoDaAggiornare");
-
-        DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
-
-        datiCondivisi.setDato(attributoDaAggiornare, valoreDaAggiornare);
+        session.setAttribute(attributoDaAggiornare, valoreDaAggiornare);
         return ResponseEntity.ok("Modello aggiornato con successo");
     }
 
@@ -212,33 +186,77 @@ public class MainController {
     }
 
     @GetMapping("/reviewPage")
-    public String reviewPage(Model model) {
+    public String reviewPage(Model model, HttpSession session) {
 
-        DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
-        List<Tag> tags = (List<Tag>) datiCondivisi.getDato("tagList");
-        ApiSpec apiSpec = (ApiSpec) datiCondivisi.getDato("apiSpec");
-        apiSpec.setTags(tags);
+        String finalYamlSpec = (String) session.getAttribute("finalYaml");
+        if (finalYamlSpec == null) {
+            List<Tag> tags = (List<Tag>) session.getAttribute("tagList");
+            ApiSpec apiSpec = (ApiSpec) session.getAttribute("apiSpec");
+            apiSpec.setTags(tags);
 
-        List<String> selectedPojos = (List<String>) datiCondivisi.getDato("selectedPojos");
-        Map<String, String> map = new HashMap<>();
-        for (String name: selectedPojos) {
-            String pojoValue = (String) datiCondivisi.getDato("currentPojo"+name);
-            map.put(name, pojoValue);
+            List<String> selectedPojos = (List<String>) session.getAttribute("selectedPojos");
+            Map<String, String> map = new HashMap<>();
+            for (String name: selectedPojos) {
+                String pojoValue = (String) session.getAttribute("currentPojo"+name);
+                map.put(name, pojoValue);
+            }
+            String yamlComponents = this.entitiesService.defineYamlComponents(map);
+            finalYamlSpec = this.yamlService.buildYaml(apiSpec, yamlComponents);
         }
-        String yamlComponents = this.entitiesService.defineYamlComponents(map);
-        String finalYamlSpec = this.yamlService.buildYaml(apiSpec, yamlComponents);
-
         model.addAttribute("finalYaml", finalYamlSpec);
 
-        return "reviewPage";
+        return loginCheck(model, session, "reviewPage");
     }
 
     // Metodo per convertire una lista di oggetti in YAML
 
     @PostMapping("/reviewSpec")
-    public ResponseEntity<String> tagKeyDescMap(@RequestBody List<Tag> data) {
-        DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
-        datiCondivisi.setDato("tagList", data);
+    public ResponseEntity<String> tagKeyDescMap(@RequestBody List<Tag> data, HttpSession session) {
+        session.setAttribute("tagList", data);
         return ResponseEntity.ok("reviewPage");
+    }
+
+    @PostMapping("/importSchema")
+    public ResponseEntity<String> importSchema(@RequestBody String yaml, HttpSession session) {
+        String formattedYaml = this.yamlService.formatYaml(yaml);
+        session.setAttribute("finalYaml", formattedYaml);
+        return ResponseEntity.ok("reviewPage");
+    }
+
+    @PostMapping("/selectSchema")
+    public ResponseEntity<String> selectSchema(@RequestBody String filename, HttpSession session) {
+        String formattedYaml = this.persistenceService.retrieveFile(filename, (String) session.getAttribute("username"));
+        session.setAttribute("finalYaml", formattedYaml);
+        return ResponseEntity.ok("reviewPage");
+    }
+
+    @PostMapping("/saveSpecification")
+    public ResponseEntity<String> uploadYamlFile(@RequestBody Map<String, String> data, HttpSession session) {
+        String filename = data.get("filename");
+        String yaml = data.get("yaml");
+        String response = this.persistenceService.uploadFile(yaml, filename, (String) session.getAttribute("username"));
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/generateImgFromZip")
+    public String generateImgFromZip(@RequestParam("file") MultipartFile file) {
+        // Controlla se il file è stato fornito
+        if (file.isEmpty()) {
+            return "Errore: nessun file fornito.";
+        }
+
+        // TODO
+
+        try {
+            // Esempio di salvataggio del file .zip nel server
+            byte[] bytes = file.getBytes();
+            // Qui esegui la logica per generare l'immagine docker dal file .zip
+
+            // Ritorna il percorso dell'immagine docker generata
+            return "/path/to/generated/docker/image";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Errore durante il caricamento del file: " + e.getMessage();
+        }
     }
 }

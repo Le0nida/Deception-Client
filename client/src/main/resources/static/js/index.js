@@ -1,17 +1,28 @@
-document.addEventListener('DOMContentLoaded', function () {
+function uploadFile() {
+    var fileInput = document.getElementById('fileInput');
+    var file = fileInput.files[0];
+    if (!file) {
+        alert("Si prega di selezionare un file.");
+        return;
+    }
 
-    // Recupera il token dal modello
-    var token = document.getElementById('token').getAttribute('data-securityToken');
+    var formData = new FormData();
+    formData.append("file", file);
 
-    // Memorizza il token nel sessionStorage
-    sessionStorage.setItem('accessToken', token);
-});
-
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/upload", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            alert("File caricato con successo!");
+        } else if (xhr.readyState === 4 && xhr.status !== 200) {
+            alert("Si è verificato un errore durante il caricamento del file.");
+        }
+    };
+    xhr.send(formData);
+}
 
 function creaNuovaSpecifica() {
     // Recupera il token memorizzato
-    var token = sessionStorage.getItem('accessToken');
-
     // Creare un oggetto con i dati da inviare
     var data = {
         step: 'general'
@@ -23,9 +34,6 @@ function creaNuovaSpecifica() {
         url: 'creazioneSpecifica',
         contentType: 'application/json',
         data: JSON.stringify(data),
-        headers: {
-            'Authorization': 'Bearer ' + token // Aggiungi il token nell'header Authorization
-        },
         success: function (response) {
             // Gestire la risposta dal server, se necessario
             window.location.href = 'specificationInfos';
@@ -37,16 +45,80 @@ function creaNuovaSpecifica() {
 }
 
 
+function generateImgFromZip() {
 
-function importaSpecificaEsistente() {
-    // Aggiungi la logica desiderata per l'importazione di una specifica esistente
-    alert("Azione: Importa specifica esistente");
+    var fileInput = document.getElementById('fileInput');
+    var file = fileInput.files[0];
+    if (!file) {
+        alert("Si prega di selezionare un file.");
+        return;
+    }
 
+    var formData = new FormData();
+    formData.append('file', file);
 
+    $.ajax({
+        type: 'POST',
+        url: '/generateImgFromZip',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log(response)
+        },
+        error: function(error) {
+            console.error("Si è verificato un errore durante il caricamento del file: ", error);
+        }
+    });
 }
 
-function visualizzaStorico() {
-    // Aggiungi la logica desiderata per la visualizzazione dello storico
-    alert("Azione: Visualizza Storico");
+
+function importaSpecificaEsistente() {
+
+    var fileInput = document.getElementById('fileInput');
+    var file = fileInput.files[0];
+    if (!file) {
+        alert("Si prega di selezionare un file.");
+        return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function(event) {
+        var fileContent = event.target.result;
+        $.ajax({
+            type: 'POST',
+            url: '/importSchema',
+            contentType: 'application/json',
+            data: JSON.stringify(fileContent),
+            success: function(response) {
+                window.location.href = response
+            },
+            error: function(error) {
+                console.error("Si è verificato un errore durante il caricamento del file: ", error);
+            }
+        });
+    };
+    reader.readAsText(file);
+}
+
+function selezionaSpecifica() {
+    var fileSelected = document.getElementById('entitySelect').value;
+    if (fileSelected === null || fileSelected === "") {
+        alert("Si prega di selezionare una specifica");
+        return;
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: '/selectSchema',
+        contentType: 'application/json',
+        data: fileSelected,
+        success: function(response) {
+            window.location.href = response
+        },
+        error: function(error) {
+            console.error("Si è verificato un errore durante la selezione dello schema: ", error);
+        }
+    });
 
 }

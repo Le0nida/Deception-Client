@@ -36,7 +36,40 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    function saveYamlFile() {
+
+        var userInput = prompt("Inserisci il nome con cui salvare il file .yaml");
+
+        // Controlla se l'utente ha inserito un valore
+        if (userInput !== null) {
+            // Creare un oggetto con i dati da inviare
+            var data = {
+                filename: userInput,
+                yaml: document.getElementById("yamlContent").textContent
+        };
+
+            // Eseguire la richiesta POST con Ajax
+            $.ajax({
+                type: 'POST',
+                url: 'saveSpecification',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response) {
+                    console.log(response)
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        } else {
+            // Se l'utente ha premuto Annulla, stampa un messaggio nella console del browser
+            console.log("Operazione annullata dall'utente.");
+        }
+
+    }
+
     // Aggiungi gli eventi ai pulsanti
     document.getElementById("downloadButton").addEventListener("click", downloadYAML);
     document.getElementById("validationButton").addEventListener("click", validate);
+    document.getElementById("saveButton").addEventListener("click", saveYamlFile);
 });

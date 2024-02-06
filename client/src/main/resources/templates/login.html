@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <script th:src="@{/js/login.js}"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -68,9 +67,26 @@
             <input type="password" id="password" name="password" required>
         </div>
         <div class="form-group">
-            <button type="submit">Loginnnn</button>
+            <button type="submit">Login</button>
         </div>
     </form>
 </div>
+
+<script>
+    // Verifica se c'è il parametro di logout nella URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const logoutParam = urlParams.get('logout');
+    // Se il parametro di logout è "true", mostra un prompt
+    if (logoutParam === 'true') {
+        alert('Logout effettuato con successo');
+    }
+
+    // Verifica se c'è il parametro di error nella URL
+    const errorParam = urlParams.get('error');
+    // Se il parametro di logout è "true", mostra un prompt
+    if (errorParam === 'true') {
+        alert(errorParam);
+    }
+</script>
 </body>
 </html>

@@ -1,0 +1,64 @@
+/* Stili per la form */
+h1 {
+    text-align: center;
+}
+
+.button-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#inner-form-section {
+    display: flex;
+}
+
+.form-container {
+    width: 50%; /* Imposta la larghezza al 50% per affiancarli */
+    box-sizing: border-box; /* Assicurati che il padding e il bordo siano inclusi nella larghezza */
+    padding: 0 10px; /* Aggiunge spazio tra i form */
+}
+
+.form-section {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.inner-form-section {
+    display: flex;
+    flex-direction: row;
+}
+
+.form-section h2 {
+    margin-top: 0;
+}
+
+.form-section label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-section input[type="text"] {
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.form-section button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.form-section button:hover {
+    background-color: #45a049;
+}

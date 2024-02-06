@@ -1,13 +1,13 @@
 package cybersec.deception.client.services;
 
-import cybersec.deception.Utils;
+import cybersec.deception.client.utils.Utils;
 import cybersec.deception.model.*;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class YamlBuilderService {
@@ -216,4 +216,29 @@ public class YamlBuilderService {
 
         return builder.toString();
     }
+
+    public String formatYaml(String yamlString) {
+        // Configura le opzioni di formattazione
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK); // Formato a blocchi invece di inline
+
+        // Crea un'istanza di Yaml con le opzioni di formattazione
+        Yaml yaml = new Yaml(options);
+
+        // Analizza il YAML in un oggetto
+        Object yamlObject = yaml.load(yamlString);
+
+        // Verifica se l'oggetto è una mappa
+        if (yamlObject instanceof Map) {
+            // Cast dell'oggetto a una mappa
+            Map<String, Object> yamlMap = (Map<String, Object>) yamlObject;
+
+            // Serializza la mappa in una stringa YAML formattata
+            return yaml.dump(yamlMap);
+        } else {
+            // Il YAML non rappresenta una mappa valida
+            return yamlObject.toString();
+        }
+    }
+
 }

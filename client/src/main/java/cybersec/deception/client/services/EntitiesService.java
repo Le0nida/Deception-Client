@@ -1,6 +1,5 @@
 package cybersec.deception.client.services;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

@@ -3,21 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Specifica Management</title>
+    <title>Deception Component Generator</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script th:src="@{/js/index.js}"></script>
+    <!-- <style th:src="@{/css/index.css}"></style> -->
+    <link rel="stylesheet" type="text/css" href="/css/index.css">
 </head>
 <body>
-<h1>Benvenuto nella gestione delle specifiche</h1>
-<div id="token" th:data-securityToken="${securityToken}"></div>
-<button onclick="creaNuovaSpecifica()">Crea nuova specifica</button>
-<button onclick="importaSpecificaEsistente()">Importa specifica esistente</button>
-<button onclick="visualizzaStorico()">Storico</button>
+<div class="container">
 
-<form th:action="@{/logout}" method="post">
-    <input type="submit" value="Sign Out"/>
-</form>
+    <div class="title">
+        <h1><span>Deception Component Generator</span></h1>
+        <h3>RestApi Server Generation</h3>
+    </div>
 
-<!-- Aggiungi qui eventuali script JavaScript per gestire le azioni dei pulsanti -->
+    <p>
+        Welcome <b th:text="${username}"></b>!
+    </p>
+    <p>
+
+        Within this application, you'll have the opportunity to define an <b>OpenAPI specification</b> and generate a <b>RestAPI server</b> based on it.
+        <br>
+        The documentation regarding the usage of the application is available at this <a href="http://">link</a>.
+    </p>
+
+
+
+    <div id="cont">
+        <div class="sections" id="left">
+            <!-- Section 1 -->
+            <section>
+
+                <button onclick="creaNuovaSpecifica()">Create new specification</button>
+            </section>
+
+            <!-- Section 2 -->
+            <section>
+                <button onclick="importaSpecificaEsistente()">Import existing specification</button>
+                <input type="file" id="fileInput" accept=".yaml">
+            </section>
+        </div>
+
+        <div class="sections" id="right">
+            <!-- Section 3 -->
+            <section>
+                <button onclick="selezionaSpecifica()">Select specification</button>
+                <select id="entitySelect" name="entitySelect">
+                    <option value="">Select an entity</option>
+                    <!-- Utilizza Thymeleaf per iterare sulla lista di entità nel model -->
+                    <th:block th:each="entity : ${yamlFiles}">
+                        <option th:text="${entity}" th:value="${entity}"></option>
+                    </th:block>
+                </select>
+            </section>
+
+            <!-- Section 4 -->
+            <section>
+                <button onclick="generateImgFromZip()">Generate Docker image</button>
+                <input type="file" id="zipInput" accept=".zip">
+            </section>
+
+        </div>
+    </div>
+
+    <div id="footer">
+        <section>
+            <div><span>Username: </span><span id="username" class="username" th:text="${username}"></div>
+            <form th:action="@{/logout}" method="post">
+                <input type="submit" value="Sign Out"/>
+            </form>
+        </section>
+    </div>
+</div>
+
+
+
 </body>
 </html>
