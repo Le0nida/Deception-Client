@@ -2,17 +2,13 @@ package cybersec.deception.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cybersec.deception.client.config.JwtTokenUtil;
 import cybersec.deception.client.services.EntitiesService;
 import cybersec.deception.client.utils.DatiCondivisi;
 import cybersec.deception.model.*;
 import cybersec.deception.client.services.YamlBuilderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,15 +28,13 @@ public class MainController {
 
     private final YamlBuilderService yamlService;
     private final EntitiesService entitiesService;
-    private final JwtTokenUtil jwtTokenUtil;
     private static List<String> pojoList;
     private static Map<String, String> pojoMap;
 
     @Autowired
-    public MainController(YamlBuilderService yamlService, EntitiesService entitiesService, JwtTokenUtil jwtTokenUtil) {
+    public MainController(YamlBuilderService yamlService, EntitiesService entitiesService) {
         this.yamlService = yamlService;
         this.entitiesService = entitiesService;
-        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @GetMapping("/")
@@ -64,20 +58,6 @@ public class MainController {
 
     @PostMapping("/")
     public String homePagePost(Model model) {
-
-        // Nel punto del codice in cui desideri ottenere lo username
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = "";
-        if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
-            username = ((org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal()).getUsername();
-            System.out.println("Username: " + username);
-        } else {
-            System.out.println("Utente non autenticato o informazioni non disponibili.");
-        }
-
-        // generazione token (login effettuato)
-        String token = jwtTokenUtil.generateToken(username);
-        model.addAttribute("securityToken", token);
 
         // all'avvio resetto tutto
         DatiCondivisi datiCondivisi = applicationContext.getBean(DatiCondivisi.class);
