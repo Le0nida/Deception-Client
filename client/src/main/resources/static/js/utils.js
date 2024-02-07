@@ -1,4 +1,4 @@
-const defaultBackgroundColor = '#FCFCFC'
+const defaultBackgroundColor = "rgba(195, 210, 243, 0.42)";
 
 function showHiddenElement(id) {
     document.getElementById(id).classList.remove('hidden');
@@ -58,6 +58,10 @@ function addButton(btnText, containerID, btnFunction){
     }
 
     container.appendChild(newButton);
+}
+
+function isValueInMapKeys(map, value) {
+    return Array.from(map.keys()).includes(value);
 }
 
 class OpenApiOperation {

@@ -1,12 +1,438 @@
 let currentContent = null;
-function associateNewTag() {
 
+document.addEventListener("DOMContentLoaded", function() {
+
+    // Chiudi la dialog se si clicca al di fuori di essa
+    $(document).mouseup(function(e) {
+        var dialog = $('#operation-dialog-container');
+        // Se il click non è all'interno della dialog o del pulsante "Import", chiudi la dialog
+        if (!dialog.is(e.target) && dialog.has(e.target).length === 0 && !$('#import').is(e.target)) {
+            dialog.hide();
+            $('body').removeClass('dialog-open');
+        }
+    });
+});
+
+// FUNZIONI DI UTILITA' ------------------------------------------------------------------------------------------------
+
+function removeElementsByClass(className, parentDivId) {
+    var parentDiv = document.getElementById(parentDivId);
+    if (parentDiv) {
+        var elements = parentDiv.getElementsByClassName(className);
+        while (elements.length > 0) {
+            elements[0].parentNode.removeChild(elements[0]);
+        }
+    } else {
+        console.error("Parent div with id " + parentDivId + " not found.");
+    }
+}
+
+// Funzione per aprire la dialog con JSON della risposta
+function showCreatedJsonDialog(elementToStringify) {
+
+    removeElementsByClass("created-json-dialog", "json-view");
+
+    const responseDialog = document.createElement('div');
+    responseDialog.className = 'created-json-dialog';
+
+    const closeButton = document.createElement('button');
+    closeButton.innerText = 'Chiudi';
+    closeButton.onclick = function () {
+        document.getElementById('json-view').removeChild(responseDialog);
+    };
+
+    const jsonView = document.createElement('pre');
+    jsonView.innerText = JSON.stringify(elementToStringify, null, 2);
+
+    responseDialog.appendChild(jsonView);
+    responseDialog.appendChild(closeButton);
+
+    document.getElementById('json-view').appendChild(responseDialog);
+}
+
+function showMainDialog() {
+    $('#operation-dialog-container').show();
+    $('body').addClass('dialog-open');
+}
+
+function hideMainDialog() {
+    $('#operation-dialog-container').hide();
+    $('body').removeClass('dialog-open');
+}
+
+function createSchemaSection() {
+    const createSchemaDiv = document.createElement('div');
+    createSchemaDiv.className = 'form-section';
+
+    const schemaReferenceLabel = document.createElement('label');
+    schemaReferenceLabel.innerText = 'Reference:';
+    const schemaReferenceInput = document.createElement('input');
+    schemaReferenceInput.type = 'text';
+    schemaReferenceInput.id = 'schemaReferenceInput';
+
+    const schemaTypeLabel = document.createElement('label');
+    schemaTypeLabel.innerText = 'Type:';
+    const schemaTypeInput = document.createElement('input');
+    schemaTypeInput.type = 'text';
+    schemaTypeInput.id = 'schemaTypeInput';
+
+    const schemaFormatLabel = document.createElement('label');
+    schemaFormatLabel.innerText = 'Format:';
+    const schemaFormatInput = document.createElement('input');
+    schemaFormatInput.type = 'text';
+    schemaFormatInput.id = 'schemaFormatInput';
+
+    const schemaTitle = document.createElement('h3');
+    schemaTitle.innerText = "Schema"
+
+    createSchemaDiv.appendChild(schemaTitle);
+    createSchemaDiv.appendChild(schemaReferenceLabel);
+    createSchemaDiv.appendChild(schemaReferenceInput);
+    createSchemaDiv.appendChild(document.createElement('br'));
+    createSchemaDiv.appendChild(schemaTypeLabel);
+    createSchemaDiv.appendChild(schemaTypeInput);
+    createSchemaDiv.appendChild(document.createElement('br'));
+    createSchemaDiv.appendChild(schemaFormatLabel);
+    createSchemaDiv.appendChild(schemaFormatInput);
+
+    return createSchemaDiv;
+}
+
+function createContentSection() {
+
+    const createContentDiv = document.createElement('div');
+    createContentDiv.className = 'form-section';
+
+    const contentTypeLabel = document.createElement('label');
+    contentTypeLabel.innerText = 'Type:';
+    const contentTypeInput = document.createElement('input');
+    contentTypeInput.type = 'text';
+    contentTypeInput.id = 'contentTypeInput';
+
+    // Schema section -------------
+    const createSchemaDiv = createSchemaSection();
+
+    const contentTitle = document.createElement('h3');
+    contentTitle.innerText = "Content"
+
+    createContentDiv.appendChild(contentTitle);
+    createContentDiv.appendChild(contentTypeLabel);
+    createContentDiv.appendChild(contentTypeInput);
+    createContentDiv.appendChild(createSchemaDiv);
+
+    return createContentDiv
+}
+
+function buildFormSectionDiv(){
+    const div = document.createElement('div');
+    div.className = 'form-section';
+    div.id = 'build-info-dialog';
+    return div
+}
+
+
+// FUNZIONI DI GESTIONE ------------------------------------------------------------------------------------------------
+
+function buildParameters() {
+    // Svuoto il div contenitore
+    $('#operation-dialog-container').empty();
     const operationId = window.operationOpened;
 
     // Creazione della dialog
     const dialog = document.createElement('div');
-    dialog.className = 'dialog';
+    dialog.className = 'operation-dialog';
 
+    // creazione del div per contenere il form di creazione
+    const createResponseDiv = buildFormSectionDiv()
+
+    // creazione di tutti i campi del form
+    const nameLabel = document.createElement('label');
+    nameLabel.innerText = 'Name:';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    const descriptionLabel = document.createElement('label');
+    descriptionLabel.innerText = 'Description:';
+    const descriptionInput = document.createElement('input');
+    descriptionInput.type = 'text';
+    const intypeLabel = document.createElement('label');
+    intypeLabel.innerText = 'In:';
+    const intypeInput = document.createElement('input');
+    intypeInput.type = 'text';
+    const requiredLabel = document.createElement('label');
+    requiredLabel.innerText = 'Required:';
+    const requiredInput = document.createElement('input');
+    requiredInput.type = 'text';
+    const allowEmptyLabel = document.createElement('label');
+    allowEmptyLabel.innerText = 'AllowEmpty:';
+    const allowEmptyInput = document.createElement('input');
+    allowEmptyInput.type = 'text';
+
+    const jsonView = document.createElement('div');
+    jsonView.id = 'jsonView'
+
+    // Schema section
+    const createSchemaDiv = createSchemaSection();
+
+    // Bottone di salvataggio
+    const saveButton = document.createElement('button');
+    saveButton.innerText = 'Save parameter';
+    saveButton.onclick = function () {
+        const par = new Parameter();
+        par.description = descriptionInput.value;
+        par.name = nameInput.value;
+        par.required = requiredInput.value;
+        par.allowEmptyValue = allowEmptyInput.value;
+        par.intype = intypeInput.value;
+        par.schema.type = document.getElementById('schemaTypeInput').value;
+        par.schema.reference = document.getElementById('schemaReferenceInput').value;
+        par.schema.format = document.getElementById('schemaFormatInput').value;
+        window.operKeyJSONMap.get(operationId).parameters.push(par);
+        document.getElementById('operation-dialog-container').removeChild(dialog);
+        hideMainDialog()
+    };
+
+    // Creazione del titolo della form
+    const title = document.createElement('h2');
+    title.innerText = "New parameter"
+    createResponseDiv.appendChild(title);
+
+    // Aggiunta di tutti gli elementi al form
+    createResponseDiv.appendChild(nameLabel);
+    createResponseDiv.appendChild(nameInput);
+    createResponseDiv.appendChild(document.createElement('br'));
+    createResponseDiv.appendChild(intypeLabel);
+    createResponseDiv.appendChild(intypeInput);
+    createResponseDiv.appendChild(document.createElement('br'));
+    createResponseDiv.appendChild(descriptionLabel);
+    createResponseDiv.appendChild(descriptionInput);
+    createResponseDiv.appendChild(document.createElement('br'));
+    createResponseDiv.appendChild(requiredLabel);
+    createResponseDiv.appendChild(requiredInput);
+    createResponseDiv.appendChild(document.createElement('br'));
+    createResponseDiv.appendChild(allowEmptyLabel);
+    createResponseDiv.appendChild(allowEmptyInput);
+    createResponseDiv.appendChild(document.createElement('br'));
+    createResponseDiv.appendChild(jsonView);
+    createResponseDiv.appendChild(document.createElement('br'));
+    createResponseDiv.appendChild(createSchemaDiv);
+    createResponseDiv.appendChild(document.createElement('br'));
+    createResponseDiv.appendChild(saveButton);
+    dialog.appendChild(createResponseDiv);
+
+    // se l'operazione ha già dei parametri li mostro
+    if (window.operKeyJSONMap.has(operationId) && window.operKeyJSONMap.get(operationId).parameters.length > 0) {
+        const paramsCreated = document.createElement('div');
+        paramsCreated.className = 'form-section';
+        paramsCreated.id = 'json-view';
+        const title = document.createElement('h2');
+        title.innerText = "Current parameters"
+        paramsCreated.appendChild(title);
+
+        window.operKeyJSONMap.get(operationId).parameters.forEach(par => {
+            const responseButton = document.createElement('button');
+            responseButton.innerText = `${par.name}`;
+            responseButton.onclick = function () {
+                showCreatedJsonDialog(par);
+            };
+            paramsCreated.appendChild(responseButton);
+        })
+        dialog.appendChild(paramsCreated)
+    }
+
+    // Aggiunta della dialog
+    document.getElementById('operation-dialog-container').appendChild(dialog);
+    showMainDialog()
+}
+
+function buildRequest() {
+    // Svuoto il div contenitore
+    $('#operation-dialog-container').empty();
+    const operationId = window.operationOpened;
+
+    // Creazione della dialog
+    const dialog = document.createElement('div');
+    dialog.className = 'operation-dialog';
+
+    // creazione del div per creare una nuova richiesta o mostrare il json
+    const createResponseDiv = buildFormSectionDiv()
+
+    // se c'è già una request body la mostro
+    if (window.operKeyJSONMap.has(operationId) && window.operKeyJSONMap.get(operationId).requestBody != null && !isObjectEmpty(window.operKeyJSONMap.get(operationId).requestBody)) {
+        const title = document.createElement('h2');
+        title.innerText = "Request Body"
+        createResponseDiv.appendChild(title)
+
+        const jsonView = document.createElement('pre');
+        jsonView.innerText = JSON.stringify(window.operKeyJSONMap.get(operationId).requestBody, null, 2);
+        createResponseDiv.appendChild(jsonView);
+
+        dialog.appendChild(createResponseDiv);
+    }
+    // altrimenti genero il form di creazione
+    else {
+
+        // crazione di tutti i campi del form
+        const descriptionLabel = document.createElement('label');
+        descriptionLabel.innerText = 'Description:';
+        const descriptionInput = document.createElement('input');
+        descriptionInput.type = 'text';
+        const requiredLabel = document.createElement('label');
+        requiredLabel.innerText = 'Required:';
+        const requiredInput = document.createElement('input');
+        requiredInput.type = 'text';
+
+
+        const jsonView = document.createElement('div');
+        jsonView.id = 'jsonView'
+
+        // Content section
+        const createContentDiv = createContentSection();
+
+        // Bottone di salvataggio
+        const saveButton = document.createElement('button');
+        saveButton.innerText = 'Save RequestBody';
+        saveButton.onclick = function () {
+            const request = new RequestBody();
+            request.required = requiredInput.value;
+            request.description = descriptionInput.value;
+            request.content.type = document.getElementById('contentTypeInput').value;
+            const schema = new Schema()
+            schema.type = document.getElementById('schemaTypeInput').value;
+            schema.reference = document.getElementById('schemaReferenceInput').value;
+            schema.format = document.getElementById('schemaFormatInput').value;
+            request.content.schema = schema
+            window.operKeyJSONMap.get(operationId).requestBody = request;
+            document.getElementById('operation-dialog-container').removeChild(dialog);
+            hideMainDialog()
+        };
+
+        // Creazione del titolo della form
+        const title = document.createElement('h2');
+        title.innerText = "New RequestBody"
+        createResponseDiv.appendChild(title);
+
+        // Aggiunta di tutti gli elementi al form
+        createResponseDiv.appendChild(descriptionLabel);
+        createResponseDiv.appendChild(descriptionInput);
+        createResponseDiv.appendChild(document.createElement('br'));
+        createResponseDiv.appendChild(requiredLabel);
+        createResponseDiv.appendChild(requiredInput);
+        createResponseDiv.appendChild(document.createElement('br'));
+        createResponseDiv.appendChild(jsonView);
+        createResponseDiv.appendChild(document.createElement('br'));
+        createResponseDiv.appendChild(createContentDiv);
+        createResponseDiv.appendChild(document.createElement('br'));
+        createResponseDiv.appendChild(saveButton);
+        dialog.appendChild(createResponseDiv);
+    }
+
+    // Aggiunta della dialog
+    document.getElementById('operation-dialog-container').appendChild(dialog);
+    showMainDialog()
+}
+
+function buildResponses() {
+    // Svuoto il div contenitore
+    $('#operation-dialog-container').empty();
+    const operationId = window.operationOpened;
+
+    // Creazione della dialog
+    const dialog = document.createElement('div');
+    dialog.className = 'operation-dialog';
+
+    // creazione del div per contenere il form di creazione
+    const createResponseDiv = buildFormSectionDiv()
+
+    // creazione di tutti i campi del form
+    const statusCodeLabel = document.createElement('label');
+    statusCodeLabel.innerText = 'Status Code:';
+    const statusCodeInput = document.createElement('input');
+    statusCodeInput.type = 'number';
+    const descriptionLabel = document.createElement('label');
+    descriptionLabel.innerText = 'Description:';
+    const descriptionInput = document.createElement('input');
+    descriptionInput.type = 'text';
+
+    const jsonView = document.createElement('div');
+    jsonView.id = 'jsonView'
+
+    // Content section
+    const createContentDiv = createContentSection();
+
+    // Bottone di salvataggio
+    const saveButton = document.createElement('button');
+    saveButton.innerText = 'Save Response';
+    saveButton.onclick = function () {
+        const response = new Response();
+        response.statusCode = statusCodeInput.value;
+        response.description = descriptionInput.value;
+        const schema = new Schema()
+        schema.type = document.getElementById('schemaTypeInput').value;
+        schema.reference = document.getElementById('schemaReferenceInput').value;
+        schema.format = document.getElementById('schemaFormatInput').value;
+        response.content.type = document.getElementById('contentTypeInput').value;
+        response.content.schema = schema;
+        window.operKeyJSONMap.get(operationId).responses.push(response);
+        document.getElementById('operation-dialog-container').removeChild(dialog);
+        hideMainDialog()
+    };
+
+    // Creazione del titolo della form
+    const title = document.createElement('h2');
+    title.innerText = "New response"
+    createResponseDiv.appendChild(title);
+
+    // Aggiunta di tutti gli elementi al form
+    createResponseDiv.appendChild(statusCodeLabel);
+    createResponseDiv.appendChild(statusCodeInput);
+    createResponseDiv.appendChild(document.createElement('br'));
+    createResponseDiv.appendChild(descriptionLabel);
+    createResponseDiv.appendChild(descriptionInput);
+    createResponseDiv.appendChild(document.createElement('br'));
+    createResponseDiv.appendChild(jsonView);
+    createResponseDiv.appendChild(document.createElement('br'));
+    createResponseDiv.appendChild(createContentDiv);
+    createResponseDiv.appendChild(document.createElement('br'));
+    createResponseDiv.appendChild(saveButton);
+    dialog.appendChild(createResponseDiv);
+
+    // se l'operazione ha già delle risposte le mostro
+    if (window.operKeyJSONMap.has(operationId) && window.operKeyJSONMap.get(operationId).responses.length > 0) {
+        const paramsCreated = document.createElement('div');
+        paramsCreated.className = 'form-section';
+        paramsCreated.id = 'json-view';
+        const title = document.createElement('h2');
+        title.innerText = "Current responses"
+        paramsCreated.appendChild(title);
+
+        window.operKeyJSONMap.get(operationId).responses.forEach(response => {
+            const responseButton = document.createElement('button');
+            responseButton.innerText = `${response.statusCode}`;
+            responseButton.onclick = function () {
+                showCreatedJsonDialog(response);
+            };
+
+            paramsCreated.appendChild(responseButton);
+        })
+        dialog.appendChild(paramsCreated)
+    }
+
+    // Aggiunta della dialog
+    document.getElementById('operation-dialog-container').appendChild(dialog);
+    showMainDialog()
+}
+
+function associateNewTag() {
+    // Svuoto il div contenitore
+    $('#operation-dialog-container').empty();
+    const operationId = window.operationOpened;
+
+    // Creazione della dialog
+    const dialog = document.createElement('div');
+    dialog.className = 'operation-dialog';
+
+    // creazione del div per inserire la select
+    const createResponseDiv = buildFormSectionDiv()
 
     // itero su tutti i tag creti per renderli disponibili
     window.tagKeyDescMap.forEach((data, value) => {
@@ -36,19 +462,14 @@ function associateNewTag() {
 
         const label = document.createElement('label');
         label.htmlFor = value;
+        label.className = 'checkbox-label'
         label.appendChild(document.createTextNode(value));
 
-        dialog.appendChild(checkbox);
-        dialog.appendChild(label);
-        dialog.appendChild(document.createElement('br'));
+        createResponseDiv.appendChild(label);
+        createResponseDiv.appendChild(checkbox);
+        createResponseDiv.appendChild(document.createElement('br'));
     });
 
-    // Creazione dei pulsanti Chiudi e Salva
-    const closeButton = document.createElement('button');
-    closeButton.innerText = 'Chiudi';
-    closeButton.onclick = function () {
-        document.body.removeChild(dialog);
-    };
 
     const saveButton = document.createElement('button');
     saveButton.innerText = 'Salva';
@@ -66,486 +487,21 @@ function associateNewTag() {
                     }
                 }
             });
-            document.body.removeChild(dialog);
         }
-        else {
-            document.body.removeChild(dialog);
-        }
+        document.getElementById('operation-dialog-container').removeChild(dialog);
+        hideMainDialog()
     };
 
-    dialog.appendChild(closeButton);
-    dialog.appendChild(saveButton);
-
-    // Aggiunta della dialog al corpo del documento
-    document.body.appendChild(dialog);
-}
-
-
-// Funzione per aprire la dialog con JSON della risposta
-function showResponseDialog(elementToStringify) {
-    const responseDialog = document.createElement('div');
-    responseDialog.className = 'response-dialog';
-
-    const closeButton = document.createElement('button');
-    closeButton.innerText = 'Chiudi';
-    closeButton.onclick = function () {
-        document.body.removeChild(responseDialog);
-    };
-
-    const jsonView = document.createElement('pre');
-    jsonView.innerText = JSON.stringify(elementToStringify, null, 2);
-
-    responseDialog.appendChild(jsonView);
-    responseDialog.appendChild(closeButton);
-
-    document.body.appendChild(responseDialog);
-}
-
-function buildResponses() {
-
-    currentContent = null;
-    const operationId = window.operationOpened;
-
-    // Creazione della dialog
-    const dialog = document.createElement('div');
-    dialog.className = 'dialog';
-
-
-    // creazione del div per creare una nuova risposta
-    const createResponseDiv = document.createElement('div');
-    createResponseDiv.className = 'create-response';
-
-    const statusCodeLabel = document.createElement('label');
-    statusCodeLabel.innerText = 'Status Code:';
-    const statusCodeInput = document.createElement('input');
-    statusCodeInput.type = 'number';
-
-    const descriptionLabel = document.createElement('label');
-    descriptionLabel.innerText = 'Description:';
-    const descriptionInput = document.createElement('input');
-    descriptionInput.type = 'text';
-
-    const jsonView = document.createElement('div');
-    jsonView.id = 'jsonView'
-
-
-
-    const addContentButton = document.createElement('button');
-    addContentButton.id = 'addContentBtn'
-    addContentButton.innerText = 'Aggiungi Content';
-    addContentButton.onclick = function () {
-        if (isEmptyString(statusCodeInput.value)) {
-            alert("Necessario valorizzare lo status code")
-        }
-        else {
-            showContentDialog();
-        }
-    };
-
-
-
-    const saveButton = document.createElement('button');
-    saveButton.innerText = 'Salva Risposta';
-    saveButton.onclick = function () {
-        const response = new Response();
-        response.statusCode = statusCodeInput.value;
-        response.description = descriptionInput.value;
-        response.content = currentContent;
-        window.operKeyJSONMap.get(operationId).responses.push(response);
-        document.body.removeChild(dialog);
-    };
-
-    createResponseDiv.appendChild(statusCodeLabel);
-    createResponseDiv.appendChild(statusCodeInput);
-    createResponseDiv.appendChild(document.createElement('br'));
-    createResponseDiv.appendChild(descriptionLabel);
-    createResponseDiv.appendChild(descriptionInput);
-    createResponseDiv.appendChild(document.createElement('br'));
-    createResponseDiv.appendChild(addContentButton);
-    createResponseDiv.appendChild(document.createElement('br'));
-    createResponseDiv.appendChild(jsonView);
-    createResponseDiv.appendChild(document.createElement('br'));
-    createResponseDiv.appendChild(saveButton);
+    createResponseDiv.appendChild(saveButton)
     dialog.appendChild(createResponseDiv);
 
-
-    if (window.operKeyJSONMap.has(operationId) && window.operKeyJSONMap.get(operationId).responses.length > 0) {
-        const title = document.createElement('h2');
-        title.innerText = "Risposte create"
-        dialog.appendChild(title);
-
-        window.operKeyJSONMap.get(operationId).responses.forEach(response => {
-            const responseButton = document.createElement('button');
-            responseButton.innerText = `${response.statusCode}`;
-            responseButton.onclick = function () {
-                showResponseDialog(response);
-            };
-
-            dialog.appendChild(responseButton);
-        })
-    }
-
-
-    // Creazione dei pulsanti Chiudi e Salva
-    const closeButton = document.createElement('button');
-    closeButton.innerText = 'Chiudi';
-    closeButton.onclick = function () {
-        document.body.removeChild(dialog);
-    };
-
-    dialog.appendChild(closeButton);
-
-    // Aggiunta della dialog al corpo del documento
-    document.body.appendChild(dialog);
-}
-
-function buildParameters() {
-
-    currentContent = null;
-    const operationId = window.operationOpened;
-
-    // Creazione della dialog
-    const dialog = document.createElement('div');
-    dialog.className = 'dialog';
-
-
-    // creazione del div per creare una nuova risposta
-    const createResponseDiv = document.createElement('div');
-    createResponseDiv.className = 'create-params';
-
-    const nameLabel = document.createElement('label');
-    nameLabel.innerText = 'Name:';
-    const nameInput = document.createElement('input');
-    nameInput.type = 'text';
-
-    const descriptionLabel = document.createElement('label');
-    descriptionLabel.innerText = 'Description:';
-    const descriptionInput = document.createElement('input');
-    descriptionInput.type = 'text';
-
-    const intypeLabel = document.createElement('label');
-    intypeLabel.innerText = 'In:';
-    const intypeInput = document.createElement('input');
-    intypeInput.type = 'text';
-
-    const requiredLabel = document.createElement('label');
-    requiredLabel.innerText = 'Required:';
-    const requiredInput = document.createElement('input');
-    requiredInput.type = 'text';
-
-    const allowEmptyLabel = document.createElement('label');
-    allowEmptyLabel.innerText = 'AllowEmpty:';
-    const allowEmptyInput = document.createElement('input');
-    allowEmptyInput.type = 'text';
-
-    const jsonView = document.createElement('div');
-    jsonView.id = 'jsonView'
-
-
-
-    const addSchemaButton = document.createElement('button');
-    addSchemaButton.id = 'addContentBtn'
-    addSchemaButton.innerText = 'Aggiungi Schema';
-    addSchemaButton.onclick = function () {
-        showSchemaDialog();
-    };
-
-
-
-    const saveButton = document.createElement('button');
-    saveButton.innerText = 'Salva Parametro';
-    saveButton.onclick = function () {
-        const par = new Parameter();
-        par.description = descriptionInput.value;
-        par.name = nameInput.value;
-        par.required = requiredInput.value;
-        par.allowEmptyValue = allowEmptyInput.value;
-        par.intype = intypeInput.value;
-        par.content = currentContent;
-        window.operKeyJSONMap.get(operationId).parameters.push(par);
-        document.body.removeChild(dialog);
-    };
-
-    createResponseDiv.appendChild(nameLabel);
-    createResponseDiv.appendChild(nameInput);
-    createResponseDiv.appendChild(document.createElement('br'));
-    createResponseDiv.appendChild(intypeLabel);
-    createResponseDiv.appendChild(intypeInput);
-    createResponseDiv.appendChild(document.createElement('br'));
-    createResponseDiv.appendChild(descriptionLabel);
-    createResponseDiv.appendChild(descriptionInput);
-    createResponseDiv.appendChild(document.createElement('br'));
-    createResponseDiv.appendChild(requiredLabel);
-    createResponseDiv.appendChild(requiredInput);
-    createResponseDiv.appendChild(document.createElement('br'));
-    createResponseDiv.appendChild(allowEmptyLabel);
-    createResponseDiv.appendChild(allowEmptyInput);
-    createResponseDiv.appendChild(document.createElement('br'));
-    createResponseDiv.appendChild(addSchemaButton);
-    createResponseDiv.appendChild(document.createElement('br'));
-    createResponseDiv.appendChild(jsonView);
-    createResponseDiv.appendChild(document.createElement('br'));
-    createResponseDiv.appendChild(saveButton);
-    dialog.appendChild(createResponseDiv);
-
-
-    if (window.operKeyJSONMap.has(operationId) && window.operKeyJSONMap.get(operationId).parameters.length > 0) {
-        const title = document.createElement('h2');
-        title.innerText = "Parametri creati"
-        dialog.appendChild(title);
-
-        window.operKeyJSONMap.get(operationId).parameters.forEach(par => {
-            const responseButton = document.createElement('button');
-            responseButton.innerText = `${par.name}`;
-            responseButton.onclick = function () {
-                showResponseDialog(par);
-            };
-
-            dialog.appendChild(responseButton);
-        })
-    }
-
-
-    // Creazione dei pulsanti Chiudi e Salva
-    const closeButton = document.createElement('button');
-    closeButton.innerText = 'Chiudi';
-    closeButton.onclick = function () {
-        document.body.removeChild(dialog);
-    };
-
-    dialog.appendChild(closeButton);
-
-    // Aggiunta della dialog al corpo del documento
-    document.body.appendChild(dialog);
+    // Aggiunta della dialog
+    document.getElementById('operation-dialog-container').appendChild(dialog);
+    showMainDialog()
 }
 
 
-function buildRequest() {
-
-    currentContent = null;
-    const operationId = window.operationOpened;
-
-    // Creazione della dialog
-    const dialog = document.createElement('div');
-    dialog.className = 'dialog';
-
-    if (window.operKeyJSONMap.has(operationId) && window.operKeyJSONMap.get(operationId).requestBody != null && !isObjectEmpty(window.operKeyJSONMap.get(operationId).requestBody)) {
-        const title = document.createElement('h2');
-        title.innerText = "Request Body"
-        dialog.appendChild(title);
-
-
-        const jsonView = document.createElement('pre');
-        jsonView.innerText = JSON.stringify(window.operKeyJSONMap.get(operationId).requestBody, null, 2);
-
-        dialog.appendChild(jsonView);
-    }
-    else {
-        // creazione del div per creare una nuova risposta
-        const createResponseDiv = document.createElement('div');
-        createResponseDiv.className = 'create-request';
-
-        const descriptionLabel = document.createElement('label');
-        descriptionLabel.innerText = 'Description:';
-        const descriptionInput = document.createElement('input');
-        descriptionInput.type = 'text';
-
-        const requiredLabel = document.createElement('label');
-        requiredLabel.innerText = 'Required:';
-        const requiredInput = document.createElement('input');
-        requiredInput.type = 'text';
-
-
-        const jsonView = document.createElement('div');
-        jsonView.id = 'jsonView'
-
-        const addContentButton = document.createElement('button');
-        addContentButton.id = 'addContentBtn'
-        addContentButton.innerText = 'Aggiungi Content';
-        addContentButton.onclick = function () {
-            showContentDialog();
-        };
-
-
-
-        const saveButton = document.createElement('button');
-        saveButton.innerText = 'Salva Request Body';
-        saveButton.onclick = function () {
-            const request = new RequestBody();
-            request.required = requiredLabel.value;
-            request.description = descriptionInput.value;
-            request.content = currentContent;
-            window.operKeyJSONMap.get(operationId).requestBody = request;
-            document.body.removeChild(dialog);
-        };
-
-
-        createResponseDiv.appendChild(descriptionLabel);
-        createResponseDiv.appendChild(descriptionInput);
-        createResponseDiv.appendChild(document.createElement('br'));
-        createResponseDiv.appendChild(requiredLabel);
-        createResponseDiv.appendChild(requiredInput);
-        createResponseDiv.appendChild(document.createElement('br'));
-        createResponseDiv.appendChild(addContentButton);
-        createResponseDiv.appendChild(document.createElement('br'));
-        createResponseDiv.appendChild(jsonView);
-        createResponseDiv.appendChild(document.createElement('br'));
-        createResponseDiv.appendChild(saveButton);
-        dialog.appendChild(createResponseDiv);
-
-
-        if (window.operKeyJSONMap.has(operationId) && window.operKeyJSONMap.get(operationId).requestBody != null && window.operKeyJSONMap.get(operationId).requestBody !== {}) {
-            const title = document.createElement('h2');
-            title.innerText = "Request Body"
-            dialog.appendChild(title);
-
-            showResponseDialog(window.operKeyJSONMap.get(operationId).requestBody);
-        }
-    }
-    // Creazione dei pulsanti Chiudi e Salva
-    const closeButton = document.createElement('button');
-    closeButton.innerText = 'Chiudi';
-    closeButton.onclick = function () {
-        document.body.removeChild(dialog);
-    };
-
-    dialog.appendChild(closeButton);
-    // Aggiunta della dialog al corpo del documento
-    document.body.appendChild(dialog);
-}
-
-// Funzione per aprire la dialog con JSON del content
-function showContentDialog() {
-    const contentDialog = document.createElement('div');
-    contentDialog.className = 'content-dialog';
-
-    const typeLabel = document.createElement('label');
-    typeLabel.innerText = 'Type:';
-    const typeInput = document.createElement('input');
-    typeInput.type = 'text';
-
-    const schemaReferenceLabel = document.createElement('label');
-    schemaReferenceLabel.innerText = 'Schema Reference:';
-    const schemaReferenceInput = document.createElement('input');
-    schemaReferenceInput.type = 'text';
-
-    const schemaTypeLabel = document.createElement('label');
-    schemaTypeLabel.innerText = 'Schema Type:';
-    const schemaTypeInput = document.createElement('input');
-    schemaTypeInput.type = 'text';
-
-    const schemaFormatLabel = document.createElement('label');
-    schemaFormatLabel.innerText = 'Schema Format:';
-    const schemaFormatInput = document.createElement('input');
-    schemaFormatInput.type = 'text';
-
-    const saveContentButton = document.createElement('button');
-    saveContentButton.innerText = 'Salva Content';
-    saveContentButton.onclick = function () {
-        const c = new Content();
-        c.type = typeInput.value;
-        const s = new Schema();
-        s.type = schemaTypeInput.value;
-        s.format = schemaFormatInput.value;
-        s.reference = schemaReferenceInput.value;
-        c.schema = s;
-        currentContent = c
-
-        const jsonView = document.getElementById('jsonView');
-        emptyDiv('jsonView')
-        const jsonViewN = document.createElement('pre');
-        jsonViewN.innerText = JSON.stringify(c, null, 2);
-        jsonView.appendChild(jsonViewN);
-        document.body.removeChild(contentDialog);
-        hideDisplayBlockElement('addContentBtn')
-    };
-
-    contentDialog.appendChild(typeLabel);
-    contentDialog.appendChild(typeInput);
-    contentDialog.appendChild(document.createElement('br'));
-    contentDialog.appendChild(schemaReferenceLabel);
-    contentDialog.appendChild(schemaReferenceInput);
-    contentDialog.appendChild(document.createElement('br'));
-    contentDialog.appendChild(schemaTypeLabel);
-    contentDialog.appendChild(schemaTypeInput);
-    contentDialog.appendChild(document.createElement('br'));
-    contentDialog.appendChild(schemaFormatLabel);
-    contentDialog.appendChild(schemaFormatInput);
-    contentDialog.appendChild(document.createElement('br'));
-    contentDialog.appendChild(saveContentButton);
-
-    const closeButton = document.createElement('button');
-    closeButton.innerText = 'Chiudi';
-    closeButton.onclick = function () {
-        document.body.removeChild(contentDialog);
-    };
-
-    contentDialog.appendChild(closeButton);
-
-    document.body.appendChild(contentDialog);
-}
-
-
-function showSchemaDialog() {
-    const contentDialog = document.createElement('div');
-    contentDialog.className = 'content-dialog';
-
-    const schemaReferenceLabel = document.createElement('label');
-    schemaReferenceLabel.innerText = 'Schema Reference:';
-    const schemaReferenceInput = document.createElement('input');
-    schemaReferenceInput.type = 'text';
-
-    const schemaTypeLabel = document.createElement('label');
-    schemaTypeLabel.innerText = 'Schema Type:';
-    const schemaTypeInput = document.createElement('input');
-    schemaTypeInput.type = 'text';
-
-    const schemaFormatLabel = document.createElement('label');
-    schemaFormatLabel.innerText = 'Schema Format:';
-    const schemaFormatInput = document.createElement('input');
-    schemaFormatInput.type = 'text';
-
-    const saveContentButton = document.createElement('button');
-    saveContentButton.innerText = 'Salva Content';
-    saveContentButton.onclick = function () {
-
-        const s = new Schema();
-        s.type = schemaTypeInput.value;
-        s.format = schemaFormatInput.value;
-        s.reference = schemaReferenceInput.value;
-
-        currentContent = s
-
-        const jsonView = document.getElementById('jsonView');
-        emptyDiv('jsonView')
-        const jsonViewN = document.createElement('pre');
-        jsonViewN.innerText = JSON.stringify(s, null, 2);
-        jsonView.appendChild(jsonViewN);
-        document.body.removeChild(contentDialog);
-        hideDisplayBlockElement('addContentBtn')
-    };
-
-    contentDialog.appendChild(schemaReferenceLabel);
-    contentDialog.appendChild(schemaReferenceInput);
-    contentDialog.appendChild(document.createElement('br'));
-    contentDialog.appendChild(schemaTypeLabel);
-    contentDialog.appendChild(schemaTypeInput);
-    contentDialog.appendChild(document.createElement('br'));
-    contentDialog.appendChild(schemaFormatLabel);
-    contentDialog.appendChild(schemaFormatInput);
-    contentDialog.appendChild(document.createElement('br'));
-    contentDialog.appendChild(saveContentButton);
-
-    const closeButton = document.createElement('button');
-    closeButton.innerText = 'Chiudi';
-    closeButton.onclick = function () {
-        document.body.removeChild(contentDialog);
-    };
-
-    contentDialog.appendChild(closeButton);
-
-    document.body.appendChild(contentDialog);
-}
+// FUNZIONI PER SETTARE I CAMPI TESTUALI E LA SELECT
 
 function setOperationMethod(method) {
     window.operKeyJSONMap.get(window.operationOpened).method = method;

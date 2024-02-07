@@ -1,0 +1,143 @@
+.form-section {
+    border: 1px solid #ccc;
+    padding: 10px;
+    padding-top: 0 !important;
+    margin-bottom: 20px;
+    background-color: #F5F7FA6E;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-section button {
+    padding: 9px 18px;
+    font-size: 17px;
+    background-color: rgba(119, 248, 83, 0.52);
+    color: black;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+    margin-left: 3px;
+}
+.form-section button:hover {
+    background-color: rgba(119, 248, 83, 0.88);
+}
+
+.external-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+}
+
+.form-section {
+    flex-grow: 1;
+    margin-right: 13px;
+}
+
+.inner-title-span {
+    font-size: 20px;
+    font-style: italic;
+    color: darkslategray;
+}
+
+.form-section input[type="number"]{
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.form-section input[type="text"]{
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.form-section input[type="checkbox"]{
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.form-section label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-section .checkbox-label {
+    display: unset !important;
+}
+
+.valueBtnList button {
+    padding: 5px 10px;
+    font-size: 13px;
+    background-color: rgba(195, 210, 243, 0.42);
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+    margin-left: 3px;
+}
+
+.form-section button:hover {
+    background-color: rgba(195, 210, 243, 0.82);
+}
+
+.valueBtnList {
+    margin-top: 20px;
+}
+
+select {
+    padding: 7px;
+    font-size: 13px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    margin-bottom: 10px;
+}
+
+.dialog {
+    width: 50%;
+    height: fit-content;
+    max-height: 80%; /* Altezza massima desiderata per il div */
+    overflow-y: auto; /* Abilita lo scrolling verticale quando necessario */
+}
+
+#operation-dialog-container {
+    flex-grow: 1;
+}
+
+#operation-dialog-container  .operation-dialog{
+    flex-grow: 1;
+    display: flex;
+}
+
+#build-info-dialog {
+    max-height: 50%;
+}
+
+#operation-buttons {
+    margin-top: 15px;
+}
+
+#operation-buttons button {
+    padding: 5px 10px;
+    font-size: 13px;
+    background-color: rgba(241, 178, 104, 0.42);
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+    margin-left: 3px;
+}
+
+#operation-buttons button:hover {
+    background-color: rgba(241, 178, 104, 0.82);
+}

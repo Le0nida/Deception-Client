@@ -47,3 +47,34 @@ class Server {
         this.description = "";
     }
 }
+
+class SecurityScheme {
+    constructor(type, description, name, inValue, scheme, bearerFormat, openIdConnectUrl, flows) {
+        this.type = type;
+        this.description = description;
+        this.name = name;
+        this.in = inValue;
+        this.scheme = scheme;
+        this.bearerFormat = bearerFormat;
+        this.openIdConnectUrl = openIdConnectUrl;
+        this.flows = flows;
+    }
+}
+
+class OAuthFlows {
+    constructor(authorizationCode, implicit, password, clientCredentials) {
+        this.authorizationCode = authorizationCode;
+        this.implicit = implicit;
+        this.password = password;
+        this.clientCredentials = clientCredentials;
+    }
+}
+
+class OAuthFlow {
+    constructor(authorizationUrl, tokenUrl, refreshUrl, scopes) {
+        this.authorizationUrl = authorizationUrl;
+        this.tokenUrl = tokenUrl;
+        this.refreshUrl = refreshUrl;
+        this.scopes = scopes;
+    }
+}

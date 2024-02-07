@@ -10,14 +10,20 @@ window.operKeyJSONMap = new Map(); // mappa con operID come chiave e oggetto Ope
 
 document.addEventListener('DOMContentLoaded', function () {
 
+    $('#continue').click(function () {
+        handleContinueButton()
+    });
+
+    $('#reset').click(function () {
+        window.location.reload()
+    });
+
+    window.tagKeyDescMap.clear();
+    window.pathMap.clear();
+    window.operationsMap.clear();
+    window.operKeyJSONMap.clear();
+
     const confirmCRUD = window.confirm("Do you want to generate CRUD methods for each of the entities defined in the previous step?")
-
-    function initializeTagList() {
-        window.tagKeyDescMap.forEach((data, value) => {
-            addTagButton(value);
-        });
-    }
-
     if (confirmCRUD) {
         const pojos = []
         const allLabels = document.querySelectorAll('p[class="currentPojoElement"]');
@@ -25,17 +31,112 @@ document.addEventListener('DOMContentLoaded', function () {
             pojos.push(p.innerText)
         });
         initializeCRUD(pojos)
+    }
 
+    let confirmLogin = false;
+    const allLabels = document.querySelectorAll('p[class="currentPojoElement"]');
+    allLabels.forEach(p => {
+        if (p.innerText === "User") {
+            confirmLogin = window.confirm("It's the user entity present, do you want to create the login and logout methods?")
+            initializeLoginOut()
+        }
+    });
+
+    if (confirmCRUD || confirmLogin) {
         initializeTagList();
     }
 });
 
-function initializeCRUD(entities) {
+function initializeTagList() {
+    window.tagKeyDescMap.forEach((data, value) => {
+        addTagButton(value);
+    });
+}
 
-    window.tagKeyDescMap.clear();
-    window.pathMap.clear();
-    window.operationsMap.clear();
-    window.operKeyJSONMap.clear();
+function initializeLoginOut() {
+    const tagName = "User";
+    const tagNameLC = tagName.toLowerCase()
+
+    if (!isValueInMapKeys(tagKeyDescMap, tagNameLC)) {
+        // Significa che NON è gia settato il tag User
+        // aggiungo il tag
+        window.tagKeyDescMap.set(tagNameLC, tagName + " management")
+        // aggiungo i paths
+        window.pathMap.set(tagNameLC, [`/${tagNameLC}/login`, `/${tagNameLC}/logout`] )
+    }
+
+    // aggiungo i paths (a quelli già presenti)
+    let userPaths = window.pathMap.get(tagNameLC);
+    userPaths.push(`/${tagNameLC}/login`)
+    userPaths.push(`/${tagNameLC}/logout`)
+
+    // aggiungo le operazioni
+    window.operationsMap.set(`/${tagNameLC}/login`, [`login${tagName}`])
+    window.operationsMap.set(`/${tagNameLC}/logout`, [`logout${tagName}`])
+
+    // LOGIN -----------------
+    const opC = new OpenApiOperation();
+    opC.id = `login${tagName}`
+    opC.description = `Logs the ${tagName} into the system`
+    opC.tags = [ tagNameLC ]
+    opC.method = 'get'
+    opC.summary = `Login for ${tagName}`
+
+    const schema = new Schema();
+    schema.type = "string"
+    const content = new Content();
+    content.type = 'application/json'
+    content.schema = schema;
+
+    // costruzione parametri
+    const param1 = new Parameter();
+    param1.name = 'username'
+    param1.intype = 'query'
+    param1.description = 'The username for login'
+    param1.required = true
+    param1.schema = schema
+    opC.parameters.push(param1)
+
+    const param2 = new Parameter();
+    param2.name = 'password'
+    param2.intype = 'query'
+    param2.description = 'The password for login in clear text'
+    param2.required = true
+    param2.schema = schema
+    opC.parameters.push(param2)
+
+    // costruzione Response
+    const respSuc = new Response();
+    respSuc.statusCode = '200'
+    respSuc.description = 'Successful operation'
+    respSuc.content = content;
+    opC.responses.push(respSuc)
+    const respFail = new Response();
+    respFail.statusCode = '400'
+    respFail.description = 'Invalid username/password supplied'
+    opC.responses.push(respFail)
+
+    window.operKeyJSONMap.set(`login${tagName}`, opC)
+
+
+    // LOGIN -----------------
+    const opR = new OpenApiOperation();
+    opR.id = `logout${tagName}`
+    opR.description = `Logs out current logged in ${tagName} session`
+    opR.tags = [ tagNameLC ]
+    opR.method = 'get'
+    opR.summary = `Logout for ${tagName}`
+
+    // costruzione Response
+    const respDef = new Response();
+    respDef.statusCode = '200'
+    respDef.description = 'Successful operation'
+    opR.responses.push(respDef)
+
+    window.operKeyJSONMap.set(`logout${tagName}`, opR)
+}
+
+function initializeCRUD(entities) {
 
     entities.forEach(ent => {
         const entLC = ent.toLowerCase();
@@ -179,13 +280,18 @@ function initializeCRUD(entities) {
 }
 
 
+// LOGICHE PER LA VISUALIZZAZIONE DELLE VARIE SEZIONI
+
 // Funzione scatenata al click su un tag
 function openTagSection(tagValue) {
     showHiddenElement("tagSection");
     hideShownElement("pathSection");
     hideShownElement("operationSection");
-    document.getElementById('tagSelected').innerText = 'Tag:' + tagValue
+    document.getElementById('tagSelected').innerText = tagValue
     window.tagOpened = tagValue;
+
+    // resetto il valore dei campi
+    document.getElementById('newPath').value = ''
 
     // Devo azzerare e ricreare la lista di path in base al tag
     emptyDiv('pathValues')
@@ -201,8 +307,11 @@ function openTagSection(tagValue) {
 function openPathSection(pathValue) {
     showHiddenElement('pathSection')
     hideShownElement("operationSection");
-    document.getElementById('pathSelected').innerText = 'Path:' + pathValue
+    document.getElementById('pathSelected').innerText = pathValue
     window.pathOpened = pathValue;
+
+    // resetto il valore dei campi
+    document.getElementById('newOperation').value = ''
 
     // Devo azzerare e ricreare la lista di operazioni in base al path
     emptyDiv('operationsValues')
@@ -217,8 +326,13 @@ function openPathSection(pathValue) {
 
 function openOperationSection(operationValue) {
     showHiddenElement('operationSection')
-    document.getElementById('operationSelected').innerText = 'Operation:' + operationValue
+    document.getElementById('operationSelected').innerText = operationValue
     window.operationOpened = operationValue;
+
+    // resetto il valore dei campi
+    document.getElementById('method').value = 'GET'
+    document.getElementById('operationSummary').value = ''
+    document.getElementById('operationDescription').value = ''
 
     // se l'operazione è nuova o non è stata salvata in precedenza (id === '') allora si resetta il valore
     if (window.operKeyJSONMap.get(operationValue) == null || window.operKeyJSONMap.get(operationValue).id === '') {
@@ -237,6 +351,7 @@ function openOperationSection(operationValue) {
 }
 
 
+// AGGIUNTA DI NUOVI ELEMENTI
 
 function addTag() {
 
@@ -304,12 +419,13 @@ function addOperation() {
     newOperationInput.value = '';
 }
 
-// Aggiunge un bottone con il nuovo path appena inserito
+
+// AGGIUNTA DI BOTTONI
+
 function addPathButton(pathValue){
     addButton(pathValue, 'pathValues', openPathSection)
 }
 
-// Aggiunge un bottone con la nuova operation
 function addOperationButton(operationValue){
     addButton(operationValue, 'operationsValues', openOperationSection)
 }

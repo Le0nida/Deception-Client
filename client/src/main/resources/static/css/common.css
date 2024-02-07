@@ -125,13 +125,6 @@ body {
     z-index: 9990; /* Assicura che lo sfondo sia dietro la dialog */
 }
 
-.dialog div{
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Allinea verticalmente al centro */
-    text-align: center; /* Centra orizzontalmente */
-}
-
 .dialog select {
     margin-top: 20px;
     padding: 10px;

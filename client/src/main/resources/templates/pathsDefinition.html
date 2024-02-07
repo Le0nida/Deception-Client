@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Buttons</title>
-    <!-- Includi jQuery -->
+    <title>API Specification</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script th:src="@{/js/utils.js}"></script>
     <script th:src="@{/js/pathsDefinition.js}"></script>
     <script th:src="@{/js/operationBuilder.js}"></script>
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/pathsDefinition.css">
     <style>
         .hidden {
             display: none;
@@ -18,122 +19,135 @@
 </head>
 <body>
 
-
+<!-- data model -->
 <div style="display: none">
-    <h3>List of entities</h3>
     <div th:each="item : ${currentPojoList}">
         <p class="currentPojoElement" th:text="${item}"></p>
     </div>
 </div>
 
-
-<!-- Tags -->
-<div>
-    <h2>Tags</h2>
-
-    <div class="formInputText">
-        <label for="name">Name:</label>
-        <input type="text" id="name" required>
-        <br>
-        <label for="description">Description:</label>
-        <input type="text" id="description">
-        <br>
-        <button onclick="addTag()">Add Tag</button>
+<div class="container">
+    <div class="title">
+        <h1>API Specification</h1>
+        <h3>Definition of paths and their corresponding endpoints</h3>
     </div>
 
-    <!-- Lista di tag -->
-    <div id="tagValues" class="valueBtnList"></div>
+    <div class="button-container">
+        <button id="reset">Reset</button>
+        <button id="continue">Continue</button>
+    </div>
 
-    <div class="nextstepbtn">
-        <button onclick="handleContinueButton()">
-            Continue
-        </button>
+
+
+
+    <div class="external-section">
+        <!-- Tags -->
+        <div class="form-section">
+            <h2>Tags</h2>
+
+            <div class="formInputText">
+                <label for="name">Name:       </label>
+                <input type="text" id="name" required>
+                <br>
+
+                <label for="description">Description:</label>
+                <input type="text" id="description">
+                <br>
+                <button onclick="addTag()">Add Tag</button>
+            </div>
+
+            <!-- Lista di tag -->
+            <div id="tagValues" class="valueBtnList"></div>
+        </div>
+
+
+
+        <!-- Paths -->
+        <div id="tagSection" class="hidden form-section">
+
+            <h2>Paths   <span id="tagSelected" class="inner-title-span"></span></h2>
+
+
+            <div class="formInputText">
+                <label for="newPath">Path:</label>
+                <input type="text" id="newPath">
+                <button onclick="addPath()">Add Path</button>
+            </div>
+
+            <!-- Lista di path -->
+            <div id="pathValues" class="valueBtnList"></div>
+
+        </div>
+
+
+
+        <!-- Operations -->
+        <div id="pathSection" class="hidden form-section">
+
+            <h2>Operations   <span id="pathSelected" class="inner-title-span"></span></h2>
+
+            <div class="formInputText">
+                <label for="newOperation">OperationID:</label>
+                <input type="text" id="newOperation">
+                <button onclick="addOperation()">Add Operation</button>
+            </div>
+
+
+            <!-- Lista di operazioni -->
+            <div id="operationsValues" class="valueBtnList"></div>
+
+
+        </div>
+    </div>
+
+
+
+    <!-- Operation Detail -->
+    <div id="operationSection" class="hidden form-section">
+        <h2>Operation Detail   <span id="operationSelected" class="inner-title-span"></span></h2>
+
+        <div id="apiConfiguration">
+            <label for="method">Method:</label>
+            <select id="method" name="method" onchange="setOperationMethod(this.selectedItem)">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="OPTIONS">OPTIONS</option>
+                <option value="HEAD">HEAD</option>
+                <option value="PATCH">PATCH</option>
+                <option value="TRACE">TRACE</option>
+            </select>
+
+            <br>
+
+            <label for="operationSummary">Summary:</label>
+            <input type="text" id="operationSummary" name="summary" onchange="setOperationSummary(this.value)">
+
+            <br>
+
+            <label for="operationDescription">Description:</label>
+            <input type="text" id="operationDescription" name="description" onchange="setOperationDescription(this.value)">
+
+            <br>
+
+            <div id="operation-buttons">
+                <button id="parameters" onclick="buildParameters()">Parameters</button>
+                <button id="requestBody" onclick="buildRequest()">Request</button>
+                <button id="responses" onclick="buildResponses()">Responses</button>
+                <button id="security" disabled>Security</button>
+                <button id="associatenewtag" onclick="associateNewTag()">Associated Tags</button>
+            </div>
+
+
+            <button onclick="finalSave()">SAVE OPERATION</button>
+
+        </div>
     </div>
 </div>
 
-
-
-<!-- Paths -->
-<div id="tagSection" class="hidden">
-    <hr>
-    <h2>Paths</h2>
-    <h4 id="tagSelected"></h4>
-
-    <div class="formInputText">
-        <label for="newPath">Path:</label>
-        <input type="text" id="newPath">
-        <button onclick="addPath()">Add Path</button>
-    </div>
-
-    <!-- Lista di path -->
-    <div id="pathValues" class="valueBtnList"></div>
-
-</div>
-
-
-
-<!-- Operations -->
-<div id="pathSection" class="hidden">
-    <hr>
-    <h2>Operations</h2>
-    <h4 id="pathSelected"></h4>
-    <div class="formInputText">
-        <label for="newOperation">OperationID:</label>
-        <input type="text" id="newOperation">
-        <button onclick="addOperation()">Add Operation</button>
-    </div>
-
-
-    <!-- Lista di operazioni -->
-    <div id="operationsValues" class="valueBtnList"></div>
-
-
-</div>
-
-
-
-<!-- Operation Detail -->
-<div id="operationSection" class="hidden">
-    <hr>
-    <h2>Operation Detail</h2>
-    <h4 id="operationSelected"></h4>
-
-    <div id="apiConfiguration">
-        <label for="method">Method:</label>
-        <select id="method" name="method" onchange="setOperationMethod(this.selectedItem)">
-            <option value="GET">GET</option>
-            <option value="POST">POST</option>
-            <option value="PUT">PUT</option>
-            <option value="DELETE">DELETE</option>
-            <option value="OPTIONS">OPTIONS</option>
-            <option value="HEAD">HEAD</option>
-            <option value="PATCH">PATCH</option>
-            <option value="TRACE">TRACE</option>
-        </select>
-
-        <br>
-
-        <label for="operationSummary">Summary:</label>
-        <input type="text" id="operationSummary" name="summary" onchange="setOperationSummary(this.value)">
-
-        <br>
-
-        <label for="operationDescription">Description:</label>
-        <input type="text" id="operationDescription" name="description" onchange="setOperationDescription(this.value)">
-
-        <br>
-
-        <button id="parameters" onclick="buildParameters()">Parameters</button>
-        <button id="requestBody" onclick="buildRequest()">Request Body</button>
-        <button id="responses" onclick="buildResponses()">Add Response</button>
-        <button id="security" disabled>Security</button>
-        <button id="associatenewtag" onclick="associateNewTag()">Associate new tag</button>
-
-
-        <button onclick="finalSave()">SAVE OPERATION</button>
-
-    </div>
-</div>
+<div id="page-cover"></div> <!-- Div di copertura -->
+<div id="operation-dialog-container" class="dialog"></div>
 
 </body>
 </html>

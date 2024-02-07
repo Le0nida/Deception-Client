@@ -100,3 +100,10 @@ h2 {
 #addedServers button:hover {
     background-color: rgba(195, 210, 243, 0.52);
 }
+
+.dialog div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Allinea verticalmente al centro */
+    text-align: center; /* Centra orizzontalmente */
+}
