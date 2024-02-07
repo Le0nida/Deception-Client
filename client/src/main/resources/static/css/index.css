@@ -1,28 +1,8 @@
-body {
-    background-color: #e3effc !important;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    display: flex;
-}
 
 #cont{
     display: flex;
 }
 
-.title {
-    max-width: 800px !important;
-    max-height: 160px !important;
-    background-color: rgba(84, 147, 255, 0.18);
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin: 0 auto 40px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Allinea verticalmente al centro */
-    text-align: center; /* Centra orizzontalmente */
-}
 
 .sections {
     display: flex;

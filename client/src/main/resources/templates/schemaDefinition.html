@@ -3,24 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schema Definition</title>
-    <!-- Includi jQuery -->
+    <title>API Specification</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script th:src="@{/js/schemaDefiniton.js}"></script>
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/schemaDefinition.css">
 </head>
 <body>
 
-<h2>Schema Definition</h2>
-<p>
-    Below are the entities that make up the schema at the core of the OpenAPI specification. <br>
-    Select the attributes of interest for each entity and save them. Finally, proceed to the next phase.
-</p>
-<p>
-    <b>WARNING:</b> In this demo version of the application, it is possible to save changes only once per entity.
-</p>
+<div class="container">
+    <div class="title">
+        <h1>API Specification</h1>
+        <h3>Definition of the entities that will constitute the schema</h3>
+    </div>
 
     <div>
+        <p>
+            Below are the entities that make up the schema at the core of the OpenAPI specification.
+            Select the attributes of interest for each entity and save them. Finally, proceed to the next phase.
+        </p>
+        <p>
+            <b>WARNING:</b> In this demo version of the application, it is possible to save changes only once per entity.
+        </p>
+    </div>
+    <div class="button-container">
+        <button id="reset">Reset</button>
+        <button id="continue">Continue</button>
+    </div>
+
+
+    <div class="form-section">
         <h3>List of entities</h3>
+        <p>Before proceeding, it is mandatory to select at least one entity. You must open the details of an entity before being able to select it.</p>
         <div th:each="item : ${checkboxList}">
             <button th:id="${item}" class="checkboxes" onclick="handleLabelClick(this.id, this)">Open</button>
             <input th:id="${item}" type="checkbox" class="pojoparent" disabled/>
@@ -28,12 +42,7 @@
         </div>
     </div>
 
-
-    <div class="nextstepbtn">
-        <button onclick="handleContinueButton()">
-            Continue
-        </button>
-    </div>
-    <div id="rightPanel"></div>
+    <div id="rightPanel" class="form-section" style="display: none"></div>
+</div>
 </body>
 </html>

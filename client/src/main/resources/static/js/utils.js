@@ -44,12 +44,18 @@ function addButton(btnText, containerID, btnFunction){
     const container = document.getElementById(containerID);
     const newButton = document.createElement('button');
     newButton.innerText = btnText;
-    newButton.onclick = function () {
-        resetButtonBackground(container); // Imposta il colore di sfondo predefinito su tutti i bottoni nel container
-        btnFunction(btnText);
-        newButton.style.backgroundColor = 'yellow'
+
+    if (btnFunction === null){
         newButton.disabled = true;
-    };
+    }
+    else {
+        newButton.onclick = function () {
+            resetButtonBackground(container); // Imposta il colore di sfondo predefinito su tutti i bottoni nel container
+            btnFunction(btnText);
+            newButton.style.backgroundColor = 'yellow'
+            newButton.disabled = true;
+        };
+    }
 
     container.appendChild(newButton);
 }

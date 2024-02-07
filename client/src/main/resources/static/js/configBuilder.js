@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (document.getElementById("pojoEdited").innerText === "true") {
         var saveBtn = document.getElementById('saveBtn');
         saveBtn.innerText = 'Schema salvato'
-        saveBtn.style.backgroundColor = 'green'
+        saveBtn.style.backgroundColor = '#919191FF'
         saveBtn.disabled = true;
         alreadySaved = true;
     }
@@ -127,7 +127,7 @@ function handleSaveButtonClick(){
 
             var saveBtn = document.getElementById('saveBtn');
             saveBtn.innerText = 'Schema salvato'
-            saveBtn.style.backgroundColor = 'green'
+            saveBtn.style.backgroundColor = '#919191FF'
             saveBtn.disabled = true;
 
             disableAllCheckbox();

@@ -3,6 +3,7 @@ package cybersec.deception.client.utils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class Utils {
@@ -44,6 +45,14 @@ public class Utils {
         return array == null || array.length == 0;
     }
 
+    public static <T> boolean isNullOrEmpty(List<T> array) {
+        return array == null || array.isEmpty();
+    }
+
+    public static <T> boolean isNullOrEmpty(Map<T, T> array) {
+        return array == null || array.isEmpty();
+    }
+
     public static void removeEmptyStrings(List<String> stringList, String valueToRemove) {
 
         stringList.removeIf(str -> str.equals(valueToRemove));
@@ -53,4 +62,5 @@ public class Utils {
 
         removeEmptyStrings(stringList, "");
     }
+
 }

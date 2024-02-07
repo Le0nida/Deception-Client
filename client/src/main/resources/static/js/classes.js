@@ -13,6 +13,7 @@ class Info {
         this.description = "";
         this.termsOfService = "";
         this.version = "";
+        this.license = new License();
         this.contact = new Contact();
     }
 }

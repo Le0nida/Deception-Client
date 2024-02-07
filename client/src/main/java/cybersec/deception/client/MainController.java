@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cybersec.deception.client.services.EntitiesService;
 import cybersec.deception.client.services.PersistenceService;
+import cybersec.deception.client.utils.Utils;
 import cybersec.deception.model.*;
 import cybersec.deception.client.services.YamlBuilderService;
 import jakarta.servlet.http.HttpSession;
@@ -46,32 +47,42 @@ public class MainController {
         }
     }
 
-    @GetMapping("/")
-    public String homePage(Model model, HttpSession session) {
-
-        String returnPage = loginCheck(model, session, "index");
+    private boolean setPojos(){
         ResponseEntity<Map> response = this.entitiesService.retrieveAllEntities();
-
-        List<String> files = this.persistenceService.retrieveAllFiles((String) session.getAttribute("username"));
-        model.addAttribute("yamlFiles", files);
         if (response.getStatusCode().is2xxSuccessful()) {
             Map<String, String> map = response.getBody();
             pojoMap = map;
             pojoList = map.keySet().stream().toList();
-            return returnPage;
-        } else {
-            return "error";
+            return true;
         }
+        return false;
+    }
+
+    @GetMapping("/")
+    public String homePage(Model model, HttpSession session) {
+        String returnPage = loginCheck(model, session, "index");
+
+        List<String> files = this.persistenceService.retrieveAllYaml((String) session.getAttribute("username"));
+        model.addAttribute("yamlFiles", files);
+
+        boolean boolPojo = setPojos();
+        return boolPojo ? returnPage : "error";
     }
 
     @GetMapping("/schemaDefinition")
     public String schemaDefinition(Model model, HttpSession session) {
+        if (Utils.isNullOrEmpty(pojoList)) {
+            if (!setPojos())
+                return "error";
+        }
         model.addAttribute("checkboxList", pojoList);
         return loginCheck(model, session, "schemaDefinition");
     }
 
     @GetMapping("/specificationInfos")
     public String specificationInfos(Model model, HttpSession session) {
+        List<String> files = this.persistenceService.retrieveAllGeneralInfos((String) session.getAttribute("username"));
+        model.addAttribute("generalInfoFiles", files);
         return loginCheck(model, session, "specificationInfos");
     }
 
@@ -91,7 +102,7 @@ public class MainController {
             }
         }
         model.addAttribute("currentPojoList", currentPojoList);
-        return loginCheck(model, session, "pathDefinition");
+        return loginCheck(model, session, "pathsDefinition");
     }
 
     @PostMapping("/creazioneSpecifica")
@@ -99,7 +110,7 @@ public class MainController {
         String step = (String) requestBody.get("step");
 
         if (step.equals("general")) {
-            if (pojoList != null && !pojoList.isEmpty()) {
+            if (!Utils.isNullOrEmpty(pojoList) || setPojos()) {
                 return loginCheck(model, session, "specificationInfos");
             } else {
                 model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
@@ -141,6 +152,9 @@ public class MainController {
     @GetMapping("/definizionePojo")
     public String showDefinizionePojoPage(@RequestParam(name = "entityName", required = true) String paramName, Model model, HttpSession session) {
         if (paramName != null) {
+            if (Utils.isNullOrEmpty(pojoMap) && !setPojos()) {
+                return "error";
+            }
             if (pojoMap.containsKey(paramName)) {
                 String currentPojoName = "currentPojo" + paramName;
                 model.addAttribute("currentPojoName", currentPojoName);
@@ -160,6 +174,19 @@ public class MainController {
         }
 
         return loginCheck(model, session, "pojoBuilding");
+    }
+
+    @PostMapping("/resetPojos")
+    public String resetPojos(HttpSession session) {
+        Enumeration<String> attributeNames = session.getAttributeNames();
+
+        while (attributeNames.hasMoreElements()) {
+            String attributeName = attributeNames.nextElement();
+            if (attributeName.startsWith("currentPojo")) {
+                session.removeAttribute(attributeName);
+            }
+        }
+        return "schemaDefinition";
     }
 
     @PostMapping("/aggiornaModello")
@@ -225,7 +252,7 @@ public class MainController {
 
     @PostMapping("/selectSchema")
     public ResponseEntity<String> selectSchema(@RequestBody String filename, HttpSession session) {
-        String formattedYaml = this.persistenceService.retrieveFile(filename, (String) session.getAttribute("username"));
+        String formattedYaml = this.persistenceService.retrieveYaml(filename, (String) session.getAttribute("username"));
         session.setAttribute("finalYaml", formattedYaml);
         return ResponseEntity.ok("reviewPage");
     }
@@ -234,7 +261,22 @@ public class MainController {
     public ResponseEntity<String> uploadYamlFile(@RequestBody Map<String, String> data, HttpSession session) {
         String filename = data.get("filename");
         String yaml = data.get("yaml");
-        String response = this.persistenceService.uploadFile(yaml, filename, (String) session.getAttribute("username"));
+        String response = this.persistenceService.uploadYaml(yaml, filename, (String) session.getAttribute("username"));
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/getGeneralInfos")
+    public ResponseEntity<String> getGeneralInfos(@RequestBody String filename, HttpSession session) {
+        String generalInfo = this.persistenceService.retrieveGeneralInfo(filename, (String) session.getAttribute("username"));
+        // session.setAttribute("generalInfo", generalInfo);
+        return ResponseEntity.ok(generalInfo);
+    }
+
+    @PostMapping("/setGeneralInfos")
+    public ResponseEntity<String> setGeneralInfos(@RequestBody Map<String, String> data, HttpSession session) {
+        String filename = data.get("filename");
+        String generalInfo = data.get("generalInfo");
+        String response = this.persistenceService.uploadGeneralInfo(generalInfo, filename, (String) session.getAttribute("username"));
         return ResponseEntity.ok(response);
     }
 

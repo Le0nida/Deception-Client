@@ -1,0 +1,162 @@
+body {
+    background-color: #e3effc !important;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    display: flex;
+}
+
+.title {
+    max-width: 800px !important;
+    max-height: 160px !important;
+    background-color: rgba(84, 147, 255, 0.18);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 0 auto 40px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Allinea verticalmente al centro */
+    text-align: center; /* Centra orizzontalmente */
+}
+
+/* AGGIUNTI PER LE PAGINE NON HOME*/
+.title {
+    max-width: 650px !important;
+    max-height: 60px !important; /* Aumenta l'altezza per evitare sovrapposizioni */
+    padding: 20px !important; /* Aumenta il padding per spaziatura interna */
+}
+
+.title h1 {
+    margin-bottom: 10px; /* Riduci il margine tra h1 e h3 */
+    flex-grow: 1; /* Espandi l'h1 per occupare lo spazio rimanente */
+}
+
+.title h3 {
+    margin-top: 5px; /* Riduci il margine tra h1 e h3 */
+    flex-grow: 1; /* Espandi l'h3 per occupare lo spazio rimanente */
+}
+
+.container {
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.container {
+    width: 80%;
+    height: 100%;
+}
+
+.button-container {
+    display: flex; /* Utilizza il layout Flexbox */
+    justify-content: flex-end; /* Allinea i bottoni alla fine del container */
+    margin-bottom: 20px;
+    margin-right: 20px;
+}
+
+.button-container button{
+    padding: 5px 10px;
+    font-size: 16px;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-right: 5px;
+}
+
+.button-container #continue {
+    background-color: rgba(103, 234, 105, 0.56);
+}
+.button-container #continue:hover {
+    background-color: rgba(103, 234, 105, 0.91);
+}
+
+.button-container #import {
+    background-color: rgba(103, 110, 234, 0.56);
+}
+.button-container #import:hover {
+    background-color: rgba(103, 110, 234, 0.86);
+}
+
+.button-container #save {
+    background-color: rgba(234, 212, 103, 0.56);
+}
+.button-container #save:hover {
+    background-color: rgba(234, 212, 103, 0.85);
+}
+
+.button-container #reset {
+    background-color: rgba(229, 113, 113, 0.56);
+}
+.button-container #rest:hover {
+    background-color: rgba(229, 113, 113, 0.86);
+}
+
+.dialog {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    padding-top: 10px !important;
+}
+
+#page-cover {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Grigio trasparente */
+    z-index: 9990; /* Assicura che lo sfondo sia dietro la dialog */
+}
+
+.dialog-open #page-cover {
+    display: block;
+    z-index: 9990; /* Assicura che lo sfondo sia dietro la dialog */
+}
+
+.dialog div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Allinea verticalmente al centro */
+    text-align: center; /* Centra orizzontalmente */
+}
+
+.dialog select {
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.dialog button {
+    padding: 10px 20px;
+    font-size: 17px;
+    background-color: rgba(195, 210, 243, 0.52);
+    color: black;
+    border: none;
+    border-radius: 2px;
+    cursor: unset;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+    margin-left: 3px;
+}
+
+.dialog button:hover {
+    background-color: rgba(195, 210, 243, 0.90);
+}

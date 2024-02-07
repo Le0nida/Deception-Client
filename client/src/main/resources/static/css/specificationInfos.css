@@ -1,28 +1,45 @@
-/* Stili per la form */
-h1 {
-    text-align: center;
-}
-
-.button-container {
-    text-align: center;
-    margin-bottom: 20px;
-}
 
 #inner-form-section {
     display: flex;
+    margin-top: 20px;
 }
 
-.form-container {
-    width: 50%; /* Imposta la larghezza al 50% per affiancarli */
+#apiSpecForm {
+    display: flex;
+    align-items: stretch; /* Allinea gli elementi verticalmente estendendoli */
+    max-height: min-content;
+}
+
+#serverform {
+    height: 100%; /* Estendi il div fino alla stessa altezza del genitore */
+}
+
+#apiSpecForm .form-section {
+    width: 100%; /* Imposta la larghezza al 50% per affiancarli */
     box-sizing: border-box; /* Assicurati che il padding e il bordo siano inclusi nella larghezza */
     padding: 0 10px; /* Aggiunge spazio tra i form */
 }
 
+.form-container {
+    width: 100%; /* Imposta la larghezza al 50% per affiancarli */
+    box-sizing: border-box; /* Assicurati che il padding e il bordo siano inclusi nella larghezza */
+    padding: 0 10px; /* Aggiunge spazio tra i form */
+
+}
+
+.form-container {
+    flex: 1; /* Imposta la stessa larghezza per entrambi i form-container */
+    display: flex;
+    flex-direction: column;
+}
+
 .form-section {
     border: 1px solid #ccc;
-    border-radius: 5px;
     padding: 10px;
     margin-bottom: 20px;
+    background-color: #F5F7FA6E;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .inner-form-section {
@@ -51,7 +68,7 @@ h1 {
 .form-section button {
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #4CAF50;
+    background-color: rgba(103, 145, 234, 0.56);
     color: white;
     border: none;
     border-radius: 5px;
@@ -60,5 +77,26 @@ h1 {
 }
 
 .form-section button:hover {
-    background-color: #45a049;
+    background-color: rgb(103, 145, 234);
+}
+
+h2 {
+    padding-top: 7px;
+}
+
+#addedServers button {
+    padding: 3px 7px;
+    font-size: 12px;
+    background-color: rgba(195, 210, 243, 0.52);
+    color: black;
+    border: none;
+    border-radius: 2px;
+    cursor: unset;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+    margin-left: 3px;
+}
+
+#addedServers button:hover {
+    background-color: rgba(195, 210, 243, 0.52);
 }

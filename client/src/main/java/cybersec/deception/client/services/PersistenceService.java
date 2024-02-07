@@ -10,19 +10,30 @@ import java.util.List;
 public class PersistenceService {
 
     @Value("${data.yaml.path}")
-    private String yamlDirPath;
+    private String yamlPath;
 
-    private String getYamlFilePath(String filename, String username) {
-        return FileUtils.buildPath(yamlDirPath, FileUtils.buildPath(username, filename+".yaml"));
+    @Value("${data.generalinfo.path}")
+    private String generalInfoPath;
+
+    private String currentDir = "";
+    private String getFilePath(String filename, String username) {
+        String extension = ".txt";
+        if (currentDir.equals(generalInfoPath)) {
+            extension = ".json";
+        }
+        else if (currentDir.equals(yamlPath)) {
+            extension = ".yaml";
+        }
+        return FileUtils.buildPath(currentDir, FileUtils.buildPath(username, filename+extension));
     }
 
-    public String uploadFile(String fileContent, String filename, String username){
+    private String uploadFile(String fileContent, String filename, String username){
 
-        String dirResponse = FileUtils.createDirectoryIfNotExists(FileUtils.buildPath(yamlDirPath, username));
+        String dirResponse = FileUtils.createDirectoryIfNotExists(FileUtils.buildPath(currentDir, username));
         if (dirResponse.equals("Failed to create directory"))
             return dirResponse;
 
-        String filepath = getYamlFilePath(filename, username);
+        String filepath = getFilePath(filename, username);
         String response = FileUtils.createFileIfNotExists(filepath);
 
         if (response.equals("File created successfully")) {
@@ -31,17 +42,50 @@ public class PersistenceService {
         return response;
     }
 
-    public String retrieveFile(String filename,String username){
-        String filepath = getYamlFilePath(filename, username);
+    private String retrieveFile(String filename,String username){
+        String filepath = getFilePath(filename, username);
         return FileUtils.readFile(filepath);
     }
 
-    public List<String> retrieveAllFiles(String username){
-        String dirPath = FileUtils.buildPath(yamlDirPath, username);
+    private List<String> retrieveAllFiles(String username){
+        String dirPath = FileUtils.buildPath(currentDir, username);
         String dirResponse = FileUtils.createDirectoryIfNotExists(dirPath);
         if (dirResponse.equals("Failed to create directory"))
             return null;
 
         return FileUtils.removeFileExtensions(FileUtils.listFiles(dirPath));
+    }
+
+
+    // Metodi pubblici -------------------------------------------------------------------------------------------------
+
+    public List<String> retrieveAllYaml(String username){
+        currentDir = yamlPath;
+        return retrieveAllFiles(username);
+    }
+    
+    public List<String> retrieveAllGeneralInfos(String username){
+        currentDir = generalInfoPath;
+        return retrieveAllFiles(username);
+    }
+    
+    public String retrieveYaml(String filename,String username){
+        currentDir = yamlPath;
+        return retrieveFile(filename, username);
+    }
+
+    public String retrieveGeneralInfo(String filename,String username){
+        currentDir = generalInfoPath;
+        return retrieveFile(filename, username);
+    }
+
+    public String uploadYaml(String fileContent, String filename, String username){
+        currentDir = yamlPath;
+        return uploadFile(fileContent, filename, username);
+    }
+
+    public String uploadGeneralInfo(String fileContent, String filename, String username){
+        currentDir = generalInfoPath;
+        return uploadFile(fileContent, filename, username);
     }
 }

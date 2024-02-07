@@ -1,3 +1,23 @@
+document.addEventListener("DOMContentLoaded", function() {
+    $('#continue').click(function () {
+        handleContinueButton()
+    });
+
+    $('#reset').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: 'resetPojos',
+            success: function (response) {
+                // Gestire la risposta dal server, se necessario
+                window.location.reload()
+            },
+            error: function (error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+});
+
 function visualProcessing(currentLabel, btn) {
 
     // evidenzio l'elemento selezionato
@@ -51,10 +71,13 @@ function handleLabelClick(label, btn) {
         // Rimuove tutto dal pannello destro
         rightPanel.innerHTML = '';
 
+        const h3 = document.createElement('h3');
+        h3.innerText = label
+        rightPanel.appendChild(h3);
+
         const iframe = document.createElement('iframe');
         iframe.src = `./definizionePojo?entityName=${label}`;
         iframe.style.width = '100%';
-        iframe.style.height = '100vh';
 
         rightPanel.appendChild(iframe);
     }
@@ -70,6 +93,11 @@ function handleContinueButton() {
             pojos.push(l.id);
         }
     });
+
+    if (pojos.length === 0) {
+        alert("Necessario selezionare almeno una entità")
+        return;
+    }
 
     // Creare un oggetto con i dati da inviare
     var data = {

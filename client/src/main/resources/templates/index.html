@@ -6,7 +6,7 @@
     <title>Deception Component Generator</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script th:src="@{/js/index.js}"></script>
-    <!-- <style th:src="@{/css/index.css}"></style> -->
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
     <link rel="stylesheet" type="text/css" href="/css/index.css">
 </head>
 <body>
@@ -49,7 +49,7 @@
             <section>
                 <button onclick="selezionaSpecifica()">Select specification</button>
                 <select id="entitySelect" name="entitySelect">
-                    <option value="">Select an entity</option>
+                    <option value="">Select a specification</option>
                     <!-- Utilizza Thymeleaf per iterare sulla lista di entità nel model -->
                     <th:block th:each="entity : ${yamlFiles}">
                         <option th:text="${entity}" th:value="${entity}"></option>

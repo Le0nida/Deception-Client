@@ -1,0 +1,16 @@
+#saveBtn {
+    padding: 6px 12px;
+    font-size: 15px;
+    background-color: rgba(211, 255, 212, 0.42);
+    color: black;
+    border: none;
+    border-radius: 2px;
+    cursor: unset;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+    margin-left: 3px;
+    margin-top: 10px;
+}
+#saveBtn:hover {
+    background-color: rgba(195, 243, 196, 0.92);
+}
