@@ -2,25 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Review Page</title>
-    <!-- Includi jQuery -->
+    <title>API Specification</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.0.0/dist/js-yaml.min.js"></script>
     <script th:src="@{/js/reviewPage.js}"></script>
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/reviewPage.css">
 </head>
 <body>
-    <h2>Review OpenAPI specification</h2>
-    <!-- Pulsante di download -->
-    <a id="downloadButton" download="openApiSpecification.yaml">
-        <button>Download</button>
-    </a>
+   <div class="container">
+       <div class="title">
+           <h1>API Specification</h1>
+           <h3>Review of the created OpenAPI specification</h3>
+       </div>
 
-    <!-- Pulsante di validazione -->
-    <button id="validationButton">Validazione</button>
+       <div class="button-container">
+           <button id="validate">Validate</button>
+           <button id="download">Download</button>
+           <button id="save">Save</button>
+           <button id="generate">Generate Server</button>
+       </div>
 
-    <button id="saveButton">Save</button>
-    <pre id="yamlContent" th:text="${finalYaml}">
+       <div class="form-section">
+           <h2>OpenAPI Specification</h2>
+           <pre id="yamlContent" th:text="${finalYaml}"></pre>
+       </div>
 
-    </pre>
+       <div id="footer">
+           <section>
+               <div><span>Username: </span><span id="username" class="username" th:text="${username}"></span></div>
+               <form th:action="@{/}" method="get">
+                   <input type="submit" value="Home"/>
+               </form>
+           </section>
+       </div>
+   </div>
+
+   <div id="page-cover"></div>
+   <div id="dialogimport" class="dialog">
+       <h2>Server generation</h2>
+       <p>
+           A Spring server will be generated based on the defined OpenAPI specification. A <i>.zip</i> file containing the server project (to allow for modification) and its corresponding <b>Docker image</b> will be provided.
+       </p>
+
+       <p>
+           Additionally, it's possible to define a <b>database</b> upon which the endpoint responses will be based. Only default methods will be automatically implemented for interaction with the database. Other methods will be marked as <i>NOT_IMPLEMENTED</i>, and a list of these will be provided.
+           <br>
+           If no database is used, endpoint responses will be generated randomly.
+       </p>
+
+       <button onclick="generateServer(true)">Generate with DB</button>
+       <button onclick="generateServer(false)">Generate without DB</button>
+   </div>
 </body>
 </html>

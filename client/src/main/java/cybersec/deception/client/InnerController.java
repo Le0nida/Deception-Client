@@ -24,6 +24,15 @@ public class InnerController {
         this.persistenceService = persistenceService;
     }
 
+    // Salva in sessione i tag, con relativi path e operazioni
+    @PostMapping("/generateServer")
+    public ResponseEntity<String> setTags(@RequestBody boolean useDb, HttpSession session) {
+        session.getAttribute("finalYaml");
+
+        // TODO chiamata al server
+
+        return ResponseEntity.ok("reviewPage");
+    }
 
     // Salva in sessione i tag, con relativi path e operazioni
     @PostMapping("/setTags")
@@ -31,8 +40,6 @@ public class InnerController {
         session.setAttribute("tagList", data);
         return ResponseEntity.ok("reviewPage");
     }
-
-
 
     // Import & Save - OpenApi specification
     // L'import corrisponde alla funzionalità 3 nel Main Controller

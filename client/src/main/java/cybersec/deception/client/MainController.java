@@ -304,16 +304,20 @@ public class MainController {
         if (finalYamlSpec == null) {
             List<Tag> tags = (List<Tag>) session.getAttribute("tagList");
             ApiSpec apiSpec = (ApiSpec) session.getAttribute("apiSpec");
-            apiSpec.setTags(tags);
 
-            List<String> selectedPojos = (List<String>) session.getAttribute("selectedPojos");
-            Map<String, String> map = new HashMap<>();
-            for (String name: selectedPojos) {
-                String pojoValue = (String) session.getAttribute("currentPojo"+name);
-                map.put(name, pojoValue);
+            if (apiSpec != null) {
+                apiSpec.setTags(tags);
+
+                List<String> selectedPojos = (List<String>) session.getAttribute("selectedPojos");
+                Map<String, String> map = new HashMap<>();
+                for (String name: selectedPojos) {
+                    String pojoValue = (String) session.getAttribute("currentPojo"+name);
+                    map.put(name, pojoValue);
+                }
+                String yamlComponents = this.entitiesService.defineYamlComponents(map, (SecurityScheme) session.getAttribute("securityScheme"));
+                finalYamlSpec = this.yamlService.buildYaml(apiSpec, yamlComponents);
             }
-            String yamlComponents = this.entitiesService.defineYamlComponents(map, (SecurityScheme) session.getAttribute("securityScheme"));
-            finalYamlSpec = this.yamlService.buildYaml(apiSpec, yamlComponents);
+            finalYamlSpec = "Error while parsing yaml file";
         }
         model.addAttribute("finalYaml", finalYamlSpec);
 

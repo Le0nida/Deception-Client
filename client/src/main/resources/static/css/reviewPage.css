@@ -1,0 +1,27 @@
+.button-container #generate {
+    background-color: rgba(103, 234, 105, 0.56);
+}
+.button-container #generate:hover {
+    background-color: rgba(103, 234, 105, 0.91);
+}
+
+.button-container #download {
+    background-color: rgba(103, 110, 234, 0.56);
+}
+.button-container #download:hover {
+    background-color: rgba(103, 110, 234, 0.86);
+}
+
+.button-container #save {
+    background-color: rgba(234, 212, 103, 0.56);
+}
+.button-container #save:hover {
+    background-color: rgba(234, 212, 103, 0.85);
+}
+
+.button-container #validate {
+    background-color: rgba(229, 113, 113, 0.56);
+}
+.button-container #validate:hover {
+    background-color: rgba(229, 113, 113, 0.86);
+}
