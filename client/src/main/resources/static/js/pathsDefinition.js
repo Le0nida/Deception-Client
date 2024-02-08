@@ -359,7 +359,7 @@ function addTag() {
     const tagNameInput = document.getElementById('name');
     const tagNameValue = tagNameInput.value.trim();
     if (isEmptyString(tagNameValue)) {
-        alert('Il campo "name" non può essere vuoto.');
+        alert('The "name" field cannot be empty.');
         return;
     }
     // Recupero del campo "description"
@@ -379,7 +379,7 @@ function addPath() {
     const newPathInput = document.getElementById('newPath');
     const newPathValue = newPathInput.value.trim();
     if (newPathValue === '') {
-        alert('Il "path" non può essere vuoto.');
+        alert('The "path" field cannot be empty.');
         return;
     }
 
@@ -401,7 +401,7 @@ function addOperation() {
     const newOperationInput = document.getElementById('newOperation');
     const newOperationValue = newOperationInput.value.trim();
     if (newOperationValue === '') {
-        alert('L\'id dell\'operazione non può essere vuoto.');
+        alert('The "operationId" field cannot be empty.');
         return;
     }
 
@@ -458,8 +458,6 @@ function handleContinueButton(){
         tags.push(t);
     });
 
-    console.log(JSON.stringify(tags));
-    // Invia la mappa tagKeyDescMap separatamente
     $.ajax({
         type: 'POST',
         url: '/setTags',
@@ -469,7 +467,8 @@ function handleContinueButton(){
             window.location.href = response
         },
         error: function(error) {
-            console.error('Errore durante l\'invio di tagKeyDescMap:', error);
+            console.error('Error: ', error);
+            alert("Error while proceeding to the next step")
         }
     });
 
