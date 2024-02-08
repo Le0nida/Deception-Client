@@ -148,8 +148,13 @@ function addServer() {
     const serverUrlValue = serverUrl.value.trim();
     if (isEmptyString(serverUrlValue)) {
         alert("The 'url' field of a server cannot be empty.");
+        serverUrl.style.borderColor = 'red';
         return;
     }
+    else {
+        serverUrl.style.borderColor = '';
+    }
+
     // Se il campo non è vuoto
     if (serverUrlValue !== '') {
         // Verifica la corrispondenza con la regex

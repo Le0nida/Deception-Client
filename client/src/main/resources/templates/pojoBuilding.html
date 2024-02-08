@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Defizione POJO</title>
+    <title>Entity Definition</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script th:src="@{/js/configBuilder.js}"></script>
     <link rel="stylesheet" type="text/css" href="/css/pojoCheckboxes.css">
 </head>
 <body>
-<!-- Accedi al valore del parametro utilizzando Thymeleaf -->
 <p id="currentPojo" th:class="${currentPojoName}" style="display: none" th:text="${#vars[currentPojoName]}"></p>
 <p id="pojoEdited" style="display: none" th:text="${pojoEdited}"></p>
 

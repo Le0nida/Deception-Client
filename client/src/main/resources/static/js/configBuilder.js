@@ -25,11 +25,11 @@ function fetchJSONData(callback) {
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    var alreadySaved = false;
+    let alreadySaved = false;
     if (document.getElementById("pojoEdited").innerText === "true") {
-        var saveBtn = document.getElementById('saveBtn');
-        saveBtn.innerText = 'Schema salvato'
-        saveBtn.style.backgroundColor = '#919191FF'
+        const saveBtn = document.getElementById('saveBtn');
+        saveBtn.innerText = 'Schema saved'
+        saveBtn.style.backgroundColor = '#eef7eb'
         saveBtn.disabled = true;
         alreadySaved = true;
     }
@@ -108,7 +108,7 @@ function generateJsonFromCheckboxes(jsonData, parentKey = '', indentionLevel = 0
 function handleSaveButtonClick(){
     const jsonString = document.getElementById("currentPojo").innerText
     const jsonObject = JSON.parse(jsonString);
-    var selectedJsonData = generateJsonFromCheckboxes(jsonObject)
+    const selectedJsonData = generateJsonFromCheckboxes(jsonObject);
 
     const datiDaInviare = {
         attributoDaAggiornare: document.getElementById("currentPojo").className,
@@ -117,23 +117,22 @@ function handleSaveButtonClick(){
 
     // Invia una richiesta AJAX al server per aggiornare il modello
     $.ajax({
-        type: 'POST',  // Puoi utilizzare 'GET' se è più appropriato
-        url: '/updatePojoModel',  // Specifica l'URL del tuo endpoint Spring
+        type: 'POST',
+        url: '/updatePojoModel',
         contentType: 'application/json',
         data: JSON.stringify(datiDaInviare),
         success: function(response) {
-            // Gestisci la risposta dal server (se necessario)
-            console.log('Modello aggiornato con successo:', response);
 
-            var saveBtn = document.getElementById('saveBtn');
-            saveBtn.innerText = 'Schema salvato'
-            saveBtn.style.backgroundColor = '#919191FF'
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerText = 'Schema saved'
+            saveBtn.style.backgroundColor = '#eef7eb'
             saveBtn.disabled = true;
 
             disableAllCheckbox();
         },
         error: function(error) {
-            console.error('Errore durante l\'aggiornamento del modello:', error);
+            console.error('Error: ', error);
+            alert("Error during schema update")
         }
     });
 

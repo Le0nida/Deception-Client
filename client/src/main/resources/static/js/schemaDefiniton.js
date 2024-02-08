@@ -8,11 +8,11 @@ document.addEventListener("DOMContentLoaded", function() {
             type: 'POST',
             url: 'resetPojos',
             success: function (response) {
-                // Gestire la risposta dal server, se necessario
                 window.location.reload()
             },
             error: function (error) {
                 console.error('Error:', error);
+                alert("Error while restoring the page")
             }
         });
     });
@@ -38,7 +38,7 @@ function visualProcessing(currentLabel, btn) {
     });
 
     const allButtons = document.querySelectorAll('button[class="checkboxes"]');
-    var isClosed = btn.innerText === 'Close';
+    const isClosed = btn.innerText === 'Close';
     allButtons.forEach(button => {
         button.innerText = 'Open'
     });
@@ -54,13 +54,12 @@ function handleLabelClick(label, btn) {
 
     const allLabels = document.querySelectorAll('input[type="checkbox"]');
     allLabels.forEach(l => {
-        // label.style.color = 'gray'
         if (l.id === label) {
             l.disabled = false;
         }
     });
 
-    var rightPanel = document.getElementById("rightPanel")
+    const rightPanel = document.getElementById("rightPanel");
 
     if (btn.innerText === 'Close') {
         rightPanel.style.display = 'none'
@@ -86,7 +85,7 @@ function handleLabelClick(label, btn) {
 }
 
 function handleContinueButton() {
-    var pojos = [];
+    const pojos = [];
     const allLabels = document.querySelectorAll('input[type="checkbox"]');
     allLabels.forEach(l => {
         if (l.checked === true) {
@@ -95,28 +94,27 @@ function handleContinueButton() {
     });
 
     if (pojos.length === 0) {
-        alert("Necessario selezionare almeno una entità")
+        alert("At least one entity must be selected");
         return;
     }
 
     // Creare un oggetto con i dati da inviare
-    var data = {
+    const data = {
         step: 'sec',
         pojos: pojos
     };
 
-    // Eseguire la richiesta POST con Ajax
     $.ajax({
         type: 'POST',
         url: 'creazioneSpecifica',
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: function (response) {
-            // Gestire la risposta dal server, se necessario
             window.location.href = 'securityScheme'
         },
         error: function (error) {
             console.error('Error:', error);
+            alert("Error while proceeding to the next step")
         }
     });
 }
