@@ -118,7 +118,7 @@ function handleSaveButtonClick(){
     // Invia una richiesta AJAX al server per aggiornare il modello
     $.ajax({
         type: 'POST',  // Puoi utilizzare 'GET' se è più appropriato
-        url: '/aggiornaModello',  // Specifica l'URL del tuo endpoint Spring
+        url: '/updatePojoModel',  // Specifica l'URL del tuo endpoint Spring
         contentType: 'application/json',
         data: JSON.stringify(datiDaInviare),
         success: function(response) {

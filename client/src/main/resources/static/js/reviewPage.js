@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // Eseguire la richiesta POST con Ajax
         $.ajax({
             type: 'POST',
-            url: 'validazioneYaml',
+            url: 'validateYaml',
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function (response) {
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Eseguire la richiesta POST con Ajax
             $.ajax({
                 type: 'POST',
-                url: 'saveSpecification',
+                url: 'setSpecification',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function (response) {

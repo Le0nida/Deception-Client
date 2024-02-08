@@ -87,7 +87,7 @@ function importaSpecificaEsistente() {
         var fileContent = event.target.result;
         $.ajax({
             type: 'POST',
-            url: '/importSchema',
+            url: '/importScheme',
             contentType: 'application/json',
             data: JSON.stringify(fileContent),
             success: function(response) {
@@ -110,7 +110,7 @@ function selezionaSpecifica() {
 
     $.ajax({
         type: 'POST',
-        url: '/selectSchema',
+        url: '/getSpecification',
         contentType: 'application/json',
         data: fileSelected,
         success: function(response) {

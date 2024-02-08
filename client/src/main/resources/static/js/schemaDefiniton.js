@@ -76,7 +76,7 @@ function handleLabelClick(label, btn) {
         rightPanel.appendChild(h3);
 
         const iframe = document.createElement('iframe');
-        iframe.src = `./definizionePojo?entityName=${label}`;
+        iframe.src = `./pojoDefinition?entityName=${label}`;
         iframe.style.width = '100%';
 
         rightPanel.appendChild(iframe);

@@ -462,7 +462,7 @@ function handleContinueButton(){
     // Invia la mappa tagKeyDescMap separatamente
     $.ajax({
         type: 'POST',
-        url: '/reviewSpec',
+        url: '/setTags',
         contentType: 'application/json',
         data: JSON.stringify(tags),
         success: function(response) {
