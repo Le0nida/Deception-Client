@@ -24,6 +24,10 @@
     <div th:each="item : ${currentPojoList}">
         <p class="currentPojoElement" th:text="${item}"></p>
     </div>
+    <div th:each="item : ${securitySchemeScopes}">
+        <p class="securitySchemeScope" th:text="${item}"></p>
+    </div>
+    <div id="securitySchemeName" th:text="${securitySchemeName}"></div>
 </div>
 
 <div class="container">
@@ -135,7 +139,7 @@
                 <button id="parameters" onclick="buildParameters()">Parameters</button>
                 <button id="requestBody" onclick="buildRequest()">Request</button>
                 <button id="responses" onclick="buildResponses()">Responses</button>
-                <button id="security" disabled>Security</button>
+                <button id="security" onclick="buildSecurity()">Security</button>
                 <button id="associatenewtag" onclick="associateNewTag()">Associated Tags</button>
             </div>
 

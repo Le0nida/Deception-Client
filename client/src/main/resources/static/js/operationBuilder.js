@@ -500,6 +500,124 @@ function associateNewTag() {
     showMainDialog()
 }
 
+function buildSecurity() {
+    // Svuoto il div contenitore
+    $('#operation-dialog-container').empty();
+    const operationId = window.operationOpened;
+
+    // Creazione della dialog
+    const dialog = document.createElement('div');
+    dialog.className = 'operation-dialog';
+
+    // creazione del div per contenere il form di creazione
+    const createResponseDiv = buildFormSectionDiv()
+
+    const title = document.createElement('h2');
+    title.innerText = "Select security scopes"
+    createResponseDiv.appendChild(title);
+
+    const par = document.createElement('p');
+    par.innerText = "Se non verrà selezionato alcuno scope, lo schema di sicurezza non sarà considerato"
+    createResponseDiv.appendChild(par);
+
+    const subtitle = document.createElement('h4');
+    subtitle.innerText = document.getElementById('securitySchemeName').innerText
+    createResponseDiv.appendChild(subtitle);
+
+    const securitySchemeScopes = document.querySelectorAll('p[class="securitySchemeScope"]');
+    securitySchemeScopes.forEach(scope => {
+        const value = scope.innerText;
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = "secscope"
+        checkbox.value = value;
+        checkbox.id = value;
+
+        if (window.operKeyJSONMap.get(operationId).security !== null && window.operKeyJSONMap.get(operationId).security.length > 0){
+            for (const security of window.operKeyJSONMap.get(operationId).security) {
+                if (security.securitySchemaName === document.getElementById('securitySchemeName').innerText) {
+                    if (security.scopes !== null && security.scopes.length > 0){
+                        for (const scope of security.scopes) {
+                            if (scope === value) {
+                                checkbox.checked = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        const label = document.createElement('label');
+        label.htmlFor = value;
+        label.className = 'checkbox-label'
+        label.appendChild(document.createTextNode(value));
+
+        createResponseDiv.appendChild(label);
+        createResponseDiv.appendChild(checkbox);
+        createResponseDiv.appendChild(document.createElement('br'));
+    });
+
+    const button = document.createElement('button');
+    button.innerText = "Add Optional Security"
+    if (window.operKeyJSONMap.get(operationId).security !== null && window.operKeyJSONMap.get(operationId).security.length > 0){
+        for (const security of window.operKeyJSONMap.get(operationId).security) {
+            if (security.securitySchemaName === 'optional') {
+                button.innerText = "Remove Optional Security"
+                break
+            }
+        }
+    }
+    button.onclick = function () {
+        if (button.innerText === "Add Optional Security") {
+            const confirmSave = window.confirm('Aggiungere la sicurezza opzionale a questa operazione?');
+            if (confirmSave) {
+                button.innerText = "Remove Optional Security";
+            }
+        }
+        else {
+            const confirmSave = window.confirm('Rimuovere la sicurezza opzionale a questa operazione?');
+            if (confirmSave) {
+                button.innerText = "Add Optional Security";
+            }
+        }
+    }
+    createResponseDiv.appendChild(button);
+    createResponseDiv.appendChild(document.createElement('br'));
+
+    const saveButton = document.createElement('button');
+    saveButton.innerText = 'Save';
+    saveButton.onclick = function () {
+        const confirmSave = window.confirm('Salvare le modifiche?');
+        if (confirmSave) {
+            window.operKeyJSONMap.get(operationId).security = []
+
+            if (button.innerText === "Remove Optional Security") {
+                const optsecurity = new Security();
+                optsecurity.securitySchemaName = 'optional'
+                window.operKeyJSONMap.get(operationId).security.push(optsecurity)
+            }
+
+            const security = new Security();
+            security.securitySchemaName = document.getElementById('securitySchemeName').innerText;
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"][class="secscope"]');
+            allCheckboxes.forEach(c => {
+                if (c.checked === true) {
+                    security.scopes.push(c.id)
+                }
+            });
+            window.operKeyJSONMap.get(operationId).security.push(security)
+        }
+        document.getElementById('operation-dialog-container').removeChild(dialog);
+        hideMainDialog()
+    };
+
+    createResponseDiv.appendChild(saveButton)
+    dialog.appendChild(createResponseDiv);
+
+    // Aggiunta della dialog
+    document.getElementById('operation-dialog-container').appendChild(dialog);
+    showMainDialog()
+}
 
 // FUNZIONI PER SETTARE I CAMPI TESTUALI E LA SELECT
 

@@ -14,7 +14,7 @@ public class Operation {
     private List<Parameter> parameters;
     private RequestBody requestBody;
     private List<Response> responses;
-    private List<String> security;
+    private List<Security> security;
 
     public String getId() {
         return id;
@@ -80,11 +80,11 @@ public class Operation {
         this.responses = responses;
     }
 
-    public List<String> getSecurity() {
+    public List<Security> getSecurity() {
         return security;
     }
 
-    public void setSecurity(List<String> security) {
+    public void setSecurity(List<Security> security) {
         this.security = security;
     }
 

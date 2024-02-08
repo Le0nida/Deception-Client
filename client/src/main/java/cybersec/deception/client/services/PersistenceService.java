@@ -15,6 +15,8 @@ public class PersistenceService {
     @Value("${data.generalinfo.path}")
     private String generalInfoPath;
 
+    @Value("${data.security.path}")
+    private String securitySchemePath;
     private String currentDir = "";
     private String getFilePath(String filename, String username) {
         String extension = ".txt";
@@ -23,6 +25,9 @@ public class PersistenceService {
         }
         else if (currentDir.equals(yamlPath)) {
             extension = ".yaml";
+        }
+        else if (currentDir.equals(securitySchemePath)) {
+            extension = ".json";
         }
         return FileUtils.buildPath(currentDir, FileUtils.buildPath(username, filename+extension));
     }
@@ -68,6 +73,11 @@ public class PersistenceService {
         currentDir = generalInfoPath;
         return retrieveAllFiles(username);
     }
+
+    public List<String> retrieveAllSecuritySchemes(String username){
+        currentDir = securitySchemePath;
+        return retrieveAllFiles(username);
+    }
     
     public String retrieveYaml(String filename,String username){
         currentDir = yamlPath;
@@ -79,6 +89,11 @@ public class PersistenceService {
         return retrieveFile(filename, username);
     }
 
+    public String retrieveSecurityScheme(String filename,String username){
+        currentDir = securitySchemePath;
+        return retrieveFile(filename, username);
+    }
+
     public String uploadYaml(String fileContent, String filename, String username){
         currentDir = yamlPath;
         return uploadFile(fileContent, filename, username);
@@ -86,6 +101,11 @@ public class PersistenceService {
 
     public String uploadGeneralInfo(String fileContent, String filename, String username){
         currentDir = generalInfoPath;
+        return uploadFile(fileContent, filename, username);
+    }
+
+    public String uploadSecurityScheme(String fileContent, String filename, String username){
+        currentDir = securitySchemePath;
         return uploadFile(fileContent, filename, username);
     }
 }

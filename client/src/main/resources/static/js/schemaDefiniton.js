@@ -101,7 +101,7 @@ function handleContinueButton() {
 
     // Creare un oggetto con i dati da inviare
     var data = {
-        step: 'paths',
+        step: 'sec',
         pojos: pojos
     };
 
@@ -113,7 +113,7 @@ function handleContinueButton() {
         data: JSON.stringify(data),
         success: function (response) {
             // Gestire la risposta dal server, se necessario
-            window.location.href = 'pathsDefinition'
+            window.location.href = 'securityScheme'
         },
         error: function (error) {
             console.error('Error:', error);

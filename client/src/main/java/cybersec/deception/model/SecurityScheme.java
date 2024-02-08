@@ -1,7 +1,5 @@
 package cybersec.deception.model;
 
-import java.util.Map;
-
 public class SecurityScheme {
     private String type;
     private String description;

@@ -1,5 +1,8 @@
 package cybersec.deception.client.services;
 
+import cybersec.deception.client.utils.Utils;
+import cybersec.deception.model.OAuthFlows;
+import cybersec.deception.model.SecurityScheme;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -11,7 +14,7 @@ import java.util.Map;
 
 @Service
 public class EntitiesService {
-    public String defineYamlComponents(Map<String, String> entitiesMap) {
+    public String defineYamlComponents(Map<String, String> entitiesMap, SecurityScheme scheme) {
 
         // Imposta le opzioni per la formattazione YAML
         DumperOptions dumperOptions = new DumperOptions();
@@ -50,6 +53,69 @@ public class EntitiesService {
             }
         }
 
+        // aggiungo l'unico schema di sicurezza
+        if (scheme != null) {
+            yamlStringBuilder.append("  securitySchemes:\n");
+            yamlStringBuilder.append("    ").append(scheme.getName()).append(":\n");
+            yamlStringBuilder.append("      type: ").append(scheme.getType()).append("\n");
+            yamlStringBuilder.append("      description: ").append(scheme.getDescription()).append("\n");
+            yamlStringBuilder.append("      name: ").append(scheme.getName()).append("\n");
+            yamlStringBuilder.append("      in: ").append(scheme.getIn()).append("\n");
+            yamlStringBuilder.append("      scheme: ").append(scheme.getScheme()).append("\n");
+            yamlStringBuilder.append("      bearerFormat: ").append(scheme.getBearerFormat()).append("\n");
+            yamlStringBuilder.append("      openIdConnectUrl: ").append(scheme.getOpenIdConnectUrl()).append("\n");
+
+            OAuthFlows o = scheme.getFlows();
+            if (o != null) {
+                yamlStringBuilder.append("      flows: ").append("\n");
+                if (o.getAuthorizationCode() != null) {
+                    yamlStringBuilder.append("        authorizationCode: ").append("\n");
+                    yamlStringBuilder.append("          authorizationUrl: ").append(o.getAuthorizationCode().getAuthorizationUrl()).append("\n");
+                    yamlStringBuilder.append("          tokenUrl: ").append(o.getAuthorizationCode().getTokenUrl()).append("\n");
+                    yamlStringBuilder.append("          refreshUrl: ").append(o.getAuthorizationCode().getRefreshUrl()).append("\n");
+                    if (!Utils.isNullOrEmpty(o.getAuthorizationCode().getScopes())) {
+                        yamlStringBuilder.append("          scopes: ").append("\n");
+                        for (Map.Entry<String, String> entry: o.getAuthorizationCode().getScopes().entrySet()) {
+                            yamlStringBuilder.append("            ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+                        }
+                    }
+                }
+
+                if (o.getImplicit() != null) {
+                    yamlStringBuilder.append("        implicit: ").append("\n");
+                    yamlStringBuilder.append("          authorizationUrl: ").append(o.getImplicit().getAuthorizationUrl()).append("\n");
+                    yamlStringBuilder.append("          refreshUrl: ").append(o.getImplicit().getRefreshUrl()).append("\n");
+                    if (!Utils.isNullOrEmpty(o.getImplicit().getScopes())) {
+                        yamlStringBuilder.append("          scopes: ").append("\n");
+                        for (Map.Entry<String, String> entry: o.getImplicit().getScopes().entrySet()) {
+                            yamlStringBuilder.append("            ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+                        }
+                    }
+                }
+                if (o.getPassword() != null) {
+                    yamlStringBuilder.append("        password: ").append("\n");
+                    yamlStringBuilder.append("          tokenUrl: ").append(o.getPassword().getTokenUrl()).append("\n");
+                    yamlStringBuilder.append("          refreshUrl: ").append(o.getPassword().getRefreshUrl()).append("\n");
+                    if (!Utils.isNullOrEmpty(o.getPassword().getScopes())) {
+                        yamlStringBuilder.append("          scopes: ").append("\n");
+                        for (Map.Entry<String, String> entry: o.getPassword().getScopes().entrySet()) {
+                            yamlStringBuilder.append("            ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+                        }
+                    }
+                }
+                if (o.getClientCredentials() != null) {
+                    yamlStringBuilder.append("        clientCredentials: ").append("\n");
+                    yamlStringBuilder.append("          tokenUrl: ").append(o.getClientCredentials().getTokenUrl()).append("\n");
+                    yamlStringBuilder.append("          refreshUrl: ").append(o.getClientCredentials().getRefreshUrl()).append("\n");
+                    if (!Utils.isNullOrEmpty(o.getClientCredentials().getScopes())) {
+                        yamlStringBuilder.append("          scopes: ").append("\n");
+                        for (Map.Entry<String, String> entry: o.getClientCredentials().getScopes().entrySet()) {
+                            yamlStringBuilder.append("            ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+                        }
+                    }
+                }
+            }
+        }
         return yamlStringBuilder.toString();
     }
 

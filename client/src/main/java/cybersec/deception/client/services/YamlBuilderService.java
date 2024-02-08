@@ -131,6 +131,22 @@ public class YamlBuilderService {
                     }
                 }
             }
+
+            // Handle security
+            if (!Utils.isNullOrEmpty(operation.getSecurity())) {
+                transformedYaml.append("      security:\n");
+                for (Security sec: operation.getSecurity()) {
+                    if (sec.getSecuritySchemaName().equals("optional")) {
+                        transformedYaml.append("        - {}\n");
+                    }
+                    else {
+                        transformedYaml.append("        - ").append(sec.getSecuritySchemaName()).append(":\n");
+                        for (String scope: sec.getScopes()) {
+                            transformedYaml.append("            - ").append(scope).append("\n");
+                        }
+                    }
+                }
+            }
         }
 
         return transformedYaml.toString();

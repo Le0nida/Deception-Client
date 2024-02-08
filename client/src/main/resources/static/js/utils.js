@@ -78,6 +78,13 @@ class OpenApiOperation {
     }
 }
 
+class Security {
+    constructor(securitySchemaName, scopes) {
+        this.securitySchemaName = securitySchemaName || '';
+        this.scopes = scopes || [];
+    }
+}
+
 class Response {
     constructor(statusCode, description, content) {
         this.statusCode = statusCode;

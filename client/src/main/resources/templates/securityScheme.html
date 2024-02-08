@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <title>API Specification</title>
+    <script th:src="@{/js/utils.js}"></script>
+    <script th:src="@{/js/classes.js}"></script>
+    <script th:src="@{/js/securityScheme.js}"></script>
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/securityScheme.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 5px;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="title">
+        <h1>API Specification</h1>
+        <h3>Definition of security schemes</h3>
+    </div>
+
+    <div class="button-container">
+        <button id="reset">Reset</button>
+        <button id="import">Import</button>
+        <button id="save">Save</button>
+        <button id="continue" onclick="handleContinueButton()">Continue</button>
+    </div>
+
+    <div class="form-container">
+        <div class="form-section">
+            <h2>Security Scheme</h2>
+            <label for="type">Type:</label>
+            <input type="text" id="type" name="type" placeholder="e.g., apiKey">
+
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" placeholder="Enter a description">
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="e.g., api_key">
+
+            <label for="in">In:</label>
+            <input type="text" id="in" name="in" placeholder="e.g., header or query">
+
+            <label for="scheme">Scheme:</label>
+            <input type="text" id="scheme" name="scheme" placeholder="e.g., basic or bearer">
+
+            <label for="bearerFormat">Bearer Format:</label>
+            <input type="text" id="bearerFormat" name="bearerFormat" placeholder="e.g., JWT">
+
+            <label for="openIdConnectUrl">OpenId Connect URL:</label>
+            <input type="text" id="openIdConnectUrl" name="openIdConnectUrl" placeholder="Enter authorization URL">
+        </div>
+
+        <div id="flow-section" class="form-section">
+            <h2>OAuth Flows <span>  oauth2</span></h2>
+            <div class="mid-container">
+                <div class="inner-form-section" id="implicitFlow">
+                    <h4>Implicit</h4>
+                    <label for="authorizationUrlImplicit">Authorization URL:</label>
+                    <input type="text" id="authorizationUrlImplicit" name="authorizationUrlImplicit" placeholder="Enter authorization URL">
+
+                    <label for="refreshUrlImplicit">Refresh URL:</label>
+                    <input type="text" id="refreshUrlImplicit" name="refreshUrlImplicit" placeholder="Enter refresh URL">
+
+                    <label for="scopesImplicit">Scopes (comma-separated):</label>
+                    <input type="text" id="scopesImplicit" name="scopesImplicit" placeholder="e.g., read,write">
+                </div>
+                <div class="inner-form-section" id="authorizationCodeFlow">
+                    <h4>Authorization Code</h4>
+                    <label for="authorizationUrlAuthCode">Authorization URL:</label>
+                    <input type="text" id="authorizationUrlAuthCode" name="authorizationUrlAuthCode" placeholder="Enter authorization URL">
+
+                    <label for="refreshUrlAuthCode">Refresh URL:</label>
+                    <input type="text" id="refreshUrlAuthCode" name="refreshUrlAuthCode" placeholder="Enter refresh URL">
+
+                    <label for="scopesAuthCode">Scopes (comma-separated):</label>
+                    <input type="text" id="scopesAuthCode" name="scopesAuthCode" placeholder="e.g., read,write">
+
+                    <label for="tokenUrlAuthCode">Token URL:</label>
+                    <input type="text" id="tokenUrlAuthCode" name="tokenUrlAuthCode" placeholder="Enter token URL">
+
+                </div>
+            </div>
+            <div class="mid-container">
+                <div class="inner-form-section" id="clientCredentialsFlow">
+                    <h4>Client Credentials</h4>
+                    <label for="tokenUrlClient">Token URL:</label>
+                    <input type="text" id="tokenUrlClient" name="tokenUrlClient" placeholder="Enter token URL">
+
+                    <label for="refreshUrlClient">Refresh URL:</label>
+                    <input type="text" id="refreshUrlClient" name="refreshUrlClient" placeholder="Enter refresh URL">
+
+                    <label for="scopesClient">Scopes (comma-separated):</label>
+                    <input type="text" id="scopesClient" name="scopesClient" placeholder="e.g., read,write">
+                </div>
+                <div class="inner-form-section" id="passwordFlow">
+                    <h4>Password</h4>
+                    <label for="tokenUrlPass">Token URL:</label>
+                    <input type="text" id="tokenUrlPass" name="tokenUrlPass" placeholder="Enter token URL">
+
+                    <label for="refreshUrlPass">Refresh URL:</label>
+                    <input type="text" id="refreshUrlPass" name="refreshUrlPass" placeholder="Enter refresh URL">
+
+                    <label for="scopesPass">Scopes (comma-separated):</label>
+                    <input type="text" id="scopesPass" name="scopesPass" placeholder="e.g., read,write">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="page-cover"></div> <!-- Div di copertura -->
+<div id="dialogimport" class="dialog">
+    <h2>Select Schema to Import</h2>
+    <label for="selectOption"></label><select id="selectOption">
+    <option value="">Select a configuration</option>
+    <!-- Utilizza Thymeleaf per iterare sulla lista di entità nel model -->
+    <th:block th:each="entity : ${securitySchemes}">
+        <option th:text="${entity}" th:value="${entity}"></option>
+    </th:block>
+</select>
+    <button onclick="confirmSelection()">Confirm</button>
+</div>
+</body>
+</html>

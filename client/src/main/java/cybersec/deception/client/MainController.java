@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class MainController {
@@ -86,6 +87,13 @@ public class MainController {
         return loginCheck(model, session, "specificationInfos");
     }
 
+    @GetMapping("/securityScheme")
+    public String securityScheme(Model model, HttpSession session) {
+        List<String> files = this.persistenceService.retrieveAllSecuritySchemes((String) session.getAttribute("username"));
+        model.addAttribute("securitySchemes", files);
+        return loginCheck(model, session, "securityScheme");
+    }
+
     @GetMapping("/pathsDefinition")
     public String pathsDefinition(Model model, HttpSession session) {
         List<String> currentPojoList = new ArrayList<>();
@@ -102,6 +110,24 @@ public class MainController {
             }
         }
         model.addAttribute("currentPojoList", currentPojoList);
+
+
+        List<String> scopes = new ArrayList<>();
+        OAuthFlows o = ((SecurityScheme) session.getAttribute("securityScheme")).getFlows();
+        if (o.getAuthorizationCode() != null && !Utils.isNullOrEmpty(o.getAuthorizationCode().getScopes()))
+            scopes.addAll(o.getAuthorizationCode().getScopes().keySet().stream().toList());
+
+        if (o.getImplicit() != null && !Utils.isNullOrEmpty(o.getImplicit().getScopes()))
+            scopes.addAll(o.getImplicit().getScopes().keySet().stream().toList());
+
+        if (o.getPassword() != null && !Utils.isNullOrEmpty(o.getPassword().getScopes()))
+            scopes.addAll(o.getPassword().getScopes().keySet().stream().toList());
+
+        if (o.getClientCredentials() != null && !Utils.isNullOrEmpty(o.getClientCredentials().getScopes()))
+            scopes.addAll(o.getClientCredentials().getScopes().keySet().stream().toList());
+
+        model.addAttribute("securitySchemeName", ((SecurityScheme) session.getAttribute("securityScheme")).getName());
+        model.addAttribute("securitySchemeScopes", scopes.stream().distinct().collect(Collectors.toList()));
         return loginCheck(model, session, "pathsDefinition");
     }
 
@@ -134,11 +160,30 @@ public class MainController {
                 model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
                 return "errorpage";
             }
-        } else if (step.equals("paths")) {
+        } else if (step.equals("sec")) {
             List<String> pojos = (List<String>) requestBody.get("pojos");
 
             session.setAttribute("selectedPojos", pojos);
             if (Collections.list(session.getAttributeNames()).stream().anyMatch(name -> name.startsWith("currentPojo"))) {
+                return loginCheck(model, session, "securityScheme");
+            } else {
+                model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
+                return "errorpage";
+            }
+        } else if (step.equals("paths")) {
+            if (requestBody.get("securityScheme") !=  null) {
+                // Creare un oggetto ObjectMapper
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                // Convertire la stringa JSON in un oggetto ApiSpec
+                SecurityScheme securityScheme = null;
+                try {
+                    securityScheme = objectMapper.readValue(requestBody.get("securityScheme").toString(), SecurityScheme.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+
+                session.setAttribute("securityScheme", securityScheme);
                 return loginCheck(model, session, "pathsDefinition");
             } else {
                 model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
@@ -227,7 +272,7 @@ public class MainController {
                 String pojoValue = (String) session.getAttribute("currentPojo"+name);
                 map.put(name, pojoValue);
             }
-            String yamlComponents = this.entitiesService.defineYamlComponents(map);
+            String yamlComponents = this.entitiesService.defineYamlComponents(map, (SecurityScheme) session.getAttribute("securityScheme"));
             finalYamlSpec = this.yamlService.buildYaml(apiSpec, yamlComponents);
         }
         model.addAttribute("finalYaml", finalYamlSpec);
@@ -277,6 +322,21 @@ public class MainController {
         String filename = data.get("filename");
         String generalInfo = data.get("generalInfo");
         String response = this.persistenceService.uploadGeneralInfo(generalInfo, filename, (String) session.getAttribute("username"));
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/getSecurityScheme")
+    public ResponseEntity<String> getSecurityScheme(@RequestBody String filename, HttpSession session) {
+        String securityScheme = this.persistenceService.retrieveSecurityScheme(filename, (String) session.getAttribute("username"));
+        // session.setAttribute("generalInfo", generalInfo);
+        return ResponseEntity.ok(securityScheme);
+    }
+
+    @PostMapping("/setSecurityScheme")
+    public ResponseEntity<String> setSecurityScheme(@RequestBody Map<String, String> data, HttpSession session) {
+        String filename = data.get("filename");
+        String securityScheme = data.get("securityScheme");
+        String response = this.persistenceService.uploadSecurityScheme(securityScheme, filename, (String) session.getAttribute("username"));
         return ResponseEntity.ok(response);
     }
 
