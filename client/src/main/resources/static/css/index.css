@@ -1,5 +1,6 @@
 
 #cont{
+    margin-top: 20px;
     display: flex;
 }
 
@@ -71,6 +72,10 @@ h3 {
     flex: 1;
 }
 
+#right {
+    margin-left: 20px;
+}
+
 button {
     padding: 10px 20px;
     font-size: 18px;
@@ -92,6 +97,7 @@ label {
 
 /* Stile per la select */
 select {
+    margin-top: 12px;
     padding: 10px;
     font-size: 16px;
     border-radius: 5px;
@@ -115,4 +121,14 @@ input[type="file"] {
 
 input[type="file"]:hover {
     background-color: #e2edfa;
+}
+
+section p {
+    margin-bottom: -2px;
+}
+
+.title {
+    max-width: 800px !important;
+    max-height: 110px !important; /* Aumenta l'altezza per evitare sovrapposizioni */
+    padding: 20px !important; /* Aumenta il padding per spaziatura interna */
 }

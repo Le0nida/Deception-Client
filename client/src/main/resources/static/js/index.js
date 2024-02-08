@@ -1,56 +1,29 @@
-function uploadFile() {
-    var fileInput = document.getElementById('fileInput');
-    var file = fileInput.files[0];
-    if (!file) {
-        alert("Si prega di selezionare un file.");
-        return;
-    }
-
-    var formData = new FormData();
-    formData.append("file", file);
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/upload", true);
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            alert("File caricato con successo!");
-        } else if (xhr.readyState === 4 && xhr.status !== 200) {
-            alert("Si è verificato un errore durante il caricamento del file.");
-        }
-    };
-    xhr.send(formData);
-}
-
 function creaNuovaSpecifica() {
-    // Recupera il token memorizzato
-    // Creare un oggetto con i dati da inviare
-    var data = {
+
+    const data = {
         step: 'general'
     };
 
-    // Eseguire la richiesta POST con Ajax
     $.ajax({
         type: 'POST',
         url: 'creazioneSpecifica',
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: function (response) {
-            // Gestire la risposta dal server, se necessario
             window.location.href = 'specificationInfos';
         },
         error: function (error) {
-            console.error('Error:', error);
+            console.error('Error: ', error);
         }
     });
 }
 
-
 function generateImgFromZip() {
 
-    var fileInput = document.getElementById('fileInput');
-    var file = fileInput.files[0];
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
     if (!file) {
-        alert("Si prega di selezionare un file.");
+        alert("Please select a file");
         return;
     }
 
@@ -67,22 +40,22 @@ function generateImgFromZip() {
             console.log(response)
         },
         error: function(error) {
-            console.error("Si è verificato un errore durante il caricamento del file: ", error);
+            console.error("Error: ", error);
+            alert("An error occurred while loading the file");
         }
     });
 }
 
-
 function importaSpecificaEsistente() {
 
-    var fileInput = document.getElementById('fileInput');
-    var file = fileInput.files[0];
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
     if (!file) {
-        alert("Si prega di selezionare un file.");
+        alert("Please select a file");
         return;
     }
 
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.onload = function(event) {
         var fileContent = event.target.result;
         $.ajax({
@@ -91,10 +64,11 @@ function importaSpecificaEsistente() {
             contentType: 'application/json',
             data: JSON.stringify(fileContent),
             success: function(response) {
-                window.location.href = response
+                window.location.href = 'reviewPage'
             },
             error: function(error) {
-                console.error("Si è verificato un errore durante il caricamento del file: ", error);
+                console.error("Error: ", error);
+                alert("An error occurred while loading the file");
             }
         });
     };
@@ -104,7 +78,7 @@ function importaSpecificaEsistente() {
 function selezionaSpecifica() {
     var fileSelected = document.getElementById('entitySelect').value;
     if (fileSelected === null || fileSelected === "") {
-        alert("Si prega di selezionare una specifica");
+        alert("Please select a specification");
         return;
     }
 
@@ -114,10 +88,11 @@ function selezionaSpecifica() {
         contentType: 'application/json',
         data: fileSelected,
         success: function(response) {
-            window.location.href = response
+            window.location.href = 'reviewPage'
         },
         error: function(error) {
-            console.error("Si è verificato un errore durante la selezione dello schema: ", error);
+            console.error("Error: ", error);
+            alert("An error occurred while loading the specification");
         }
     });
 
