@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @Controller
 public class MainController {
 
+    private static final String REDIRECT = "redirect:/login";
     private final YamlBuilderService yamlService;
     private final EntitiesService entitiesService;
     private final PersistenceService persistenceService;
@@ -40,23 +41,28 @@ public class MainController {
     // HomePage
     @GetMapping("/")
     public String homePage(Model model, HttpSession session) {
-        String returnPage = loginCheck(model, session, "index");
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
 
         List<String> files = this.persistenceService.retrieveAllYaml((String) session.getAttribute("username"));
         model.addAttribute("yamlFiles", files);
 
-        boolean boolPojo = setPojos();
-        return boolPojo ? returnPage : "error";
+        return setPojos() ? "index" : "error";
     }
 
     // Funzionalità 1 (creazione di una specifica "form scratch")
     @PostMapping("/creazioneSpecifica")
     public String showSpecCreationPage(@RequestBody Map<String, Object> requestBody, Model model, HttpSession session) {
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
+
         String step = (String) requestBody.get("step");
 
         if (step.equals("general")) {
             if (!Utils.isNullOrEmpty(pojoList) || setPojos()) {
-                return loginCheck(model, session, "specificationInfos");
+                return "specificationInfos";
             } else {
                 model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
                 return "errorpage";
@@ -74,7 +80,7 @@ public class MainController {
                     throw new RuntimeException(e);
                 }
                 session.setAttribute("apiSpec", apiSpec);
-                return loginCheck(model, session, "schemaDefinition");
+                return "schemaDefinition";
             } else {
                 model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
                 return "errorpage";
@@ -84,7 +90,7 @@ public class MainController {
 
             session.setAttribute("selectedPojos", pojos);
             if (Collections.list(session.getAttributeNames()).stream().anyMatch(name -> name.startsWith("currentPojo"))) {
-                return loginCheck(model, session, "securityScheme");
+                return "securityScheme";
             } else {
                 model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
                 return "errorpage";
@@ -103,7 +109,7 @@ public class MainController {
                 }
 
                 session.setAttribute("securityScheme", securityScheme);
-                return loginCheck(model, session, "pathsDefinition");
+                return "pathsDefinition";
             } else {
                 model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
                 return "errorpage";
@@ -115,23 +121,32 @@ public class MainController {
 
     // Funzionalità 2 (import di uno schema dall'esterno)
     @PostMapping("/importScheme")
-    public ResponseEntity<String> importScheme(@RequestBody String yaml, HttpSession session) {
+    public String importScheme(@RequestBody String yaml, Model model, HttpSession session) {
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
         String formattedYaml = this.yamlService.formatYaml(yaml);
         session.setAttribute("finalYaml", formattedYaml);
-        return ResponseEntity.ok("reviewPage");
+        return "reviewPage";
     }
 
     // Funzionalità 3 (selezione di uno schema esistente)
     @PostMapping("/getSpecification")
-    public ResponseEntity<String> getSpecification(@RequestBody String filename, HttpSession session) {
+    public String getSpecification(@RequestBody String filename, Model model, HttpSession session) {
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
         String formattedYaml = this.persistenceService.retrieveYaml(filename, (String) session.getAttribute("username"));
         session.setAttribute("finalYaml", formattedYaml);
-        return ResponseEntity.ok("reviewPage");
+        return "reviewPage";
     }
 
     // Funzionalità 4 (generazione di un'immagine da un file .zip)
     @PostMapping("/generateImgFromZip")
-    public String generateImgFromZip(@RequestParam("file") MultipartFile file) {
+    public String generateImgFromZip(@RequestParam("file") MultipartFile file, Model model, HttpSession session) {
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
         // Controlla se il file è stato fornito
         if (file.isEmpty()) {
             return "Errore: nessun file fornito.";
@@ -157,43 +172,39 @@ public class MainController {
 
     // OASCreation steps (step della funzionalità 1) -------------------------------------------------------------------
 
-    // Validazione di un file yaml
-    @PostMapping("/validateYaml")
-    public ResponseEntity<String> validateYaml(@RequestBody Map<String, String> data) {
 
-        String yaml = data.get("yaml");
-
-        // TODO
-
-        String otherProjectUrl = "http://localhost:8080/api/validateOpenAPISpec"; // Cambia l'URL con quello effettivo dell'altro progetto
-        RestTemplate restTemplate = new RestTemplate();
-
-        // Esegui la chiamata HTTP per ottenere la mappa di contenuti
-        return null; //restTemplate.getForEntity(otherProjectUrl, String.class);
-    }
 
     // 1.1 - definizione della informazioni generali della specifica
     @GetMapping("/specificationInfos")
     public String specificationInfos(Model model, HttpSession session) {
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
         List<String> files = this.persistenceService.retrieveAllGeneralInfos((String) session.getAttribute("username"));
         model.addAttribute("generalInfoFiles", files);
-        return loginCheck(model, session, "specificationInfos");
+        return "specificationInfos";
     }
 
     // 1.2 - definizione delle entità
     @GetMapping("/schemaDefinition")
     public String schemaDefinition(Model model, HttpSession session) {
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
         if (Utils.isNullOrEmpty(pojoList)) {
             if (!setPojos())
                 return "error";
         }
         model.addAttribute("checkboxList", pojoList);
-        return loginCheck(model, session, "schemaDefinition");
+        return "schemaDefinition";
     }
 
     // 1.2.x - definizione degli attributi di una entità
     @GetMapping("/pojoDefinition")
     public String showDefinizionePojoPage(@RequestParam(name = "entityName", required = true) String paramName, Model model, HttpSession session) {
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
         if (paramName != null) {
             if (Utils.isNullOrEmpty(pojoMap) && !setPojos()) {
                 return "error";
@@ -216,20 +227,26 @@ public class MainController {
             }
         }
 
-        return loginCheck(model, session, "pojoBuilding");
+        return "pojoBuilding";
     }
 
     // 1.3 - definizione dello schema di sicurezza
     @GetMapping("/securityScheme")
     public String securityScheme(Model model, HttpSession session) {
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
         List<String> files = this.persistenceService.retrieveAllSecuritySchemes((String) session.getAttribute("username"));
         model.addAttribute("securitySchemes", files);
-        return loginCheck(model, session, "securityScheme");
+        return "securityScheme";
     }
 
     // 1.4 - definizione di tag, path e operazioni
     @GetMapping("/pathsDefinition")
     public String pathsDefinition(Model model, HttpSession session) {
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
         List<String> currentPojoList = new ArrayList<>();
 
         List<String> selectedPojos = (List<String>) session.getAttribute("selectedPojos");
@@ -262,13 +279,15 @@ public class MainController {
 
         model.addAttribute("securitySchemeName", ((SecurityScheme) session.getAttribute("securityScheme")).getName());
         model.addAttribute("securitySchemeScopes", scopes.stream().distinct().collect(Collectors.toList()));
-        return loginCheck(model, session, "pathsDefinition");
+        return "pathsDefinition";
     }
 
     // 1.5 - pagina di review con possibilità di download/modifica e validazione .yaml e generazione server
     @GetMapping("/reviewPage")
     public String reviewPage(Model model, HttpSession session) {
-
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
         String finalYamlSpec = (String) session.getAttribute("finalYaml");
         if (finalYamlSpec == null) {
             List<Tag> tags = (List<Tag>) session.getAttribute("tagList");
@@ -286,21 +305,35 @@ public class MainController {
         }
         model.addAttribute("finalYaml", finalYamlSpec);
 
-        return loginCheck(model, session, "reviewPage");
+        return "reviewPage";
+    }
+
+    // 1.5.x - validazione di un file yaml
+    @PostMapping("/validateYaml")
+    public ResponseEntity<String> validateYaml(@RequestBody Map<String, String> data) {
+
+        String yaml = data.get("yaml");
+
+        // TODO
+
+        String otherProjectUrl = "http://localhost:8080/api/validateOpenAPISpec"; // Cambia l'URL con quello effettivo dell'altro progetto
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Esegui la chiamata HTTP per ottenere la mappa di contenuti
+        return null; //restTemplate.getForEntity(otherProjectUrl, String.class);
     }
 
 
 
-
     // Metodi di utilità -----------------------------------------------------------------------------------------------
-    private String loginCheck(Model model, HttpSession session, String pageToReturn) {
+    private boolean loginCheck(Model model, HttpSession session) {
         String username = (String) session.getAttribute("username");
         model.addAttribute("username", username);
         if (username != null) {
             model.addAttribute("username", username);
-            return pageToReturn;
+            return true;
         } else {
-            return "redirect:/login";
+            return false;
         }
     }
 
