@@ -43,6 +43,15 @@
     </div>
 
     <div id="rightPanel" class="form-section" style="display: none"></div>
+
+    <div id="footer">
+        <section>
+            <div><span>Username: </span><span id="username" class="username" th:text="${username}"></span></div>
+            <form th:action="@{/}" method="get">
+                <input type="submit" value="Home"/>
+            </form>
+        </section>
+    </div>
 </div>
 </body>
 </html>

@@ -44,11 +44,23 @@ public class MainController {
         if (!loginCheck(model, session)) {
             return REDIRECT;
         }
+        cleanSession(session);
 
         List<String> files = this.persistenceService.retrieveAllYaml((String) session.getAttribute("username"));
         model.addAttribute("yamlFiles", files);
 
         return setPojos() ? "index" : "error";
+    }
+
+    private void cleanSession(HttpSession session) {
+        java.util.Enumeration<String> attributeNames = session.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            String attributeName = attributeNames.nextElement();
+            // Rimuovo tutti gli attributi tranne quello con il nome "username"
+            if (!attributeName.equals("username")) {
+                session.removeAttribute(attributeName);
+            }
+        }
     }
 
     // Funzionalità 1 (creazione di una specifica "form scratch")

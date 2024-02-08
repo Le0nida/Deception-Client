@@ -153,3 +153,39 @@ body {
 .dialog button:hover {
     background-color: rgba(195, 210, 243, 0.90);
 }
+
+#footer {
+    display: flex;
+    flex: 1;
+    margin-top: 20px;
+    width: max-content;
+}
+
+#footer form {
+    margin-top: 10px;
+}
+
+#footer section span{
+    font-weight: bold;
+    font-size: 19px;
+    color: darkslategray;
+}
+
+#footer input[type="submit"] {
+    padding: 10px;
+    font-size: 16px;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#footer input[type="submit"]:hover {
+    background-color: #e59e9e;
+}
+
+#footer #username {
+    font-weight: lighter !important;
+    font-size: 18px !important;
+}

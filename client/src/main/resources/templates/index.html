@@ -68,7 +68,7 @@
 
     <div id="footer">
         <section>
-            <div><span>Username: </span><span id="username" class="username" th:text="${username}"></div>
+            <div><span>Username: </span><span id="username" class="username" th:text="${username}"></span></div>
             <form th:action="@{/logout}" method="post">
                 <input type="submit" value="Sign Out"/>
             </form>
