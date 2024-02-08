@@ -9,7 +9,8 @@ import cybersec.deception.model.*;
 import cybersec.deception.client.services.YamlBuilderService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,12 @@ import java.util.stream.Collectors;
 
 @Controller
 public class MainController {
+
+    @Value("${deamon.path}")
+    private String deamonPath;
+
+    @Value("${deamon.validateyaml.api}")
+    private String validateYamlApi;
 
     private static final String REDIRECT = "redirect:/login";
     private final YamlBuilderService yamlService;
@@ -328,15 +335,21 @@ public class MainController {
     @PostMapping("/validateYaml")
     public ResponseEntity<String> validateYaml(@RequestBody Map<String, String> data) {
 
-        String yaml = data.get("yaml");
+        String yamlString = data.get("yaml");
+        String deamonUrl = deamonPath + validateYamlApi;
 
-        // TODO
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> requestEntity = new HttpEntity<>(yamlString, headers);
 
-        String otherProjectUrl = "http://localhost:8080/api/validateOpenAPISpec"; // Cambia l'URL con quello effettivo dell'altro progetto
         RestTemplate restTemplate = new RestTemplate();
-
-        // Esegui la chiamata HTTP per ottenere la mappa di contenuti
-        return null; //restTemplate.getForEntity(otherProjectUrl, String.class);
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity(deamonUrl, requestEntity, String.class);
+            return responseEntity;
+        } catch (Exception e) {
+            System.out.println("Errore durante la chiamata all'endpoint: " + e.getMessage());
+        };
+        return ResponseEntity.ok("Error");
     }
 
 

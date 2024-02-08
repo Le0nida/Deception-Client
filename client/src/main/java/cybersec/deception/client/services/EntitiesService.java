@@ -3,6 +3,7 @@ package cybersec.deception.client.services;
 import cybersec.deception.client.utils.Utils;
 import cybersec.deception.model.OAuthFlows;
 import cybersec.deception.model.SecurityScheme;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,12 @@ import java.util.Map;
 
 @Service
 public class EntitiesService {
+
+    @Value("${deamon.path}")
+    private String deamonPath;
+
+    @Value("${deamon.retrieveentities.api}")
+    private String retrieveEntitiesApi;
     public String defineYamlComponents(Map<String, String> entitiesMap, SecurityScheme scheme) {
 
         // Imposta le opzioni per la formattazione YAML
@@ -56,7 +63,7 @@ public class EntitiesService {
         // aggiungo l'unico schema di sicurezza
         if (scheme != null) {
             yamlStringBuilder.append("  securitySchemes:\n");
-            yamlStringBuilder.append("    ").append(scheme.getName()).append(":\n");
+            yamlStringBuilder.append("    ").append(!Utils.isNullOrEmpty(scheme.getName()) ? scheme.getName() : "defaultsecurity").append(":\n");
             yamlStringBuilder.append("      type: ").append(scheme.getType()).append("\n");
             yamlStringBuilder.append("      description: ").append(scheme.getDescription()).append("\n");
             yamlStringBuilder.append("      name: ").append(scheme.getName()).append("\n");
@@ -120,16 +127,9 @@ public class EntitiesService {
     }
 
     public ResponseEntity<Map> retrieveAllEntities() {
-        String otherProjectUrl = "http://localhost:8080/api/entities/retrieveAll"; // Cambia l'URL con quello effettivo dell'altro progetto
+        String otherProjectUrl = deamonPath + retrieveEntitiesApi;
         RestTemplate restTemplate = new RestTemplate();
-
-        // Esegui la chiamata HTTP per ottenere la mappa di contenuti
         ResponseEntity<Map> responseEntity = restTemplate.getForEntity(otherProjectUrl, Map.class);
-
-        // Ottieni lo stato HTTP dalla risposta
-        HttpStatusCode statusCode = responseEntity.getStatusCode();
-
-        // Ottieni il corpo della risposta
         return responseEntity;
     }
 }

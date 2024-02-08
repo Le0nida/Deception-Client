@@ -1,23 +1,28 @@
 package cybersec.deception.client;
 
 import cybersec.deception.client.services.PersistenceService;
-import cybersec.deception.client.services.YamlBuilderService;
+import cybersec.deception.client.utils.ZipUtils;
+import cybersec.deception.model.ServerBuildResponse;
 import cybersec.deception.model.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class InnerController {
 
+    @Value("${deamon.path}")
+    private String deamonPath;
+
+    @Value("${deamon.generateserver.api}")
+    private String generateServerApi;
     private final PersistenceService persistenceService;
     @Autowired
     public InnerController(PersistenceService persistenceService) {
@@ -26,12 +31,32 @@ public class InnerController {
 
     // Salva in sessione i tag, con relativi path e operazioni
     @PostMapping("/generateServer")
-    public ResponseEntity<String> setTags(@RequestBody boolean useDb, HttpSession session) {
-        session.getAttribute("finalYaml");
+    public ResponseEntity<byte[]> setTags(@RequestBody boolean useDb, HttpSession session) {
+        String yamlSpecString = (String) session.getAttribute("finalYaml");
+        String url = deamonPath + generateServerApi;
 
-        // TODO chiamata al server
+        // Configura il corpo della richiesta
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("yamlSpecString", yamlSpecString);
+        requestBody.put("persistence", useDb);
 
-        return ResponseEntity.ok("reviewPage");
+        // Configura l'header della richiesta
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Configura l'entità della richiesta
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            ResponseEntity<ServerBuildResponse> responseEntity = restTemplate.postForEntity(url, requestEntity, ServerBuildResponse.class);
+            byte[] finalZip = ZipUtils.createCombinedZip(Objects.requireNonNull(responseEntity.getBody()));
+
+            return ResponseEntity.ok(finalZip);
+        } catch (Exception e) {
+            System.out.println("Errore durante la chiamata all'endpoint: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     // Salva in sessione i tag, con relativi path e operazioni

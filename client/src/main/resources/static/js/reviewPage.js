@@ -94,10 +94,31 @@ function generateServer(useDb) {
         type: 'POST',
         url: 'generateServer',
         contentType: 'application/json',
-        data: useDb,
+        data: JSON.stringify(useDb),
+        xhrFields: {
+            responseType: 'blob' // Imposta il tipo di risposta come Blob
+        },
         success: function (response) {
+            // Crea un oggetto URL per il Blob
+            const blobURL = URL.createObjectURL(response);
 
-            // TODO gestire download zip
+            // Crea un link HTML per il download del file
+            const link = document.createElement('a');
+            link.href = blobURL;
+            link.download = 'restApiServer.zip'; // Nome del file da scaricare
+            link.style.display = 'none';
+
+            // Aggiungi il link al documento HTML
+            document.body.appendChild(link);
+
+            // Simula un clic sul link per avviare il download
+            link.click();
+
+            // Rimuovi il link dal documento
+            document.body.removeChild(link);
+
+            // Rilascia l'URL oggetto per il Blob
+            URL.revokeObjectURL(blobURL);
         },
         error: function (error) {
             console.error('Error: ', error);
