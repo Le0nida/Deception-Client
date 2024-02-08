@@ -19,7 +19,6 @@
         <h3>Definition of general information related to an OpenAPI specification</h3>
     </div>
 
-
     <div class="button-container">
         <button id="reset">Reset</button>
         <button id="import">Import</button>
@@ -28,21 +27,20 @@
     </div>
 
     <div id="apiSpecForm">
-
         <div class="form-container">
             <div class="form-section">
                 <h2>OpenAPI Version</h2>
                 <label for="openapi"></label>
-                <input type="text" id="openapi" name="openapi">
+                <input type="text" id="openapi" name="openapi" placeholder="e.g., 3.0.0">
             </div>
 
             <div class="form-section">
                 <h2>External Docs</h2>
                 <label for="externalDocsDescription">Description:</label>
-                <input type="text" id="externalDocsDescription" name="externalDocsDescription">
+                <input type="text" id="externalDocsDescription" name="externalDocsDescription" placeholder="e.g., Documentation for APIs">
 
                 <label for="externalDocsUrl">URL:</label>
-                <input type="text" id="externalDocsUrl" name="externalDocsUrl">
+                <input type="text" id="externalDocsUrl" name="externalDocsUrl" placeholder="e.g., https://example.com/docs">
             </div>
 
             <div class="form-section" id="serverform">
@@ -51,30 +49,29 @@
                 <div id="addedServers"></div>
 
                 <label for="serverUrl">URL:</label>
-                <input type="text" id="serverUrl" name="serverUrl">
+                <input type="text" id="serverUrl" name="serverUrl" placeholder="e.g., https://api.example.com">
 
                 <label for="serverDescription">Description:</label>
-                <input type="text" id="serverDescription" name="serverDescription">
+                <input type="text" id="serverDescription" name="serverDescription" placeholder="e.g., Main server for production environment">
 
                 <button type="button" onclick="addServer()">Add Server</button>
             </div>
-
-
         </div>
+
         <div class="form-container">
             <div class="form-section">
                 <h2>Info</h2>
                 <label for="titleInfo">Title:</label>
-                <input type="text" id="titleInfo" name="title">
+                <input type="text" id="titleInfo" name="title" placeholder="e.g., My Awesome API">
 
                 <label for="descriptionInfo">Description:</label>
-                <input type="text" id="descriptionInfo" name="description">
+                <input type="text" id="descriptionInfo" name="description" placeholder="e.g., This API provides functionalities for...">
 
                 <label for="termsOfServiceInfo">Terms of Service:</label>
-                <input type="text" id="termsOfServiceInfo" name="termsOfService">
+                <input type="text" id="termsOfServiceInfo" name="termsOfService" placeholder="e.g., https://example.com/terms">
 
                 <label for="versionInfo">Version:</label>
-                <input type="text" id="versionInfo" name="version">
+                <input type="text" id="versionInfo" name="version" placeholder="e.g., 1.0.0">
 
 
                 <div id="inner-form-section">
@@ -82,13 +79,13 @@
                         <div class="form-section">
                             <h3>Contact</h3>
                             <label for="nameContact">Name:</label>
-                            <input type="text" id="nameContact" name="name">
+                            <input type="text" id="nameContact" name="name" placeholder="e.g., John Doe">
 
                             <label for="urlContact">URL:</label>
-                            <input type="text" id="urlContact" name="url">
+                            <input type="text" id="urlContact" name="url" placeholder="e.g., https://example.com">
 
                             <label for="emailContact">E-mail:</label>
-                            <input type="text" id="emailContact" name="email">
+                            <input type="text" id="emailContact" name="email" placeholder="e.g., john.doe@example.com">
                         </div>
                     </div>
 
@@ -96,24 +93,20 @@
                         <div class="form-section">
                             <h3>License</h3>
                             <label for="nameLicense">Name:</label>
-                            <input type="text" id="nameLicense" name="nameLicense">
+                            <input type="text" id="nameLicense" name="nameLicense" placeholder="e.g., Apache 2.0">
 
                             <label for="urlLicense">URL:</label>
-                            <input type="text" id="urlLicense" name="urlLicense">
+                            <input type="text" id="urlLicense" name="urlLicense" placeholder="e.g., https://www.apache.org/licenses/LICENSE-2.0">
 
                             <label for="identifier">Identifier:</label>
-                            <input type="text" id="identifier" name="identifier">
+                            <input type="text" id="identifier" name="identifier" placeholder="e.g., Apache-2.0">
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
-
-
-
     </div>
+
     <div id="footer">
         <section>
             <div><span>Username: </span><span id="username" class="username" th:text="${username}"></span></div>
@@ -124,12 +117,11 @@
     </div>
 </div>
 
-<div id="page-cover"></div> <!-- Div di copertura -->
+<div id="page-cover"></div>
 <div id="dialogimport" class="dialog">
     <h2>Select Schema to Import</h2>
     <label for="selectOption"></label><select id="selectOption">
         <option value="">Select a configuration</option>
-        <!-- Utilizza Thymeleaf per iterare sulla lista di entità nel model -->
         <th:block th:each="entity : ${generalInfoFiles}">
             <option th:text="${entity}" th:value="${entity}"></option>
         </th:block>

@@ -1,14 +1,24 @@
 const serverKeyDescMap = new Map();
 
+// Regex per la validazione
+const regex = {
+    // Regex per l'URL
+    url: /^(ftp|http|https):\/\/[^ "]+$/,
+    // Regex per l'indirizzo email
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    // Regex per la versione
+    version: /^\d+\.\d+\.\d+$/
+};
+
 function saveConfig() {
-    var userInput = prompt("Inserisci il nome con cui salvare la configurazione");
+    const userInput = prompt("Enter the name to save the configuration");
 
     // Controlla se l'utente ha inserito un valore
     if (userInput !== null) {
         const apiSpec = buildApiSpec();
 
         // Creare un oggetto con i dati da inviare
-        var data = {
+        const data = {
             filename: userInput,
             generalInfo: JSON.stringify(apiSpec)
         };
@@ -23,12 +33,10 @@ function saveConfig() {
                 console.log(response)
             },
             error: function (error) {
-                console.error('Error:', error);
+                console.error('Error: ', error);
+                alert("Error during configuration saving")
             }
         });
-    } else {
-        // Se l'utente ha premuto Annulla, stampa un messaggio nella console del browser
-        console.log("Operazione annullata dall'utente.");
     }
 }
 
@@ -44,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     $('#reset').click(function() {
-        const confirmSave = window.confirm('Svuotare tutti i campi?');
+        const confirmSave = window.confirm('Empty all fields?');
         if (confirmSave) {
             // Imposta i valori dei campi della pagina con la risposta, gestendo i valori nulli
             $('#openapi').val('');
@@ -68,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Chiudi la dialog se si clicca al di fuori di essa
     $(document).mouseup(function(e) {
-        var dialog = $('#dialogimport');
+        const dialog = $('#dialogimport');
         // Se il click non è all'interno della dialog o del pulsante "Import", chiudi la dialog
         if (!dialog.is(e.target) && dialog.has(e.target).length === 0 && !$('#import').is(e.target)) {
             dialog.hide();
@@ -114,16 +122,17 @@ function fillValues(selectedOption) {
             }
         },
         error: function (error) {
-            console.error('Error:', error);
+            console.error('Error: ', error);
+            alert("Error during configuration retrieval")
         }
     });
 
 }
 
 function confirmSelection() {
-    var selectedOption = $('#selectOption').val();
+    const selectedOption = $('#selectOption').val();
     if (selectedOption === null || selectedOption === "") {
-        alert("Si prega di selezionare una configurazione");
+        alert("Please select a configuration");
         return;
     }
     // Esegui le azioni desiderate con l'opzione selezionata
@@ -139,8 +148,21 @@ function addServer() {
     const serverUrl = document.getElementById('serverUrl');
     const serverUrlValue = serverUrl.value.trim();
     if (isEmptyString(serverUrlValue)) {
-        alert('Il campo "url" di un server non può essere vuoto.');
+        alert("The 'url' field of a server cannot be empty.");
         return;
+    }
+    // Se il campo non è vuoto
+    if (serverUrlValue !== '') {
+        // Verifica la corrispondenza con la regex
+        if (!regex["version"].test(serverUrlValue)) {
+            // Se non corrisponde, evidenzia il campo di rosso
+            serverUrl.style.borderColor = 'red';
+            alert("The 'url' field does not comply with the syntax.");
+            return;
+        } else {
+            // Altrimenti, reimposta il colore del bordo
+            serverUrl.style.borderColor = '';
+        }
     }
 
     const serverDescInput = document.getElementById('serverDescription');
@@ -167,6 +189,27 @@ function buildApiSpec() {
     const versionInfo = document.getElementById("versionInfo").value.trim();
 
     if (!apiSpec.openapi || !titleInfo || !versionInfo) {
+        if (!apiSpec.openapi) {
+            // Se non corrisponde, evidenzia il campo di rosso
+            document.getElementById("openapi").style.borderColor = 'red';
+        } else {
+            // Altrimenti, reimposta il colore del bordo
+            document.getElementById("openapi").style.borderColor = '';
+        }
+        if (!titleInfo) {
+            // Se non corrisponde, evidenzia il campo di rosso
+            document.getElementById("titleInfo").style.borderColor = 'red';
+        } else {
+            // Altrimenti, reimposta il colore del bordo
+            document.getElementById("titleInfo").style.borderColor = '';
+        }
+        if (!versionInfo) {
+            // Se non corrisponde, evidenzia il campo di rosso
+            document.getElementById("versionInfo").style.borderColor = 'red';
+        } else {
+            // Altrimenti, reimposta il colore del bordo
+            document.getElementById("versionInfo").style.borderColor = '';
+        }
         alert("OpenAPI Version, Title Info, and Version Info cannot be null");
         return;
     }
@@ -208,10 +251,15 @@ function handleContinueButton() {
         return;
     }
 
+    if (!validateInputFields()) {
+        alert("Some fields do not comply with the syntax.");
+        return;
+    }
+
     const apiSpec = buildApiSpec();
 
     // Creare un oggetto con i dati da inviare
-    var data = {
+    const data = {
         step: 'pojo',
         apiSpec: JSON.stringify(apiSpec)
     };
@@ -227,8 +275,46 @@ function handleContinueButton() {
             window.location.href = 'schemaDefinition'
         },
         error: function (error) {
-            console.error('Error:', error);
+            console.error('Error: ', error);
+            alert("Error while proceeding to the next step")
         }
     });
 }
 
+
+// Validazione dei campi
+function validateInputFields() {
+
+    // Campi di input da validare
+    const fieldsToValidate = [
+        { id: 'openapi', type: 'version' },
+        { id: 'versionInfo', type: 'version' },
+        { id: 'externalDocsUrl', type: 'url' },
+        { id: 'termsOfServiceInfo', type: 'url' },
+        { id: 'urlContact', type: 'url' },
+        { id: 'emailContact', type: 'email' },
+        { id: 'urlLicense', type: 'url' }
+    ];
+
+    let returnvalue = true;
+
+    // Itera sui campi da validare
+    fieldsToValidate.forEach(field => {
+        const inputField = document.getElementById(field.id);
+        const value = inputField.value.trim();
+        // Se il campo non è vuoto
+        if (value !== '') {
+            // Verifica la corrispondenza con la regex
+            if (!regex[field.type].test(value)) {
+                returnvalue = false;
+                // Se non corrisponde, evidenzia il campo di rosso
+                inputField.style.borderColor = 'red';
+            } else {
+                // Altrimenti, reimposta il colore del bordo
+                inputField.style.borderColor = '';
+            }
+        }
+    });
+
+    return returnvalue
+}
