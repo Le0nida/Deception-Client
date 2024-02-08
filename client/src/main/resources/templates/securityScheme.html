@@ -79,27 +79,27 @@
                 <div class="inner-form-section" id="implicitFlow">
                     <h4>Implicit</h4>
                     <label for="authorizationUrlImplicit">Authorization URL:</label>
-                    <input type="text" id="authorizationUrlImplicit" name="authorizationUrlImplicit" placeholder="Enter authorization URL">
+                    <input type="text" id="authorizationUrlImplicit" name="authorizationUrlImplicit" placeholder="https://example.com/">
 
                     <label for="refreshUrlImplicit">Refresh URL:</label>
-                    <input type="text" id="refreshUrlImplicit" name="refreshUrlImplicit" placeholder="Enter refresh URL">
+                    <input type="text" id="refreshUrlImplicit" name="refreshUrlImplicit" placeholder="https://example.com/">
 
                     <label for="scopesImplicit">Scopes (comma-separated):</label>
-                    <input type="text" id="scopesImplicit" name="scopesImplicit" placeholder="e.g., read,write">
+                    <input type="text" id="scopesImplicit" name="scopesImplicit" placeholder="e.g., read: descrizione, write:descrizione">
                 </div>
                 <div class="inner-form-section" id="authorizationCodeFlow">
                     <h4>Authorization Code</h4>
                     <label for="authorizationUrlAuthCode">Authorization URL:</label>
-                    <input type="text" id="authorizationUrlAuthCode" name="authorizationUrlAuthCode" placeholder="Enter authorization URL">
+                    <input type="text" id="authorizationUrlAuthCode" name="authorizationUrlAuthCode" placeholder="https://example.com/">
 
                     <label for="refreshUrlAuthCode">Refresh URL:</label>
-                    <input type="text" id="refreshUrlAuthCode" name="refreshUrlAuthCode" placeholder="Enter refresh URL">
+                    <input type="text" id="refreshUrlAuthCode" name="refreshUrlAuthCode" placeholder="https://example.com/">
 
                     <label for="scopesAuthCode">Scopes (comma-separated):</label>
-                    <input type="text" id="scopesAuthCode" name="scopesAuthCode" placeholder="e.g., read,write">
+                    <input type="text" id="scopesAuthCode" name="scopesAuthCode" placeholder="e.g., read: descrizione, write:descrizione">
 
                     <label for="tokenUrlAuthCode">Token URL:</label>
-                    <input type="text" id="tokenUrlAuthCode" name="tokenUrlAuthCode" placeholder="Enter token URL">
+                    <input type="text" id="tokenUrlAuthCode" name="tokenUrlAuthCode" placeholder="https://example.com/">
 
                 </div>
             </div>
@@ -107,24 +107,24 @@
                 <div class="inner-form-section" id="clientCredentialsFlow">
                     <h4>Client Credentials</h4>
                     <label for="tokenUrlClient">Token URL:</label>
-                    <input type="text" id="tokenUrlClient" name="tokenUrlClient" placeholder="Enter token URL">
+                    <input type="text" id="tokenUrlClient" name="tokenUrlClient" placeholder="https://example.com/">
 
                     <label for="refreshUrlClient">Refresh URL:</label>
-                    <input type="text" id="refreshUrlClient" name="refreshUrlClient" placeholder="Enter refresh URL">
+                    <input type="text" id="refreshUrlClient" name="refreshUrlClient" placeholder="https://example.com/">
 
                     <label for="scopesClient">Scopes (comma-separated):</label>
-                    <input type="text" id="scopesClient" name="scopesClient" placeholder="e.g., read,write">
+                    <input type="text" id="scopesClient" name="scopesClient" placeholder="e.g., read: descrizione, write:descrizione">
                 </div>
                 <div class="inner-form-section" id="passwordFlow">
                     <h4>Password</h4>
                     <label for="tokenUrlPass">Token URL:</label>
-                    <input type="text" id="tokenUrlPass" name="tokenUrlPass" placeholder="Enter token URL">
+                    <input type="text" id="tokenUrlPass" name="tokenUrlPass" placeholder="https://example.com/">
 
                     <label for="refreshUrlPass">Refresh URL:</label>
-                    <input type="text" id="refreshUrlPass" name="refreshUrlPass" placeholder="Enter refresh URL">
+                    <input type="text" id="refreshUrlPass" name="refreshUrlPass" placeholder="https://example.com/">
 
                     <label for="scopesPass">Scopes (comma-separated):</label>
-                    <input type="text" id="scopesPass" name="scopesPass" placeholder="e.g., read,write">
+                    <input type="text" id="scopesPass" name="scopesPass" placeholder="e.g., read: descrizione, write:descrizione">
                 </div>
             </div>
         </div>
@@ -138,12 +138,11 @@
         </section>
     </div>
 </div>
-<div id="page-cover"></div> <!-- Div di copertura -->
+<div id="page-cover"></div>
 <div id="dialogimport" class="dialog">
     <h2>Select Schema to Import</h2>
     <label for="selectOption"></label><select id="selectOption">
     <option value="">Select a configuration</option>
-    <!-- Utilizza Thymeleaf per iterare sulla lista di entità nel model -->
     <th:block th:each="entity : ${securitySchemes}">
         <option th:text="${entity}" th:value="${entity}"></option>
     </th:block>

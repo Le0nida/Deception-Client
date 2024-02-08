@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     $('#reset').click(function() {
-        const confirmSave = window.confirm('Svuotare tutti i campi?');
+        const confirmSave = window.confirm('Empty all fields?');
         if (confirmSave) {
             $('input[type="text"]').val('');
         }
@@ -130,9 +130,14 @@ function buildSecurityScheme() {
     return new SecurityScheme(type, description, name, inValue, scheme, bearerFormat, openIdConnectUrl, flows);
 }
 
-
 function saveConfig() {
-    var userInput = prompt("Inserisci il nome con cui salvare la configurazione");
+
+    if (!validateInputFields()) {
+        alert("Some fields do not comply with the syntax.");
+        return;
+    }
+
+    var userInput = prompt("Enter the name to save the configuration");
 
     // Controlla se l'utente ha inserito un valore
     if (userInput !== null) {
@@ -144,7 +149,6 @@ function saveConfig() {
             securityScheme: JSON.stringify(securityScheme)
         };
 
-        // Eseguire la richiesta POST con Ajax
         $.ajax({
             type: 'POST',
             url: 'setSecurityScheme',
@@ -154,12 +158,10 @@ function saveConfig() {
                 console.log(response)
             },
             error: function (error) {
-                console.error('Error:', error);
+                console.error('Error: ', error);
+                alert("Error during configuration saving")
             }
         });
-    } else {
-        // Se l'utente ha premuto Annulla, stampa un messaggio nella console del browser
-        console.log("Operazione annullata dall'utente.");
     }
 }
 
@@ -207,7 +209,8 @@ function fillValues(selectedOption) {
             }
         },
         error: function (error) {
-            console.error('Error:', error);
+            console.error('Error: ', error);
+            alert("Error during configuration retrieval")
         }
     });
 
@@ -216,7 +219,7 @@ function fillValues(selectedOption) {
 function confirmSelection() {
     var selectedOption = $('#selectOption').val();
     if (selectedOption === null || selectedOption === "") {
-        alert("Si prega di selezionare una configurazione");
+        alert("Please select a configuration");
         return;
     }
     // Esegui le azioni desiderate con l'opzione selezionata
@@ -228,6 +231,12 @@ function confirmSelection() {
 }
 
 function handleContinueButton() {
+
+    if (!validateInputFields()) {
+        alert("Some fields do not comply with the syntax.");
+        return;
+    }
+
     const securityScheme = buildSecurityScheme();
 
     // Creare un oggetto con i dati da inviare
@@ -247,7 +256,62 @@ function handleContinueButton() {
             window.location.href = 'pathsDefinition'
         },
         error: function (error) {
-            console.error('Error:', error);
+            console.error('Error: ', error);
+            alert("Error while proceeding to the next step")
         }
     });
+}
+
+// Validazione dei campi
+function validateInputFields() {
+
+    // Regex per la validazione
+    const regex = {
+        // Regex per l'URL
+        url: /^(ftp|http|https):\/\/[^ "]+$/,
+        // Regex per gli scopes
+        scope: /^\s*(\w+)\s*:\s*(\w+)\s*(?:,\s*(\w+)\s*:\s*(\w+)\s*)*$/
+    };
+
+    // Campi di input da validare
+    const fieldsToValidate = [
+        { id: 'openIdConnectUrl', type: 'url' },
+        { id: 'authorizationUrlImplicit', type: 'url' },
+        { id: 'refreshUrlImplicit', type: 'url' },
+        { id: 'authorizationUrlAuthCode', type: 'url' },
+        { id: 'refreshUrlAuthCode', type: 'url' },
+        { id: 'tokenUrlAuthCode', type: 'url' },
+        { id: 'tokenUrlClient', type: 'url' },
+        { id: 'refreshUrlClient', type: 'url' },
+        { id: 'tokenUrlPass', type: 'url' },
+        { id: 'refreshUrlPass', type: 'url' },
+        { id: 'refreshUrlAuthCode', type: 'url' },
+        { id: 'tokenUrlAuthCode', type: 'url' },
+        { id: 'scopesImplicit', type: 'scope' },
+        { id: 'scopesAuthCode', type: 'scope' },
+        { id: 'scopesClient', type: 'scope' },
+        { id: 'scopesPass', type: 'scope' }
+    ];
+
+    let returnvalue = true;
+
+    // Itera sui campi da validare
+    fieldsToValidate.forEach(field => {
+        const inputField = document.getElementById(field.id);
+        const value = inputField.value.trim();
+        // Se il campo non è vuoto
+        if (value !== '') {
+            // Verifica la corrispondenza con la regex
+            if (!regex[field.type].test(value)) {
+                returnvalue = false;
+                // Se non corrisponde, evidenzia il campo di rosso
+                inputField.style.borderColor = 'red';
+            } else {
+                // Altrimenti, reimposta il colore del bordo
+                inputField.style.borderColor = '';
+            }
+        }
+    });
+
+    return returnvalue
 }
