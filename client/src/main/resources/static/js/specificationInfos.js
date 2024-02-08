@@ -143,7 +143,6 @@ function confirmSelection() {
     $('body').removeClass('dialog-open');
 }
 
-
 function addServer() {
     const serverUrl = document.getElementById('serverUrl');
     const serverUrlValue = serverUrl.value.trim();
@@ -154,7 +153,7 @@ function addServer() {
     // Se il campo non è vuoto
     if (serverUrlValue !== '') {
         // Verifica la corrispondenza con la regex
-        if (!regex["version"].test(serverUrlValue)) {
+        if (!regex["url"].test(serverUrlValue)) {
             // Se non corrisponde, evidenzia il campo di rosso
             serverUrl.style.borderColor = 'red';
             alert("The 'url' field does not comply with the syntax.");
