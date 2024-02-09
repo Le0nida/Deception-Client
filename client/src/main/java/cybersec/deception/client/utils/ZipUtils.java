@@ -32,7 +32,7 @@ public class ZipUtils {
     }
 
     public static byte[] createCombinedZip(ServerBuildResponse resp) throws IOException {
-        return createCombinedZip(resp.getServerZipFile(), resp.getInstructions().getBytes(), mapToBytes(resp.getNotImplMethods()), resp.getServerDockerFile().getBytes());
+        return createCombinedZip(resp.getServerZipFile(), resp.getInstructions().getBytes(), resp.getNotImplMethods().getBytes(), resp.getServerDockerFile().getBytes());
     }
 
     private static byte[] createCombinedZip(byte[] zipFileBytes, byte[] txtFileBytes, byte[] notImplMethods, byte[] dockerImageBytes) throws IOException {
