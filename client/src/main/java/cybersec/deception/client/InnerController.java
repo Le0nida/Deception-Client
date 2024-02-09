@@ -31,14 +31,18 @@ public class InnerController {
 
     // Salva in sessione i tag, con relativi path e operazioni
     @PostMapping("/generateServer")
-    public ResponseEntity<byte[]> setTags(@RequestBody boolean useDb, HttpSession session) {
+    public ResponseEntity<byte[]> setTags(@RequestBody Map<String, Object> data, HttpSession session) {
         String yamlSpecString = (String) session.getAttribute("finalYaml");
         String url = deamonPath + generateServerApi;
+
+        boolean useDb = (boolean) data.get("persistence");
+        String basePath = (String) data.get("basePath");
 
         // Configura il corpo della richiesta
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("yamlSpecString", yamlSpecString);
         requestBody.put("persistence", useDb);
+        requestBody.put("basePath", basePath);
 
         // Configura l'header della richiesta
         HttpHeaders headers = new HttpHeaders();

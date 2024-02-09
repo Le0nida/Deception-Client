@@ -9,7 +9,6 @@ info:
     name: John Doe
     url: https://example.com/
   license:
-    identifier: Apache-2.0
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
 externalDocs:
@@ -169,75 +168,70 @@ components:
           example: 10
         first_name:
           type: string
-          example: Leigha
+          example: Philly
         last_name:
           type: string
-          example: Lavens
+          example: Moxsom
         email:
           type: string
-          example: llavens0@hexun.com
+          example: pmoxsom0@usa.gov
         username:
           type: string
-          example: llavens0
+          example: pmoxsom0
         password:
           type: string
-          example: $2a$04$E2rcxA.0yR.F5UgOZiwFp.1xSnWpXCFFe83JTauj.68CftdM657oa
+          example: $2a$04$q9FVxkQgg1lIoAHMlYITTeWImyCnfAOCNOsVLtcFG0sDzvlpaPv6W
         gender:
           type: string
           example: Female
         ipaddress:
           type: string
-          example: 254.200.155.43
-        address:
+          example: 60.209.192.44
+        address_id:
           type: string
-          example: {street=2933 Farragut Place, city=Lembongan Kawan, state=null, zipcode=null}
+          example: 1
         phone_number:
           type: string
-          example: +62 (643) 733-0126
+          example: +62 (469) 972-0554
         job_title:
           type: string
-          example: Software Consultant
+          example: Accounting Assistant III
         department:
           type: string
-          example: Sales
-        company:
+          example: Legal
+        company_id:
           type: string
-          example: {name=Ntag, industry=Real Estate Investment Trusts}
+          example: 1
         isActive:
           type: string
           example: true
   securitySchemes:
-    :
+    defaultsecurity:
       type: oauth2
       description: Oauth2 security schema
-      name: 
-      in: 
-      scheme: 
-      bearerFormat: 
-      openIdConnectUrl: 
-      flows: 
-        authorizationCode: 
+      flows:
+        authorizationCode:
           authorizationUrl: https://example.com/
           tokenUrl: https://example.com/
           refreshUrl: https://example.com/
-          scopes: 
+          scopes:
             read: ok
             write: ko
-        implicit: 
+        implicit:
           authorizationUrl: https://example.com/
           refreshUrl: https://example.com/
-          scopes: 
+          scopes:
             read: ok
             write: ko
-        password: 
+        password:
           tokenUrl: https://example.com/
           refreshUrl: https://example.com/
-          scopes: 
+          scopes:
             read: ok
             write: ko
-        clientCredentials: 
+        clientCredentials:
           tokenUrl: https://example.com/
           refreshUrl: https://example.com/
-          scopes: 
+          scopes:
             read: ok
             write: ko

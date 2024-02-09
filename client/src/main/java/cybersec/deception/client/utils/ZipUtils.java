@@ -32,7 +32,7 @@ public class ZipUtils {
     }
 
     public static byte[] createCombinedZip(ServerBuildResponse resp) throws IOException {
-        return createCombinedZip(resp.getServerZipFile(), resp.getInstructions().getBytes(), mapToBytes(resp.getNotImplMethods()), resp.getServerDockerImg());
+        return createCombinedZip(resp.getServerZipFile(), resp.getInstructions().getBytes(), mapToBytes(resp.getNotImplMethods()), resp.getServerDockerFile().getBytes());
     }
 
     private static byte[] createCombinedZip(byte[] zipFileBytes, byte[] txtFileBytes, byte[] notImplMethods, byte[] dockerImageBytes) throws IOException {
@@ -55,14 +55,11 @@ public class ZipUtils {
 
             // Aggiungi l'immagine Docker
             if (dockerImageBytes != null) {
-                addEntryToZip(zos, "docker.tar", dockerImageBytes);
+                addEntryToZip(zos, "Dockerfile", dockerImageBytes);
             }
 
             zos.finish();
             return baos.toByteArray();
-            //try (FileOutputStream fos = new FileOutputStream(outputPath)) {
-            //    baos.writeTo(fos);
-            //}
         }
     }
 

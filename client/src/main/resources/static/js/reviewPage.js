@@ -87,14 +87,29 @@ function saveYamlFile() {
 }
 
 function generateServer(useDb) {
+
+    const userInput = prompt("Insert a base path for your Api (default /api)")
+    if (userInput !== null) {
+        if (userInput.startsWith("/")) {
+            userInput.substring(1)
+        }
+        if (userInput.endsWith("/")) {
+            userInput.substring(userInput.length-1)
+        }
+    }
     $('#dialogimport').hide();
     $('body').removeClass('dialog-open');
+
+    const data = {
+        persistence: useDb,
+        basePath: userInput || ''
+    };
 
     $.ajax({
         type: 'POST',
         url: 'generateServer',
         contentType: 'application/json',
-        data: JSON.stringify(useDb),
+        data: JSON.stringify(data),
         xhrFields: {
             responseType: 'blob' // Imposta il tipo di risposta come Blob
         },

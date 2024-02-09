@@ -324,7 +324,9 @@ public class MainController {
                 String yamlComponents = this.entitiesService.defineYamlComponents(map, (SecurityScheme) session.getAttribute("securityScheme"));
                 finalYamlSpec = this.yamlService.buildYaml(apiSpec, yamlComponents);
             }
-            finalYamlSpec = "Error while parsing yaml file";
+            else {
+                finalYamlSpec = "Error while parsing yaml file";
+            }
         }
         model.addAttribute("finalYaml", finalYamlSpec);
 
