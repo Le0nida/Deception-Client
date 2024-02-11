@@ -1,0 +1,57 @@
+#httpRequestLogForm {
+    display: flex;
+    align-items: stretch; /* Allinea gli elementi verticalmente estendendoli */
+    max-height: min-content;
+}
+
+#httpRequestLogForm .form-section {
+    width: 100%; /* Imposta la larghezza al 50% per affiancarli */
+    box-sizing: border-box; /* Assicurati che il padding e il bordo siano inclusi nella larghezza */
+    padding: 0 10px; /* Aggiunge spazio tra i form */
+}
+
+.form-container {
+    width: 100%; /* Imposta la larghezza al 50% per affiancarli */
+    box-sizing: border-box; /* Assicurati che il padding e il bordo siano inclusi nella larghezza */
+    padding: 0 10px; /* Aggiunge spazio tra i form */
+
+}
+
+.form-container {
+    flex: 1; /* Imposta la stessa larghezza per entrambi i form-container */
+    display: flex;
+    flex-direction: column;
+}
+
+.form-section {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #F5F7FA6E;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+}
+
+.form-section h2 {
+    margin-top: 16px;
+}
+
+.form-section p {
+    margin-bottom: 20px;
+    margin-left:6px;
+}
+
+.form-section label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-section input {
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}

@@ -97,12 +97,21 @@ function generateServer(useDb) {
             userInput.substring(userInput.length-1)
         }
     }
+
+    const userInputDocs = prompt("Do you want swagger-ui docs (y/n)? (default yes)")
+    let docs = true;
+    if (userInputDocs !== null) {
+        if (userInputDocs.endsWith("n")) {
+            docs = false;
+        }
+    }
     $('#dialogimport').hide();
     $('body').removeClass('dialog-open');
 
     const data = {
         persistence: useDb,
-        basePath: userInput || ''
+        basePath: userInput || '',
+        docs: docs
     };
 
     $.ajax({

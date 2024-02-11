@@ -202,7 +202,7 @@ components:
         company_id:
           type: string
           example: 1
-        isActive:
+        is_active:
           type: string
           example: true
   securitySchemes:

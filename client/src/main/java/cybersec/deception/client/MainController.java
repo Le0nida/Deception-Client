@@ -160,33 +160,14 @@ public class MainController {
         return "reviewPage";
     }
 
-    // Funzionalità 4 (generazione di un'immagine da un file .zip)
-    @PostMapping("/generateImgFromZip")
-    public String generateImgFromZip(@RequestParam("file") MultipartFile file, Model model, HttpSession session) {
+    // Funzionalità 4 (visualizzazione logs)
+    @GetMapping("/logs")
+    public String logs(Model model, HttpSession session) {
         if (!loginCheck(model, session)) {
             return REDIRECT;
         }
-        // Controlla se il file è stato fornito
-        if (file.isEmpty()) {
-            return "Errore: nessun file fornito.";
-        }
-
-        // TODO
-
-        try {
-            // Esempio di salvataggio del file .zip nel server
-            byte[] bytes = file.getBytes();
-            // Qui esegui la logica per generare l'immagine docker dal file .zip
-
-            // Ritorna il percorso dell'immagine docker generata
-            return "/path/to/generated/docker/image";
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "Errore durante il caricamento del file: " + e.getMessage();
-        }
+        return "logs";
     }
-
-
 
 
     // OASCreation steps (step della funzionalità 1) -------------------------------------------------------------------

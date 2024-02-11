@@ -1,18 +1,24 @@
 package cybersec.deception.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cybersec.deception.client.services.PersistenceService;
 import cybersec.deception.client.utils.ZipUtils;
 import cybersec.deception.model.ServerBuildResponse;
 import cybersec.deception.model.Tag;
+import cybersec.deception.model.logmodel.LogRequest;
+import cybersec.deception.model.logmodel.LogResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.*;
 
 @Controller
@@ -36,6 +42,7 @@ public class InnerController {
         String url = deamonPath + generateServerApi;
 
         boolean useDb = (boolean) data.get("persistence");
+        boolean docs = (boolean) data.get("docs");
         String basePath = (String) data.get("basePath");
 
         // Configura il corpo della richiesta
@@ -43,6 +50,7 @@ public class InnerController {
         requestBody.put("yamlSpecString", yamlSpecString);
         requestBody.put("persistence", useDb);
         requestBody.put("basePath", basePath);
+        requestBody.put("docs", docs);
 
         // Configura l'header della richiesta
         HttpHeaders headers = new HttpHeaders();
@@ -131,5 +139,32 @@ public class InnerController {
         String attributoDaAggiornare = data.get("attributoDaAggiornare");
         session.setAttribute(attributoDaAggiornare, valoreDaAggiornare);
         return ResponseEntity.ok("Modello aggiornato con successo");
+    }
+
+    @PostMapping("/getLogs")
+    public ResponseEntity<LogResponse> getLogs(@RequestBody Map<String, String> data) {
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Converte la stringa JSON in un oggetto LogRequest
+        ObjectMapper objectMapper = new ObjectMapper();
+        LogRequest logRequest;
+        try {
+            logRequest = objectMapper.readValue(data.get("logRequest"), LogRequest.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        HttpEntity<LogRequest> requestEntity = new HttpEntity<>(logRequest, headers);
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+        ResponseEntity<LogResponse> response = restTemplate.postForEntity(data.get("urlLog"), data.get("logRequest"), LogResponse.class);
+
+
+        return response;
     }
 }

@@ -18,32 +18,8 @@ function creaNuovaSpecifica() {
     });
 }
 
-function generateImgFromZip() {
-
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
-    if (!file) {
-        alert("Please select a file");
-        return;
-    }
-
-    var formData = new FormData();
-    formData.append('file', file);
-
-    $.ajax({
-        type: 'POST',
-        url: '/generateImgFromZip',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            console.log(response)
-        },
-        error: function(error) {
-            console.error("Error: ", error);
-            alert("An error occurred while loading the file");
-        }
-    });
+function getLogs() {
+    window.location.href = "logs"
 }
 
 function importaSpecificaEsistente() {
