@@ -1,7 +1,7 @@
 package cybersec.deception.client.services;
 
 import cybersec.deception.client.utils.Utils;
-import cybersec.deception.model.*;
+import cybersec.deception.model.apispecification.*;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -12,6 +12,7 @@ import java.util.Map;
 @Service
 public class YamlBuilderService {
 
+    // I campi che non hanno il controllo null è perchè sono obbligatori
 
     private String transformYamlPaths(Path pathObject) {
         StringBuilder transformedYaml = new StringBuilder();
@@ -29,18 +30,28 @@ public class YamlBuilderService {
                 transformedYaml.append("        - ").append(tag.toLowerCase()).append("\n");
             }
             transformedYaml.append("      operationId: ").append(operationId).append("\n");
-            transformedYaml.append("      description: ").append(description).append("\n");
-            transformedYaml.append("      summary: ").append(summary).append("\n");
+            if (!Utils.isNullOrEmpty(description)) {
+                transformedYaml.append("      description: ").append(description).append("\n");
+            }
+            if (!Utils.isNullOrEmpty(summary)) {
+                transformedYaml.append("      summary: ").append(summary).append("\n");
+            }
 
             // Handle parameters
-            if (operation.getParameters() != null && !operation.getParameters().isEmpty()) {
+            if (!Utils.isNullOrEmpty(operation.getParameters())) {
                 transformedYaml.append("      parameters:\n");
                 for (Parameter parameter : operation.getParameters()) {
                     transformedYaml.append("        - name: ").append(parameter.getName()).append("\n");
                     transformedYaml.append("          in: ").append(parameter.getIntype()).append("\n");
-                    transformedYaml.append("          description: ").append(parameter.getDescription()).append("\n");
-                    transformedYaml.append("          required: ").append(parameter.isRequired()).append("\n");
-                    transformedYaml.append("          allowEmptyValue: ").append(parameter.isAllowEmptyValue()).append("\n");
+                    if (!Utils.isNullOrEmpty(parameter.getDescription())) {
+                        transformedYaml.append("          description: ").append(parameter.getDescription()).append("\n");
+                    }
+                    if (!("" + parameter.isRequired()).equals("false") || !("" + parameter.isRequired()).equals("true")) {
+                        transformedYaml.append("          required: ").append(parameter.isRequired()).append("\n");
+                    }
+                    if (!("" + parameter.isAllowEmptyValue()).equals("false") || !("" + parameter.isAllowEmptyValue()).equals("true")) {
+                        transformedYaml.append("          allowEmptyValue: ").append(parameter.isAllowEmptyValue()).append("\n");
+                    }
 
                     // Handle schema
                     Schema schema = parameter.getSchema();
@@ -55,19 +66,21 @@ public class YamlBuilderService {
                         if (!Utils.isNullOrEmpty(schema.getReference())) {
                             transformedYaml.append("            $ref: '").append(schema.getReference()).append("'\n");
                         }
-
-                        // TODO items
                     }
                 }
             }
 
 
             // Handle requestBody
-            cybersec.deception.model.RequestBody requestBody = operation.getRequestBody();
+            RequestBody requestBody = operation.getRequestBody();
             if (requestBody != null) {
                 transformedYaml.append("      requestBody:\n");
-                transformedYaml.append("        required: ").append(requestBody.isRequired()).append("\n");
-                transformedYaml.append("        description: ").append(requestBody.getDescription()).append("\n");
+                if (!("" + requestBody.isRequired()).equals("false") || !("" + requestBody.isRequired()).equals("true")) {
+                    transformedYaml.append("        required: ").append(requestBody.isRequired()).append("\n");
+                }
+                if (!Utils.isNullOrEmpty(requestBody.getDescription())) {
+                    transformedYaml.append("        description: ").append(requestBody.getDescription()).append("\n");
+                }
 
                 // Handle content
                 Content content = requestBody.getContent();
@@ -89,14 +102,11 @@ public class YamlBuilderService {
                     if (!Utils.isNullOrEmpty(schema.getReference())) {
                         transformedYaml.append("              $ref: '").append(schema.getReference()).append("'\n");
                     }
-
-
-                    // TODO items
                 }
             }
 
             // Handle responses
-            if (operation.getResponses() != null && !operation.getResponses().isEmpty()) {
+            if (!Utils.isNullOrEmpty(operation.getResponses())) {
                 List<Response> responses = operation.getResponses();
                 transformedYaml.append("      responses:\n");
                 for (Response response : responses) {
@@ -172,35 +182,59 @@ public class YamlBuilderService {
         Info info = apiSpec.getInfo();
 
         transformedYaml.append("  title: ").append(info.getTitle()).append("\n");
-        transformedYaml.append("  description: ").append(info.getDescription()).append("\n");
-        transformedYaml.append("  termsOfService: ").append(info.getTermsOfService()).append("\n");
+
+        if (!Utils.isNullOrEmpty(info.getDescription())) {
+            transformedYaml.append("  description: ").append(info.getDescription()).append("\n");
+        }
+
+        if (!Utils.isNullOrEmpty(info.getTermsOfService())) {
+            transformedYaml.append("  termsOfService: ").append(info.getTermsOfService()).append("\n");
+        }
+
         transformedYaml.append("  version: ").append(info.getVersion()).append("\n");
 
-        if (info.getContact() != null) {
+        if (info.getContact() != null && (!Utils.isNullOrEmpty(info.getContact().getEmail()) || !Utils.isNullOrEmpty(info.getContact().getName()) || !Utils.isNullOrEmpty(info.getContact().getUrl()))) {
             transformedYaml.append("  contact:").append("\n");
-            transformedYaml.append("    email: ").append(info.getContact().getEmail()).append("\n");
-            transformedYaml.append("    name: ").append(info.getContact().getName()).append("\n");
-            transformedYaml.append("    url: ").append(info.getContact().getUrl()).append("\n");
+            if (!Utils.isNullOrEmpty(info.getContact().getName())) {
+                transformedYaml.append("    name: ").append(info.getContact().getName()).append("\n");
+            }
+            if (!Utils.isNullOrEmpty(info.getContact().getEmail())) {
+                transformedYaml.append("    email: ").append(info.getContact().getEmail()).append("\n");
+            }
+            if (!Utils.isNullOrEmpty(info.getContact().getUrl())) {
+                transformedYaml.append("    url: ").append(info.getContact().getUrl()).append("\n");
+            }
         }
 
-        if (info.getLicense() != null) {
+        if (info.getLicense() != null && !Utils.isNullOrEmpty(info.getLicense().getName()) && (!Utils.isNullOrEmpty(info.getLicense().getIdentifier()) || !Utils.isNullOrEmpty(info.getLicense().getUrl()))) {
             transformedYaml.append("  license:").append("\n");
-            transformedYaml.append("    identifier: ").append(info.getLicense().getIdentifier()).append("\n");
             transformedYaml.append("    name: ").append(info.getLicense().getName()).append("\n");
-            transformedYaml.append("    url: ").append(info.getLicense().getUrl()).append("\n");
+
+            if (!Utils.isNullOrEmpty(info.getLicense().getIdentifier())) {
+                transformedYaml.append("    identifier: ").append(info.getLicense().getIdentifier()).append("\n");
+            }
+            if (!Utils.isNullOrEmpty(info.getLicense().getUrl()) && Utils.isNullOrEmpty(info.getLicense().getIdentifier())) { // mutua esclusione dei due campi
+                transformedYaml.append("    url: ").append(info.getLicense().getUrl()).append("\n");
+            }
         }
 
-        if (apiSpec.getExternalDocs() != null) {
+        if (apiSpec.getExternalDocs() != null && !Utils.isNullOrEmpty(apiSpec.getExternalDocs().getUrl())) {
             transformedYaml.append("externalDocs:").append("\n");
-            transformedYaml.append("  description: ").append(apiSpec.getExternalDocs().getDescription()).append("\n");
             transformedYaml.append("  url: ").append(apiSpec.getExternalDocs().getUrl()).append("\n");
+
+            if (!Utils.isNullOrEmpty(apiSpec.getExternalDocs().getDescription())) {
+                transformedYaml.append("  description: ").append(apiSpec.getExternalDocs().getDescription()).append("\n");
+            }
+
         }
 
-        if (apiSpec.getServers() != null) {
+        if (!Utils.isNullOrEmpty(apiSpec.getServers())) {
             transformedYaml.append("servers:").append("\n");
             for (Server server: apiSpec.getServers()) {
                 transformedYaml.append("  - url: ").append(server.getUrl()).append("\n");
-                transformedYaml.append("    description: ").append(server.getDescription()).append("\n");
+                if (!Utils.isNullOrEmpty(server.getDescription())) {
+                    transformedYaml.append("    description: ").append(server.getDescription()).append("\n");
+                }
             }
         }
 

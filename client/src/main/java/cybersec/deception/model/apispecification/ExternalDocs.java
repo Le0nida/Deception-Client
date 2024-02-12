@@ -1,4 +1,4 @@
-package cybersec.deception.model;
+package cybersec.deception.model.apispecification;
 
 public class ExternalDocs {
     private String description;

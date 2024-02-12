@@ -1,10 +1,9 @@
 package cybersec.deception.client.services;
 
 import cybersec.deception.client.utils.Utils;
-import cybersec.deception.model.OAuthFlows;
-import cybersec.deception.model.SecurityScheme;
+import cybersec.deception.model.apispecification.OAuthFlows;
+import cybersec.deception.model.apispecification.SecurityScheme;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -63,23 +62,37 @@ public class EntitiesService {
         // aggiungo l'unico schema di sicurezza
         if (scheme != null) {
             yamlStringBuilder.append("  securitySchemes:\n");
-            yamlStringBuilder.append("    ").append(!Utils.isNullOrEmpty(scheme.getName()) ? scheme.getName() : "defaultsecurity").append(":\n");
+            yamlStringBuilder.append("    ").append("defaultsecurity").append(":\n");
             yamlStringBuilder.append("      type: ").append(scheme.getType()).append("\n");
-            yamlStringBuilder.append("      description: ").append(scheme.getDescription()).append("\n");
-            yamlStringBuilder.append("      name: ").append(scheme.getName()).append("\n");
-            yamlStringBuilder.append("      in: ").append(scheme.getIn()).append("\n");
-            yamlStringBuilder.append("      scheme: ").append(scheme.getScheme()).append("\n");
-            yamlStringBuilder.append("      bearerFormat: ").append(scheme.getBearerFormat()).append("\n");
-            yamlStringBuilder.append("      openIdConnectUrl: ").append(scheme.getOpenIdConnectUrl()).append("\n");
+            if (!Utils.isNullOrEmpty(scheme.getDescription())) {
+                yamlStringBuilder.append("      description: ").append(scheme.getDescription()).append("\n");
+            }
+            if (!Utils.isNullOrEmpty(scheme.getName())) {
+                yamlStringBuilder.append("      name: ").append(scheme.getName()).append("\n");
+            }
+            if (!Utils.isNullOrEmpty(scheme.getIn())) {
+                yamlStringBuilder.append("      in: ").append(scheme.getIn()).append("\n");
+            }
+            if (!Utils.isNullOrEmpty(scheme.getScheme())) {
+                yamlStringBuilder.append("      scheme: ").append(scheme.getScheme()).append("\n");
+            }
+            if (!Utils.isNullOrEmpty(scheme.getBearerFormat())) {
+                yamlStringBuilder.append("      bearerFormat: ").append(scheme.getBearerFormat()).append("\n");
+            }
+            if (!Utils.isNullOrEmpty(scheme.getOpenIdConnectUrl())) {
+                yamlStringBuilder.append("      openIdConnectUrl: ").append(scheme.getOpenIdConnectUrl()).append("\n");
+            }
 
             OAuthFlows o = scheme.getFlows();
-            if (o != null) {
+            if (o != null && (o.getImplicit() != null || o.getAuthorizationCode() != null || o.getPassword() != null || o.getClientCredentials() != null)) {
                 yamlStringBuilder.append("      flows: ").append("\n");
                 if (o.getAuthorizationCode() != null) {
                     yamlStringBuilder.append("        authorizationCode: ").append("\n");
                     yamlStringBuilder.append("          authorizationUrl: ").append(o.getAuthorizationCode().getAuthorizationUrl()).append("\n");
                     yamlStringBuilder.append("          tokenUrl: ").append(o.getAuthorizationCode().getTokenUrl()).append("\n");
-                    yamlStringBuilder.append("          refreshUrl: ").append(o.getAuthorizationCode().getRefreshUrl()).append("\n");
+                    if (!Utils.isNullOrEmpty(o.getAuthorizationCode().getRefreshUrl())) {
+                        yamlStringBuilder.append("          refreshUrl: ").append(o.getAuthorizationCode().getRefreshUrl()).append("\n");
+                    }
                     if (!Utils.isNullOrEmpty(o.getAuthorizationCode().getScopes())) {
                         yamlStringBuilder.append("          scopes: ").append("\n");
                         for (Map.Entry<String, String> entry: o.getAuthorizationCode().getScopes().entrySet()) {
@@ -91,7 +104,9 @@ public class EntitiesService {
                 if (o.getImplicit() != null) {
                     yamlStringBuilder.append("        implicit: ").append("\n");
                     yamlStringBuilder.append("          authorizationUrl: ").append(o.getImplicit().getAuthorizationUrl()).append("\n");
-                    yamlStringBuilder.append("          refreshUrl: ").append(o.getImplicit().getRefreshUrl()).append("\n");
+                    if (!Utils.isNullOrEmpty(o.getImplicit().getRefreshUrl())) {
+                        yamlStringBuilder.append("          refreshUrl: ").append(o.getImplicit().getRefreshUrl()).append("\n");
+                    }
                     if (!Utils.isNullOrEmpty(o.getImplicit().getScopes())) {
                         yamlStringBuilder.append("          scopes: ").append("\n");
                         for (Map.Entry<String, String> entry: o.getImplicit().getScopes().entrySet()) {
@@ -102,7 +117,9 @@ public class EntitiesService {
                 if (o.getPassword() != null) {
                     yamlStringBuilder.append("        password: ").append("\n");
                     yamlStringBuilder.append("          tokenUrl: ").append(o.getPassword().getTokenUrl()).append("\n");
-                    yamlStringBuilder.append("          refreshUrl: ").append(o.getPassword().getRefreshUrl()).append("\n");
+                    if (!Utils.isNullOrEmpty(o.getPassword().getRefreshUrl())) {
+                        yamlStringBuilder.append("          refreshUrl: ").append(o.getPassword().getRefreshUrl()).append("\n");
+                    }
                     if (!Utils.isNullOrEmpty(o.getPassword().getScopes())) {
                         yamlStringBuilder.append("          scopes: ").append("\n");
                         for (Map.Entry<String, String> entry: o.getPassword().getScopes().entrySet()) {
@@ -113,7 +130,9 @@ public class EntitiesService {
                 if (o.getClientCredentials() != null) {
                     yamlStringBuilder.append("        clientCredentials: ").append("\n");
                     yamlStringBuilder.append("          tokenUrl: ").append(o.getClientCredentials().getTokenUrl()).append("\n");
-                    yamlStringBuilder.append("          refreshUrl: ").append(o.getClientCredentials().getRefreshUrl()).append("\n");
+                    if (!Utils.isNullOrEmpty(o.getClientCredentials().getRefreshUrl())) {
+                        yamlStringBuilder.append("          refreshUrl: ").append(o.getClientCredentials().getRefreshUrl()).append("\n");
+                    }
                     if (!Utils.isNullOrEmpty(o.getClientCredentials().getScopes())) {
                         yamlStringBuilder.append("          scopes: ").append("\n");
                         for (Map.Entry<String, String> entry: o.getClientCredentials().getScopes().entrySet()) {

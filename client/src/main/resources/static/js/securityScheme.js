@@ -130,6 +130,71 @@ function buildSecurityScheme() {
     return new SecurityScheme(type, description, name, inValue, scheme, bearerFormat, openIdConnectUrl, flows);
 }
 
+function finalStep(implementSecurity) {
+    // Chiudi la dialog
+    $('#dialogconfig').hide();
+    $('body').removeClass('dialog-open');
+
+    const securityScheme = buildSecurityScheme();
+
+    let data = {};
+
+    if (implementSecurity) {
+
+        let authUrl = '', tokenUrl = '';
+
+        switch ($('#flowSelection').val()) {
+            case "AUTHORIZATION_CODE":
+                authUrl = $('#authorizationUrlAuthCode').val()
+                tokenUrl = $('#tokenUrlAuthCode').val()
+                break;
+            case "CLIENT_CREDENTIALS":
+                tokenUrl = $('#tokenUrlClient').val()
+                break;
+            case "IMPLICIT":
+                authUrl = $('#authorizationUrlImplicit').val()
+                break
+            case "PASSWORD":
+                tokenUrl = $('#tokenUrlPass').val()
+                break;
+        }
+
+        data = {
+            step: 'paths',
+            securityScheme: JSON.stringify(securityScheme),
+            flowType: $('#flowSelection').val() || '',
+            clientId: $('#clientId').val()  || '',
+            clientSecret: $('#clientSecret').val() || '',
+            username: $('#usernameOauth').val() || '',
+            password: $('#passwordOauth').val() || '',
+            authUrl: authUrl,
+            tokenUtl: tokenUrl,
+        };
+    }
+    else {
+        data = {
+            step: 'paths',
+            securityScheme: JSON.stringify(securityScheme)
+        };
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: 'creazioneSpecifica',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function (response) {
+            // Gestire la risposta dal server, se necessario
+            window.location.href = 'pathsDefinition'
+        },
+        error: function (error) {
+            console.error('Error: ', error);
+            alert("Error while proceeding to the next step")
+        }
+    });
+}
+
+
 function saveConfig() {
 
     if (!validateInputFields()) {
@@ -230,10 +295,103 @@ function confirmSelection() {
     $('body').removeClass('dialog-open');
 }
 
+
+function setFlow(){
+    const selectedOption = $('#flowSelection').val();
+    $('#oauthForm').style.display = 'flex';
+
+    const clientIdDiv = $('#clientIdDiv');
+    const clientSecretDiv = $('#clientSecretDiv');
+    clientIdDiv.style.display = 'none'
+    clientSecretDiv.style.display = 'none'
+    $('#usernameOauthDiv').style.display = 'none'
+    $('#passwordOauthDiv').style.display = 'none'
+
+    switch (selectedOption) {
+        case "AUTHORIZATION_CODE":
+            clientIdDiv.style.display = 'flex'
+            clientSecretDiv.style.display = 'flex'
+            break;
+        case "CLIENT_CREDENTIALS":
+            clientIdDiv.style.display = 'flex'
+            clientSecretDiv.style.display = 'flex'
+            break;
+        case "IMPLICIT":
+            clientIdDiv.style.display = 'flex'
+            break
+        case "PASSWORD":
+            clientIdDiv.style.display = 'flex'
+            clientSecretDiv.style.display = 'flex'
+            $('#usernameOauthDiv').style.display = 'flex'
+            $('#passwordOauthDiv').style.display = 'flex'
+            break;
+    }
+}
+
+
+function implicitCompliant() {
+    return !!($('#type').val() === 'oauth2' &&
+        isNotEmptyString($('#authorizationUrlImplicit').val()));
+}
+
+function passwordCompliant() {
+    return !!($('#type').val() === 'oauth2' &&
+        isNotEmptyString($('#tokenUrlPass').val()));
+}
+
+function clientCredentialsCompliant() {
+    return !!($('#type').val() === 'oauth2' &&
+        isNotEmptyString($('#tokenUrlClient').val()));
+}
+
+function authCodeCompliant() {
+    return !!($('#type').val() === 'oauth2' && isNotEmptyString($('#authorizationUrlAuthCode').val()) &&
+        isNotEmptyString($('#tokenUrlAuthCode').val()));
+}
+
+
+function oauth2Compliant() {
+    return authCodeCompliant() || clientCredentialsCompliant() || passwordCompliant() || implicitCompliant();
+
+}
+
 function handleContinueButton() {
 
     if (!validateInputFields()) {
         alert("Some fields do not comply with the syntax.");
+        return;
+    }
+
+    if (oauth2Compliant()) {
+        $('#dialogconfig').show();
+        $('body').addClass('dialog-open');
+
+        const selectElement = document.getElementById('flowSelection');
+        let option;
+        if (implicitCompliant()) {
+            option = document.createElement('option');
+            option.textContent = "IMPLICIT";
+            option.value = "IMPLICIT";
+            selectElement.appendChild(option);
+        }
+        if (authCodeCompliant()) {
+            option = document.createElement('option');
+            option.textContent = "AUTHORIZATION_CODE";
+            option.value = "AUTHORIZATION_CODE";
+            selectElement.appendChild(option);
+        }
+        if (passwordCompliant()) {
+            option = document.createElement('option');
+            option.textContent = "PASSWORD";
+            option.value = "PASSWORD";
+            selectElement.appendChild(option);
+        }
+        if (clientCredentialsCompliant()) {
+            option = document.createElement('option');
+            option.textContent = "CLIENT CREDENTIALS";
+            option.value = "CLIENT CREDENTIALS";
+            selectElement.appendChild(option);
+        }
         return;
     }
 

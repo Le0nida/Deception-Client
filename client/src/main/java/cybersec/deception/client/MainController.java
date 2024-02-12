@@ -7,6 +7,7 @@ import cybersec.deception.client.services.PersistenceService;
 import cybersec.deception.client.utils.Utils;
 import cybersec.deception.model.*;
 import cybersec.deception.client.services.YamlBuilderService;
+import cybersec.deception.model.apispecification.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,7 +69,7 @@ public class MainController {
         }
     }
 
-    // Funzionalità 1 (creazione di una specifica "form scratch")
+    // Funzionalità 1 (creazione di una specifica "from scratch")
     @PostMapping("/creazioneSpecifica")
     public String showSpecCreationPage(@RequestBody Map<String, Object> requestBody, Model model, HttpSession session) {
         if (!loginCheck(model, session)) {
@@ -119,15 +118,29 @@ public class MainController {
                 // Creare un oggetto ObjectMapper
                 ObjectMapper objectMapper = new ObjectMapper();
 
-                // Convertire la stringa JSON in un oggetto ApiSpec
                 SecurityScheme securityScheme = null;
                 try {
                     securityScheme = objectMapper.readValue(requestBody.get("securityScheme").toString(), SecurityScheme.class);
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
-
                 session.setAttribute("securityScheme", securityScheme);
+
+                if (requestBody.get("flowType") !=  null) {
+                    SecurityConfig securityConfig = new SecurityConfig();
+                    securityConfig.setFlowType(((String) requestBody.get("flowType")).toLowerCase());
+                    securityConfig.setClient_id((String) requestBody.get("clientId"));
+                    securityConfig.setClient_secret((String) requestBody.get("clientSecret"));
+                    securityConfig.setAuthorizationUri((String) requestBody.get("authUrl"));
+                    securityConfig.setTokenUri((String) requestBody.get("tokenUrl"));
+                    securityConfig.setPassword((String) requestBody.get("password"));
+                    securityConfig.setUsername((String) requestBody.get("username"));
+                    if (!securityScheme.getFlows().getAuthorizationCode().getScopes().isEmpty()) {
+                        securityConfig.setScopes(securityScheme.getFlows().getAuthorizationCode().getScopes().keySet().stream().toList());
+                    }
+                    session.setAttribute("securityConfig", securityConfig);
+                }
+
                 return "pathsDefinition";
             } else {
                 model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
@@ -277,7 +290,7 @@ public class MainController {
         if (o.getClientCredentials() != null && !Utils.isNullOrEmpty(o.getClientCredentials().getScopes()))
             scopes.addAll(o.getClientCredentials().getScopes().keySet().stream().toList());
 
-        model.addAttribute("securitySchemeName", ((SecurityScheme) session.getAttribute("securityScheme")).getName());
+        model.addAttribute("securitySchemeName", "defaultsecurity");
         model.addAttribute("securitySchemeScopes", scopes.stream().distinct().collect(Collectors.toList()));
         return "pathsDefinition";
     }
@@ -302,8 +315,30 @@ public class MainController {
                     String pojoValue = (String) session.getAttribute("currentPojo"+name);
                     map.put(name, pojoValue);
                 }
-                String yamlComponents = this.entitiesService.defineYamlComponents(map, (SecurityScheme) session.getAttribute("securityScheme"));
+                SecurityScheme securityScheme = session.getAttribute("securityScheme") != null ? (SecurityScheme) session.getAttribute("securityScheme") : null;
+                String yamlComponents = this.entitiesService.defineYamlComponents(map, securityScheme);
                 finalYamlSpec = this.yamlService.buildYaml(apiSpec, yamlComponents);
+
+                if (session.getAttribute("securityConfig") != null) {
+                    SecurityConfig cfg = (SecurityConfig) session.getAttribute("securityConfig");
+                    Map<String, List<String>> scopesMap = new HashMap<>();
+                    for (Tag t: tags) {
+                        for (Path p: t.getPaths()) {
+                            for (Operation o: p.getOperations()) {
+                                String key = p.getPath() + " - " + o.getMethod().toUpperCase();
+                                if (o.getSecurity() != null) {
+                                    for (Security s: o.getSecurity()) {
+                                        if (s.getSecuritySchemaName().equals("defaultsecurity")) {
+                                            scopesMap.put(key, s.getScopes());
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    tags.get(0).getPaths().get(0).getOperations().get(0).getSecurity().get(0).getScopes();
+                }
             }
             else {
                 finalYamlSpec = "Error while parsing yaml file";

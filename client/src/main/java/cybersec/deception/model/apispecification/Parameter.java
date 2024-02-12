@@ -1,4 +1,4 @@
-package cybersec.deception.model;
+package cybersec.deception.model.apispecification;
 
 import java.util.HashMap;
 import java.util.Map;

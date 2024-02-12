@@ -1,6 +1,4 @@
-package cybersec.deception.model;
-
-import java.util.Map;
+package cybersec.deception.model.apispecification;
 
 public class OAuthFlows {
     private OAuthFlow authorizationCode;

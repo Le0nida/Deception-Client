@@ -1,11 +1,10 @@
 package cybersec.deception.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cybersec.deception.client.services.PersistenceService;
 import cybersec.deception.client.utils.ZipUtils;
 import cybersec.deception.model.ServerBuildResponse;
-import cybersec.deception.model.Tag;
+import cybersec.deception.model.apispecification.Tag;
 import cybersec.deception.model.logmodel.LogRequest;
 import cybersec.deception.model.logmodel.LogResponse;
 import jakarta.servlet.http.HttpSession;
@@ -162,7 +161,7 @@ public class InnerController {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-        ResponseEntity<LogResponse> response = restTemplate.postForEntity(data.get("urlLog"), data.get("logRequest"), LogResponse.class);
+        ResponseEntity<LogResponse> response = restTemplate.postForEntity(data.get("urlLog"), requestEntity, LogResponse.class);
 
 
         return response;

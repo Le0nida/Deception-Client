@@ -149,5 +149,46 @@
 </select>
     <button onclick="confirmSelection()">Confirm</button>
 </div>
+<div id="dialogconfig" class="dialog">
+    <h2>OAuth2 Configuration</h2>
+    <p>
+        You have entered the necessary parameters to use OAuth2. You can choose one of the flows you have defined to automatically implement within the service.
+    </p>
+
+    <label for="flowSelection">Flow:</label>
+    <select id="flowSelection" name="flowSelection" onchange="setFlow()">
+
+    </select>
+
+    <div id="oauthForm" style="display: none">
+        <p>
+            Please fill in the following fields to obtain an automatic implementation of security.
+        </p>
+
+        <div id="clientIdDiv" style="display: none">
+            <label for="clientId">Client Id:</label>
+            <input type="text" id="clientId" name="clientId">
+        </div>
+
+        <div id="clientSecretDiv" style="display: none">
+            <label for="clientSecret">Client Secret:</label>
+            <input type="text" id="clientSecret" name="clientSecret">
+        </div>
+
+        <div id="usernameOauthDiv" style="display: none">
+            <label for="usernameOauth">Username:</label>
+            <input type="text" id="usernameOauth" name="usernameOauth">
+        </div>
+
+        <div id="passwordOauthDiv" style="display: none">
+            <label for="passwordOauth">Password:</label>
+            <input type="text" id="passwordOauth" name="passwordOauth">
+        </div>
+
+        <button onclick="finalStep(true)">Confirm</button>
+    </div>
+
+    <button onclick="finalStep(false)">Ignore</button>
+</div>
 </body>
 </html>

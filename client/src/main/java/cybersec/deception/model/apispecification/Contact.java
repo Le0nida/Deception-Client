@@ -1,9 +1,9 @@
-package cybersec.deception.model;
+package cybersec.deception.model.apispecification;
 
-public class License {
+public class Contact {
     private String name;
     private String url;
-    private String identifier;
+    private String email;
 
     public String getName() {
         return name;
@@ -21,11 +21,11 @@ public class License {
         this.url = url;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getEmail() {
+        return email;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
