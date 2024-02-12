@@ -337,13 +337,15 @@ public class MainController {
                             }
                         }
                     }
-                    tags.get(0).getPaths().get(0).getOperations().get(0).getSecurity().get(0).getScopes();
+                    cfg.setScopesMap(scopesMap);
+                    session.setAttribute("securityConfig", cfg);
                 }
             }
             else {
                 finalYamlSpec = "Error while parsing yaml file";
             }
         }
+        session.setAttribute("finalYaml", finalYamlSpec);
         model.addAttribute("finalYaml", finalYamlSpec);
 
         return "reviewPage";

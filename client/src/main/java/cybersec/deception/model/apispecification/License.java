@@ -3,7 +3,6 @@ package cybersec.deception.model.apispecification;
 public class License {
     private String name;
     private String url;
-    private String identifier;
 
     public String getName() {
         return name;
@@ -21,11 +20,4 @@ public class License {
         this.url = url;
     }
 
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
 }

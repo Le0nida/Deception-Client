@@ -74,10 +74,6 @@ public class SecurityConfig {
         this.tokenUri = tokenUri;
     }
 
-    public String getScopesInString() {
-        return String.join(", ", scopes);
-    }
-
     public Map<String, List<String>> getScopesMap() {
         return scopesMap;
     }

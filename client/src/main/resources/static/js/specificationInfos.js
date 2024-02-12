@@ -65,7 +65,6 @@ document.addEventListener("DOMContentLoaded", function() {
             $('#emailContact').val('');
             $('#nameLicense').val('');
             $('#urlLicense').val('');
-            $('#identifier').val('');
             $('#externalDocsDescription').val('');
             $('#externalDocsUrl').val('');
 
@@ -106,7 +105,6 @@ function fillValues(selectedOption) {
             $('#emailContact').val(responseObject.info.contact.email || '');
             $('#nameLicense').val(responseObject.info.license.name || '');
             $('#urlLicense').val(responseObject.info.license.url || '');
-            $('#identifier').val(responseObject.info.license.identifier || '');
             $('#externalDocsDescription').val(responseObject.externalDocs.description || '');
             $('#externalDocsUrl').val(responseObject.externalDocs.url || '');
 
@@ -229,7 +227,6 @@ function buildApiSpec() {
 
     apiSpec.info.license.name = document.getElementById("nameLicense").value.trim();
     apiSpec.info.license.url = document.getElementById("urlLicense").value.trim();
-    apiSpec.info.license.identifier = document.getElementById("identifier").value.trim();
 
     apiSpec.externalDocs.description = document.getElementById("externalDocsDescription").value.trim();
     apiSpec.externalDocs.url = document.getElementById("externalDocsUrl").value.trim();

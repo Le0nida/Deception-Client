@@ -1,8 +1,10 @@
 package cybersec.deception.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cybersec.deception.client.services.PersistenceService;
 import cybersec.deception.client.utils.ZipUtils;
+import cybersec.deception.model.SecurityConfig;
 import cybersec.deception.model.ServerBuildResponse;
 import cybersec.deception.model.apispecification.Tag;
 import cybersec.deception.model.logmodel.LogRequest;
@@ -34,7 +36,6 @@ public class InnerController {
         this.persistenceService = persistenceService;
     }
 
-    // Salva in sessione i tag, con relativi path e operazioni
     @PostMapping("/generateServer")
     public ResponseEntity<byte[]> setTags(@RequestBody Map<String, Object> data, HttpSession session) {
         String yamlSpecString = (String) session.getAttribute("finalYaml");
@@ -50,6 +51,16 @@ public class InnerController {
         requestBody.put("persistence", useDb);
         requestBody.put("basePath", basePath);
         requestBody.put("docs", docs);
+        if (session.getAttribute("securityConfig") != null) {
+            String jsonString = null;
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                jsonString = mapper.writeValueAsString(session.getAttribute("securityConfig"));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+            requestBody.put("securityConfig", jsonString);
+        }
 
         // Configura l'header della richiesta
         HttpHeaders headers = new HttpHeaders();

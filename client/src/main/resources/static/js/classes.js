@@ -37,7 +37,6 @@ class License {
     constructor() {
         this.name = "";
         this.url = "";
-        this.identifier = "";
     }
 }
 

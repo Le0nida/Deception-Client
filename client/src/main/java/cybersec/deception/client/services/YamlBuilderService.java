@@ -206,14 +206,11 @@ public class YamlBuilderService {
             }
         }
 
-        if (info.getLicense() != null && !Utils.isNullOrEmpty(info.getLicense().getName()) && (!Utils.isNullOrEmpty(info.getLicense().getIdentifier()) || !Utils.isNullOrEmpty(info.getLicense().getUrl()))) {
+        if (info.getLicense() != null && !Utils.isNullOrEmpty(info.getLicense().getName()) && !Utils.isNullOrEmpty(info.getLicense().getUrl())) {
             transformedYaml.append("  license:").append("\n");
             transformedYaml.append("    name: ").append(info.getLicense().getName()).append("\n");
 
-            if (!Utils.isNullOrEmpty(info.getLicense().getIdentifier())) {
-                transformedYaml.append("    identifier: ").append(info.getLicense().getIdentifier()).append("\n");
-            }
-            if (!Utils.isNullOrEmpty(info.getLicense().getUrl()) && Utils.isNullOrEmpty(info.getLicense().getIdentifier())) { // mutua esclusione dei due campi
+            if (!Utils.isNullOrEmpty(info.getLicense().getUrl())) {
                 transformedYaml.append("    url: ").append(info.getLicense().getUrl()).append("\n");
             }
         }

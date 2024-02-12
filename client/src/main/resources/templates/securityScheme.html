@@ -155,9 +155,9 @@
         You have entered the necessary parameters to use OAuth2. You can choose one of the flows you have defined to automatically implement within the service.
     </p>
 
-    <label for="flowSelection">Flow:</label>
-    <select id="flowSelection" name="flowSelection" onchange="setFlow()">
-
+    <label for="flowSelection"></label>
+    <select id="flowSelection" name="flowSelection" onchange="setFlow()" >
+        <option value="">Select a flow</option>
     </select>
 
     <div id="oauthForm" style="display: none">

@@ -28,7 +28,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Chiudi la dialog se si clicca al di fuori di essa
     $(document).mouseup(function(e) {
-        var dialog = $('#dialogimport');
+        const dialog = $('#dialogimport');
+        if (document.getElementById('dialogconfig').style.display !== 'none') {
+            return
+        }
         // Se il click non è all'interno della dialog o del pulsante "Import", chiudi la dialog
         if (!dialog.is(e.target) && dialog.has(e.target).length === 0 && !$('#import').is(e.target)) {
             dialog.hide();
@@ -168,7 +171,7 @@ function finalStep(implementSecurity) {
             username: $('#usernameOauth').val() || '',
             password: $('#passwordOauth').val() || '',
             authUrl: authUrl,
-            tokenUtl: tokenUrl,
+            tokenUrl: tokenUrl,
         };
     }
     else {
@@ -298,14 +301,16 @@ function confirmSelection() {
 
 function setFlow(){
     const selectedOption = $('#flowSelection').val();
-    $('#oauthForm').style.display = 'flex';
+    document.getElementById('oauthForm').style.display = 'block';
 
-    const clientIdDiv = $('#clientIdDiv');
-    const clientSecretDiv = $('#clientSecretDiv');
+    const clientIdDiv = document.getElementById('clientIdDiv')
+    const clientSecretDiv = document.getElementById('clientSecretDiv')
+    const userDiv = document.getElementById('usernameOauthDiv')
+    const passDiv = document.getElementById('passwordOauthDiv')
     clientIdDiv.style.display = 'none'
     clientSecretDiv.style.display = 'none'
-    $('#usernameOauthDiv').style.display = 'none'
-    $('#passwordOauthDiv').style.display = 'none'
+    userDiv.style.display = 'none'
+    passDiv.style.display = 'none'
 
     switch (selectedOption) {
         case "AUTHORIZATION_CODE":
@@ -322,8 +327,8 @@ function setFlow(){
         case "PASSWORD":
             clientIdDiv.style.display = 'flex'
             clientSecretDiv.style.display = 'flex'
-            $('#usernameOauthDiv').style.display = 'flex'
-            $('#passwordOauthDiv').style.display = 'flex'
+            userDiv.style.display = 'flex'
+            passDiv.style.display = 'flex'
             break;
     }
 }
@@ -376,7 +381,7 @@ function handleContinueButton() {
         }
         if (authCodeCompliant()) {
             option = document.createElement('option');
-            option.textContent = "AUTHORIZATION_CODE";
+            option.textContent = "AUTHORIZATION CODE";
             option.value = "AUTHORIZATION_CODE";
             selectElement.appendChild(option);
         }
@@ -389,7 +394,7 @@ function handleContinueButton() {
         if (clientCredentialsCompliant()) {
             option = document.createElement('option');
             option.textContent = "CLIENT CREDENTIALS";
-            option.value = "CLIENT CREDENTIALS";
+            option.value = "CLIENT_CREDENTIALS";
             selectElement.appendChild(option);
         }
         return;
