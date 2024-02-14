@@ -33,16 +33,41 @@ document.addEventListener('DOMContentLoaded', function () {
         initializeCRUD(pojos)
     }
 
-    let confirmLogin = false;
+    let confirmSpecificMethod = false;
+    let atLeastOneSpecific = false;
     const allLabels = document.querySelectorAll('p[class="currentPojoElement"]');
     allLabels.forEach(p => {
         if (p.innerText === "User") {
-            confirmLogin = window.confirm("It's the user entity present, do you want to create the login and logout methods?")
-            initializeLoginOut()
+            confirmSpecificMethod = window.confirm("It's the User entity present, do you want to create the \"login\", \"logout\" and \"admin\" endpoints?")
+            if (confirmSpecificMethod) {
+                atLeastOneSpecific = true;
+                initializeLoginOut()
+            }
+        }
+        if (p.innerText === "Workstation") {
+            confirmSpecificMethod = window.confirm("It's the Workstation entity present, do you want to create the \"accessWorkstation\" endpoint?")
+            if (confirmSpecificMethod) {
+                atLeastOneSpecific = true;
+                initializeWorkstation()
+            }
+        }
+        if (p.innerText === "Transaction") {
+            confirmSpecificMethod = window.confirm("It's the Transaction entity present, do you want to create the \"sendMoney\" and \"receiveMoney\" endpoints?")
+            if (confirmSpecificMethod) {
+                atLeastOneSpecific = true;
+                initializeTransaction()
+            }
+        }
+        if (p.innerText === "Crypto") {
+            confirmSpecificMethod = window.confirm("It's the Crypto entity present, do you want to create the \"transfer\" endpoint?")
+            if (confirmSpecificMethod) {
+                atLeastOneSpecific = true;
+                initializeCrypto()
+            }
         }
     });
 
-    if (confirmCRUD || confirmLogin) {
+    if (confirmCRUD || confirmSpecificMethod) {
         initializeTagList();
     }
 });
@@ -52,233 +77,6 @@ function initializeTagList() {
         addTagButton(value);
     });
 }
-
-function initializeLoginOut() {
-    const tagName = "User";
-    const tagNameLC = tagName.toLowerCase()
-
-    if (!isValueInMapKeys(tagKeyDescMap, tagNameLC)) {
-        // Significa che NON è gia settato il tag User
-        // aggiungo il tag
-        window.tagKeyDescMap.set(tagNameLC, tagName + " management")
-        // aggiungo i paths
-        window.pathMap.set(tagNameLC, [`/${tagNameLC}/login`, `/${tagNameLC}/logout`] )
-    }
-
-    // aggiungo i paths (a quelli già presenti)
-    let userPaths = window.pathMap.get(tagNameLC);
-    userPaths.push(`/${tagNameLC}/login`)
-    userPaths.push(`/${tagNameLC}/logout`)
-
-    // aggiungo le operazioni
-    window.operationsMap.set(`/${tagNameLC}/login`, [`login${tagName}`])
-    window.operationsMap.set(`/${tagNameLC}/logout`, [`logout${tagName}`])
-
-    // LOGIN -----------------
-    const opC = new OpenApiOperation();
-    opC.id = `login${tagName}`
-    opC.description = `Logs the ${tagName} into the system`
-    opC.tags = [ tagNameLC ]
-    opC.method = 'get'
-    opC.summary = `Login for ${tagName}`
-
-    const schema = new Schema();
-    schema.type = "string"
-    const content = new Content();
-    content.type = 'application/json'
-    content.schema = schema;
-
-    // costruzione parametri
-    const param1 = new Parameter();
-    param1.name = 'username'
-    param1.intype = 'query'
-    param1.description = 'The username for login'
-    param1.required = true
-    param1.schema = schema
-    opC.parameters.push(param1)
-
-    const param2 = new Parameter();
-    param2.name = 'password'
-    param2.intype = 'query'
-    param2.description = 'The password for login in clear text'
-    param2.required = true
-    param2.schema = schema
-    opC.parameters.push(param2)
-
-    // costruzione Response
-    const respSuc = new Response();
-    respSuc.statusCode = '200'
-    respSuc.description = 'Successful operation'
-    respSuc.content = content;
-    opC.responses.push(respSuc)
-    const respFail = new Response();
-    respFail.statusCode = '400'
-    respFail.description = 'Invalid username/password supplied'
-    opC.responses.push(respFail)
-
-    window.operKeyJSONMap.set(`login${tagName}`, opC)
-
-
-    // LOGIN -----------------
-    const opR = new OpenApiOperation();
-    opR.id = `logout${tagName}`
-    opR.description = `Logs out current logged in ${tagName} session`
-    opR.tags = [ tagNameLC ]
-    opR.method = 'get'
-    opR.summary = `Logout for ${tagName}`
-
-    // costruzione Response
-    const respDef = new Response();
-    respDef.statusCode = '200'
-    respDef.description = 'Successful operation'
-    opR.responses.push(respDef)
-
-    window.operKeyJSONMap.set(`logout${tagName}`, opR)
-}
-
-function initializeCRUD(entities) {
-
-    entities.forEach(ent => {
-        const entLC = ent.toLowerCase();
-        window.tagKeyDescMap.set(entLC, ent + " management")
-        window.pathMap.set(entLC, [`/${entLC}`, `/${entLC}/{${entLC}Id}`] )
-        window.operationsMap.set(`/${entLC}`, [`create${ent}`, `update${ent}`])
-        window.operationsMap.set(`/${entLC}/{${entLC}Id}`, [`retrieve${ent}`, `delete${ent}`])
-
-
-        // CREATE -----------------
-        const opC = new OpenApiOperation();
-        opC.id = `create${ent}`
-        opC.description = `Create a new ${ent}`
-        opC.tags = [ entLC ]
-        opC.method = 'post'
-        opC.summary = `Create a new ${ent}`
-
-        // costruzione RequestBody
-        const schema = new Schema();
-        schema.reference = `#/components/schemas/${ent}`
-        const content = new Content();
-        content.type = 'application/json'
-        content.schema = schema;
-        const req = new RequestBody();
-        req.required = true;
-        req.description = `Create a new ${ent}`
-        req.content = content
-        opC.requestBody = req;
-
-        // costruzione Response
-        const respSuc = new Response();
-        respSuc.statusCode = '200'
-        respSuc.description = 'Successful operation'
-        respSuc.content = content;
-        opC.responses.push(respSuc)
-        const respFail = new Response();
-        respFail.statusCode = '405'
-        respFail.description = 'Invalid input'
-        opC.responses.push(respFail)
-
-        window.operKeyJSONMap.set(`create${ent}`, opC)
-
-
-
-        // UPDATE -------------------
-
-        const opU = new OpenApiOperation();
-        opU.id = `update${ent}`
-        opU.description = `Update an existent ${ent} by ID`
-        opU.tags = [ entLC ]
-        opU.method = 'put'
-        opU.summary = `Update an existent ${ent}`
-
-        // costruzione RequestBody
-        // schema e content analoghi al precedente
-        const reqU = new RequestBody();
-        reqU.required = true;
-        reqU.description = `Update an existent ${ent}`
-        reqU.content = content
-        opU.requestBody = reqU;
-
-        // costruzione Response
-        // resp successo analoga a prima
-        opU.responses.push(respSuc)
-        const respFail1 = new Response();
-        respFail1.statusCode = '400'
-        respFail1.description = 'Invalid ID supplied'
-        opU.responses.push(respFail1)
-        const respFail2 = new Response();
-        respFail2.statusCode = '404'
-        respFail2.description = `${ent} not found`
-        opU.responses.push(respFail2)
-        const respFail3 = new Response();
-        respFail3.statusCode = '405'
-        respFail3.description = 'Validation exception'
-        opU.responses.push(respFail3)
-
-        window.operKeyJSONMap.set(`update${ent}`, opU)
-
-
-        // RETRIEVE -------------------
-
-        const opR = new OpenApiOperation();
-        opR.id = `retrieve${ent}`
-        opR.description = `Retrieve an existent ${ent} by ID`
-        opR.tags = [ entLC ]
-        opR.method = 'get'
-        opR.summary = `Retrieve a ${ent}`
-
-        // costruzione parametri
-        const param = new Parameter();
-        param.name = `${entLC}Id`
-        param.intype = 'path'
-        param.description = `Id of the ${ent} to return`
-        param.required = true
-        const schemaParam = new Schema();
-        schemaParam.type = 'integer'
-        schemaParam.format = 'int64'
-        param.schema = schemaParam
-
-        opR.parameters.push(param)
-
-        // costruzione Response
-        // resp successo, 400 e 404, analogh a prima
-        opR.responses.push(respSuc)
-        opR.responses.push(respFail1)
-        opR.responses.push(respFail2)
-
-        window.operKeyJSONMap.set(`retrieve${ent}`, opR)
-
-
-
-        // DELETE -------------------
-
-        const opD = new OpenApiOperation();
-        opD.id = `delete${ent}`
-        opD.description = `Delete an existent ${ent} by ID`
-        opD.tags = [ entLC ]
-        opD.method = 'delete'
-        opD.summary = `Delete a ${ent}`
-
-        // costruzione parametri
-        const paramDel = new Parameter();
-        paramDel.name = `${entLC}Id`
-        paramDel.intype = 'path'
-        paramDel.description = `Id of the ${ent} to delete`
-        paramDel.required = true
-        // schema analogo al precedente
-        paramDel.schema = schemaParam
-
-        opD.parameters.push(paramDel)
-
-        // costruzione Response
-        // resp 400 analoga a prima
-        opD.responses.push(respFail1)
-
-        window.operKeyJSONMap.set(`delete${ent}`, opD)
-    })
-
-
-}
-
 
 // LOGICHE PER LA VISUALIZZAZIONE DELLE VARIE SEZIONI
 
