@@ -62,4 +62,11 @@ public class HttpRequestLog {
     @JsonProperty("cookies")
     private String cookies;
 
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
 }

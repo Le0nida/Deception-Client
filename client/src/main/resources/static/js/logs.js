@@ -1,10 +1,17 @@
 function getLogsFromServer() {
 
-    const urlLog = document.getElementById("urlInput").value;
+    let urlLog = document.getElementById("urlInput").value;
     const httpRequestLog = createClass();
 
+    if (urlLog.endsWith("/")) {
+        urlLog = urlLog + 'logs'
+    }
+    else {
+        urlLog = urlLog + '/logs'
+    }
+
     const datiDaInviare = {
-        urlLog: urlLog + '/logs',
+        urlLog: urlLog,
         logRequest: JSON.stringify(httpRequestLog)
     };
     $.ajax({
@@ -42,7 +49,7 @@ function downloadLogs(logResponse) {
         // Crea un elemento link per avviare il download
         var a = document.createElement('a');
         a.href = url;
-        a.download = 'logs.txt';
+        a.download = 'logs.json';
 
         // Aggiungi il link all'elemento body e fai clic su di esso
         document.body.appendChild(a);
@@ -92,7 +99,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function createClass() {
     // Recupera i valori dai campi del modulo
-    const timestamp = document.getElementById("timestamp").value;
+    const date = document.getElementById("date").value || '';
+    const time = document.getElementById("time").value || '';
     const httpMethod = document.getElementById("httpMethod").value;
     const requestURL = document.getElementById("requestURL").value;
     const headers_host = document.getElementById("headers_host").value;
@@ -139,6 +147,17 @@ function createClass() {
         this.acceptedConnectionTypes = acceptedConnectionTypes;
         this.cookies = cookies;
     };
+
+    let timestamp = ''
+    if (date !== '') {
+        if (time !== '') {
+            timestamp = date + "T" + time + ":00"
+        }
+        else {
+            timestamp = date + "T00:00:00"
+        }
+
+    }
 
     // Crea un'istanza della classe HttpRequestLog
     const httpRequestLogObject = new HttpRequestLog(timestamp, httpMethod, requestURL, headers_host,

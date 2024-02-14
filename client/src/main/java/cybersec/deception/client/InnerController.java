@@ -3,6 +3,7 @@ package cybersec.deception.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cybersec.deception.client.services.PersistenceService;
+import cybersec.deception.client.utils.Utils;
 import cybersec.deception.client.utils.ZipUtils;
 import cybersec.deception.model.SecurityConfig;
 import cybersec.deception.model.ServerBuildResponse;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Controller
@@ -167,7 +169,10 @@ public class InnerController {
             e.printStackTrace();
             return null;
         }
-
+        if (!Utils.isNullOrEmpty(logRequest.getFilter().getTimestamp())) {
+            String timestamp = LocalDateTime.parse(logRequest.getFilter().getTimestamp()).toString();
+            logRequest.getFilter().setTimestamp(timestamp);
+        }
         HttpEntity<LogRequest> requestEntity = new HttpEntity<>(logRequest, headers);
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
