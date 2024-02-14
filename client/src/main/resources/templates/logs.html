@@ -55,19 +55,19 @@
                 <p>These fields represent the HTTP request header. They are equality filters.</p>
 
                 <label for="headers_host">Host:</label>
-                <input type="text" id="headers_host" name="headers_host"><br><br>
+                <input type="text" id="headers_host" name="headers_host" placeholder="e.g., www.example.com"><br><br>
 
                 <label for="headers_useragent">User Agent:</label>
-                <input type="text" id="headers_useragent" name="headers_useragent"><br><br>
+                <input type="text" id="headers_useragent" name="headers_useragent" placeholder="e.g., Mozilla/5.0"><br><br>
 
                 <label for="headers_contenttype">Content Type:</label>
-                <input type="text" id="headers_contenttype" name="headers_contenttype"><br><br>
+                <input type="text" id="headers_contenttype" name="headers_contenttype" placeholder="e.g., application/json"><br><br>
 
                 <label for="headers_acccept">Accept:</label>
-                <input type="text" id="headers_acccept" name="headers_acccept"><br><br>
+                <input type="text" id="headers_acccept" name="headers_acccept" placeholder="e.g., text/html"><br><br>
 
                 <label for="headers_authorization">Authorization:</label>
-                <input type="text" id="headers_authorization" name="headers_authorization"><br><br>
+                <input type="text" id="headers_authorization" name="headers_authorization" placeholder="e.g., Bearer token123"><br><br>
             </div>
         </div>
 
@@ -76,47 +76,47 @@
                 <h2>Exact Match Filters</h2>
                 <p>Each of these fields checks for exact equality.</p>
                 <label for="httpMethod">HTTP Method:</label>
-                <input type="text" id="httpMethod" name="httpMethod"><br><br>
+                <input type="text" id="httpMethod" name="httpMethod" placeholder="e.g., GET"><br><br>
 
                 <label for="requestURL">Request URL:</label>
-                <input type="text" id="requestURL" name="requestURL"><br><br>
+                <input type="text" id="requestURL" name="requestURL" placeholder="e.g., /api/user/login"><br><br>
 
                 <label for="clientIPAddress">Client IP Address:</label>
-                <input type="text" id="clientIPAddress" name="clientIPAddress"><br><br>
+                <input type="text" id="clientIPAddress" name="clientIPAddress" placeholder="e.g., 192.168.0.1"><br><br>
 
                 <label for="clientPort">Client Port:</label>
-                <input type="number" id="clientPort" name="clientPort"><br><br>
+                <input type="number" id="clientPort" name="clientPort" placeholder="e.g., 8080"><br><br>
 
                 <label for="protocol">Protocol:</label>
-                <input type="text" id="protocol" name="protocol"><br><br>
+                <input type="text" id="protocol" name="protocol" placeholder="e.g., HTTP/1.1"><br><br>
             </div>
 
             <div class="form-section">
                 <h2>String Containment Filters</h2>
                 <p>Each of these fields checks that its value is contained within the field of the element being filtered.</p>
                 <label for="queryParameters">Query Parameters:</label>
-                <input type="text" id="queryParameters" name="queryParameters"><br><br>
+                <input type="text" id="queryParameters" name="queryParameters" placeholder="e.g., param1=value1&param2=value2"><br><br>
 
                 <label for="requestBody">Request Body:</label>
-                <input type="text" id="requestBody" name="requestBody"><br><br>
+                <input type="text" id="requestBody" name="requestBody" placeholder="e.g., {'key':'value'}"><br><br>
 
                 <label for="authenticationType">Authentication Type:</label>
-                <input type="text" id="authenticationType" name="authenticationType"><br><br>
+                <input type="text" id="authenticationType" name="authenticationType" placeholder="e.g., Basic"><br><br>
 
                 <label for="acceptedContentTypes">Accepted Content Types:</label>
-                <input type="text" id="acceptedContentTypes" name="acceptedContentTypes"><br><br>
+                <input type="text" id="acceptedContentTypes" name="acceptedContentTypes" placeholder="e.g., application/json"><br><br>
 
                 <label for="preferredLanguage">Preferred Language:</label>
-                <input type="text" id="preferredLanguage" name="preferredLanguage"><br><br>
+                <input type="text" id="preferredLanguage" name="preferredLanguage" placeholder="e.g., en-US"><br><br>
 
                 <label for="acceptedCompressionTypes">Accepted Compression Types:</label>
-                <input type="text" id="acceptedCompressionTypes" name="acceptedCompressionTypes"><br><br>
+                <input type="text" id="acceptedCompressionTypes" name="acceptedCompressionTypes" placeholder="e.g., gzip"><br><br>
 
                 <label for="acceptedConnectionTypes">Accepted Connection Types:</label>
-                <input type="text" id="acceptedConnectionTypes" name="acceptedConnectionTypes"><br><br>
+                <input type="text" id="acceptedConnectionTypes" name="acceptedConnectionTypes" placeholder="e.g., keep-alive"><br><br>
 
                 <label for="cookies">Cookies:</label>
-                <input type="text" id="cookies" name="cookies"><br><br>
+                <input type="text" id="cookies" name="cookies" placeholder="e.g., cookie1=value1"><br><br>
             </div>
         </div>
     </div>
