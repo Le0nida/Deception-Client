@@ -425,6 +425,10 @@ function handleContinueButton() {
     });
 }
 
+function handleIgnore() {
+    window.location.href = 'pathsDefinition'
+}
+
 // Validazione dei campi
 function validateInputFields() {
 

@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', function () {
             checkbox.id = `${parentKey}${key}`;
             checkbox.className = `${parentKey}`;
             checkbox.checked = true;
+            if (key === "id") {
+                checkbox.disabled = true;
+            }
             checkbox.addEventListener('change', function () {
                 handleCheckboxChange(checkbox, key);
             });

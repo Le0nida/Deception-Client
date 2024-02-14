@@ -55,3 +55,7 @@
     box-sizing: border-box;
     margin-bottom: 10px;
 }
+
+#getlogs {
+    background-color: rgba(103, 234, 105, 0.91);
+}

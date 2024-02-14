@@ -275,23 +275,26 @@ public class MainController {
         }
         model.addAttribute("currentPojoList", currentPojoList);
 
+        if (session.getAttribute("securityScheme") != null) {
+            List<String> scopes = new ArrayList<>();
+            OAuthFlows o = ((SecurityScheme) session.getAttribute("securityScheme")).getFlows();
+            if (o.getAuthorizationCode() != null && !Utils.isNullOrEmpty(o.getAuthorizationCode().getScopes()))
+                scopes.addAll(o.getAuthorizationCode().getScopes().keySet().stream().toList());
 
-        List<String> scopes = new ArrayList<>();
-        OAuthFlows o = ((SecurityScheme) session.getAttribute("securityScheme")).getFlows();
-        if (o.getAuthorizationCode() != null && !Utils.isNullOrEmpty(o.getAuthorizationCode().getScopes()))
-            scopes.addAll(o.getAuthorizationCode().getScopes().keySet().stream().toList());
+            if (o.getImplicit() != null && !Utils.isNullOrEmpty(o.getImplicit().getScopes()))
+                scopes.addAll(o.getImplicit().getScopes().keySet().stream().toList());
 
-        if (o.getImplicit() != null && !Utils.isNullOrEmpty(o.getImplicit().getScopes()))
-            scopes.addAll(o.getImplicit().getScopes().keySet().stream().toList());
+            if (o.getPassword() != null && !Utils.isNullOrEmpty(o.getPassword().getScopes()))
+                scopes.addAll(o.getPassword().getScopes().keySet().stream().toList());
 
-        if (o.getPassword() != null && !Utils.isNullOrEmpty(o.getPassword().getScopes()))
-            scopes.addAll(o.getPassword().getScopes().keySet().stream().toList());
+            if (o.getClientCredentials() != null && !Utils.isNullOrEmpty(o.getClientCredentials().getScopes()))
+                scopes.addAll(o.getClientCredentials().getScopes().keySet().stream().toList());
 
-        if (o.getClientCredentials() != null && !Utils.isNullOrEmpty(o.getClientCredentials().getScopes()))
-            scopes.addAll(o.getClientCredentials().getScopes().keySet().stream().toList());
+            model.addAttribute("securitySchemeName", "defaultsecurity");
+            model.addAttribute("securitySchemeScopes", scopes.stream().distinct().collect(Collectors.toList()));
+        }
 
-        model.addAttribute("securitySchemeName", "defaultsecurity");
-        model.addAttribute("securitySchemeScopes", scopes.stream().distinct().collect(Collectors.toList()));
+
         return "pathsDefinition";
     }
 

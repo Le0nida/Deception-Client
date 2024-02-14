@@ -86,3 +86,10 @@ span {
     font-size: 20px;
     color: darkslategray;
 }
+
+.button-container #ignore {
+    background-color: rgb(173, 173, 173);
+}
+.button-container #ignore:hover {
+    background-color: rgba(229, 223, 210, 0.56);
+}
