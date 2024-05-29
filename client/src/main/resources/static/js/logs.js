@@ -1,5 +1,32 @@
-function getLogsFromServer() {
+// Variabile per memorizzare i log recuperati
+let retrievedLogs = null;
 
+$(document).ready(function () {
+
+    $('#getlogs').click(function() {
+        getLogsFromServer();
+    });
+
+    $('#reset').click(function() {
+        const confirmSave = window.confirm('Empty all fields?');
+        if (confirmSave) {
+            resetFormFields();
+        }
+    });
+
+    $('#downloadLogs').on('click', function () {
+        downloadLogs(retrievedLogs);
+    });
+
+    $('#getInsights').on('click', function () {
+        // Memorizza i log in localStorage per l'accesso nella dashboard
+        localStorage.setItem('logs', JSON.stringify(retrievedLogs));
+        window.location.href = '/log_analysis'; // La pagina della dashboard di analisi
+    });
+});
+
+
+function getLogsFromServer() {
     let urlLog = document.getElementById("urlInput").value;
     const httpRequestLog = createClass();
 
@@ -14,6 +41,7 @@ function getLogsFromServer() {
         urlLog: urlLog,
         logRequest: JSON.stringify(httpRequestLog)
     };
+
     $.ajax({
         type: 'POST',
         url: '/getLogs',
@@ -21,10 +49,12 @@ function getLogsFromServer() {
         data: JSON.stringify(datiDaInviare),
         success: function (response) {
             if (response.message === "OK") {
-                downloadLogs(response)
-            }
-            else {
-                alert(response.message)
+                retrievedLogs = response.logs; // Assumi che i log siano in response.logs
+                $('#downloadLogs').prop('disabled', false).removeClass('disabled-btn').addClass('enabled-btn');
+                $('#getInsights').prop('disabled', false).removeClass('disabled-btn').addClass('enabled-btn');
+                alert("Logs retrieved succesfully!")
+            } else {
+                alert(response.message);
             }
         },
         error: function (error) {
@@ -34,11 +64,12 @@ function getLogsFromServer() {
     });
 }
 
-function downloadLogs(logResponse) {
+
+function downloadLogs(logs) {
     // Verifica se il messaggio nella risposta è "OK"
-    if (logResponse.logs) {
+    if (logs) {
         // Converti la lista di logs in formato JSON
-        var logsJSON = JSON.stringify(logResponse.logs, null, 2);
+        var logsJSON = JSON.stringify(logs, null, 2);
 
         // Crea un oggetto Blob contenente il JSON
         var blob = new Blob([logsJSON], { type: 'text/plain' });
@@ -81,21 +112,6 @@ function resetFormFields() {
     });
 
 }
-
-document.addEventListener("DOMContentLoaded", function() {
-    // Mostra la dialog e aggiunge la classe dialog-open al body
-
-    $('#getlogs').click(function() {
-        getLogsFromServer();
-    });
-
-    $('#reset').click(function() {
-        const confirmSave = window.confirm('Empty all fields?');
-        if (confirmSave) {
-            resetFormFields();
-        }
-    });
-});
 
 function createClass() {
     // Recupera i valori dai campi del modulo

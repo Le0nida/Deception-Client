@@ -59,3 +59,17 @@
 #getlogs {
     background-color: rgba(103, 234, 105, 0.91);
 }
+
+.disabled-btn {
+    border: 1px solid darkslategray;
+    background-color: rgba(47, 79, 79, 0.32);
+    color: darkslategray;
+    cursor: not-allowed !important;
+}
+
+.enabled-btn {
+    border: 1px solid deepskyblue;
+    background-color: lightblue;
+    color: deepskyblue;
+    cursor: pointer;
+}

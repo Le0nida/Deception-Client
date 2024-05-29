@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
@@ -181,5 +183,11 @@ public class InnerController {
 
 
         return response;
+    }
+
+    // Visualizzazione pagina insights
+    @GetMapping("/log_analysis")
+    public String logs() {
+        return "log_analysis";
     }
 }
