@@ -45,12 +45,32 @@
     </div>
 
     <div class="dashboard-section">
-        <h2>Targeted Endpoints</h2>
+        <h2>Targeted Endpoints (Top 10)</h2>
         <canvas id="targetedEndpointsChart"></canvas>
     </div>
 
     <div class="dashboard-section">
-        <h2>Suspicious IP Addresses</h2>
+        <h2>JWT Token Attempts</h2>
+        <div id="jwtTokenAttempts"></div>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>XSS Attempts</h2>
+        <div id="xssAttempts"></div>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>Command Executions</h2>
+        <div id="commandExecutions"></div>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>Invalid Admin Page Access Attempts</h2>
+        <div id="invalidAdminPageAccessAttempts"></div>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>Suspicious IP Addresses (Top 10)</h2>
         <div id="suspiciousIPsList"></div>
     </div>
 
@@ -65,27 +85,12 @@
     </div>
 
     <div class="dashboard-section">
-        <h2>Request Parameters & Payload Analysis</h2>
-        <div id="requestParamsPayloadAnalysis"></div>
-    </div>
-
-    <div class="dashboard-section">
         <h2>Geo-Location of Requests</h2>
         <div id="geoLocationRequests"></div>
     </div>
 
     <div class="dashboard-section">
-        <h2>Authentication & Authorization Patterns</h2>
-        <div id="authPatterns"></div>
-    </div>
-
-    <div class="dashboard-section">
-        <h2>Error and Server Response Analysis</h2>
-        <div id="errorResponseAnalysis"></div>
-    </div>
-
-    <div class="dashboard-section">
-        <h2>Client Behavior Analysis</h2>
+        <h2>Client Session Analysis</h2>
         <div id="clientBehaviorAnalysis"></div>
     </div>
 

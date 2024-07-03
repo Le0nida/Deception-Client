@@ -22,10 +22,7 @@ $(document).ready(function () {
         const suspiciousIPs = calculateSuspiciousIPs(logs);
         const temporalPatterns = calculateTemporalPatterns(logs);
         const httpHeadersAnalysis = analyzeHTTPHeaders(logs);
-        const requestParamsPayloadAnalysis = analyzeRequestParamsPayload(logs);
         const geoLocationRequests = analyzeGeoLocation(logs);
-        const authPatterns = analyzeAuthPatterns(logs);
-        const errorResponseAnalysis = analyzeErrorResponses(logs);
         const clientBehaviorAnalysis = analyzeClientBehavior(logs);
 
         renderAttackPatternsChart(attackPatterns);
@@ -33,10 +30,7 @@ $(document).ready(function () {
         renderSuspiciousIPsList(suspiciousIPs);
         renderTemporalPatternsChart(temporalPatterns);
         renderHTTPHeadersAnalysis(httpHeadersAnalysis);
-        renderRequestParamsPayloadAnalysis(requestParamsPayloadAnalysis);
         renderGeoLocationRequests(geoLocationRequests);
-        renderAuthPatterns(authPatterns);
-        renderErrorResponseAnalysis(errorResponseAnalysis);
         renderClientBehaviorAnalysis(clientBehaviorAnalysis);
     }
 
@@ -45,39 +39,26 @@ $(document).ready(function () {
         const patternCounts = {
             'SQL Injection': 0,
             'XSS': 0,
-            'CSRF': 0,
-            'Brute Force': 0,
-            'DDoS': 0,
-            'Invalid Content-Type': 0,
+            'Remote Code Execution': 0,
+            'Directory Traversal': 0,
             'Missing Authentication': 0
         };
 
         logs.forEach(log => {
-            const requestBody = log.requestBody || '';
+            const queryParameters = log.queryParameters || '';
             const requestURL = log.requestURL || '';
-            const responseStatus = log.responseStatus || 0;
-            const contentType = log.contentType || '';
 
-            if (requestBody.includes('SELECT') || requestBody.includes('DROP')) {
+            if (requestURL.includes('users-info') && (queryParameters.includes("searchTerm: ") && queryParameters.split("searchTerm: ")[1].trim().includes(" "))) {
                 patternCounts['SQL Injection']++;
             }
-            if (requestBody.includes('<script>')) {
+            if (queryParameters.includes('<script>')) {
                 patternCounts['XSS']++;
             }
-            if (requestBody.includes('csrf_token')) {
-                patternCounts['CSRF']++;
+            if (queryParameters.includes('command')) {
+                patternCounts['Remote Code Execution']++;
             }
-            if (requestURL.includes('/login') && responseStatus === 401) {
+            if (requestURL.includes('admin/login') && queryParameters.includes("error")) {
                 patternCounts['Brute Force']++;
-            }
-            if (log.httpMethod === 'GET' && responseStatus === 503) {
-                patternCounts['DDoS']++;
-            }
-            if (contentType !== 'application/json' && log.httpMethod === 'POST') {
-                patternCounts['Invalid Content-Type']++;
-            }
-            if (responseStatus === 401 && !log.headers_authorization) {
-                patternCounts['Missing Authentication']++;
             }
         });
 
@@ -95,7 +76,7 @@ $(document).ready(function () {
             endpointCounts[requestURL] = (endpointCounts[requestURL] || 0) + 1;
         });
 
-        const labels = Object.keys(endpointCounts);
+        const labels = Object.keys(endpointCounts) //.sort((a, b) => endpointCounts[b] - endpointCounts[a]);
         const data = Object.values(endpointCounts);
 
         return {
@@ -134,48 +115,19 @@ $(document).ready(function () {
 
     function analyzeHTTPHeaders(logs) {
         const userAgentCounts = {};
-        const referrerCounts = {};
+        const authorizationCounts = {};
 
         logs.forEach(log => {
             const userAgent = log.headers_useragent || 'Unknown';
-            const referrer = log.headers_referer || 'Unknown';
+            const authorization = log.headers_authorization || 'Unknown';
             userAgentCounts[userAgent] = (userAgentCounts[userAgent] || 0) + 1;
-            referrerCounts[referrer] = (referrerCounts[referrer] || 0) + 1;
+            authorizationCounts[authorization] = (authorizationCounts[authorization] || 0) + 1;
         });
 
         return {
             userAgentCounts: userAgentCounts,
-            referrerCounts: referrerCounts
+            authorizationCounts: authorizationCounts
         };
-    }
-
-    function analyzeRequestParamsPayload(logs) {
-        let injectionAttempts = 0;
-        let dataFormatIssues = 0;
-
-        logs.forEach(log => {
-            const requestBody = log.requestBody || '';
-            if (requestBody.includes('SELECT') || requestBody.includes('DROP')) {
-                injectionAttempts++;
-            }
-            if (!isValidJSON(requestBody)) {
-                dataFormatIssues++;
-            }
-        });
-
-        return {
-            injectionAttempts: injectionAttempts,
-            dataFormatIssues: dataFormatIssues
-        };
-    }
-
-    function isValidJSON(str) {
-        try {
-            JSON.parse(str);
-        } catch (e) {
-            return false;
-        }
-        return true;
     }
 
     function analyzeGeoLocation(logs) {
@@ -194,41 +146,6 @@ $(document).ready(function () {
         return "Unknown";
     }
 
-    function analyzeAuthPatterns(logs) {
-        let tokenIssues = 0;
-        let accessControlIssues = 0;
-
-        logs.forEach(log => {
-            const authHeader = log.headers_authorization || null;
-            const responseStatus = log.responseStatus || 0;
-
-            if (authHeader) {
-                // Implement logic for detecting token reuse or expired tokens
-            }
-            if (responseStatus === 403) {
-                accessControlIssues++;
-            }
-        });
-
-        return {
-            tokenIssues: tokenIssues,
-            accessControlIssues: accessControlIssues
-        };
-    }
-
-    function analyzeErrorResponses(logs) {
-        const errorCounts = {};
-
-        logs.forEach(log => {
-            const responseStatus = log.responseStatus || 0;
-            if (responseStatus >= 400) {
-                errorCounts[responseStatus] = (errorCounts[responseStatus] || 0) + 1;
-            }
-        });
-
-        return errorCounts;
-    }
-
     function analyzeClientBehavior(logs) {
         const sessionCounts = {};
 
@@ -239,6 +156,7 @@ $(document).ready(function () {
 
         return sessionCounts;
     }
+
 
     // Functions to render charts
     function renderAttackPatternsChart(data) {
@@ -337,21 +255,13 @@ $(document).ready(function () {
         });
         userAgentHtml += '</ul>';
 
-        let referrerHtml = '<h3>Referrer Analysis</h3><ul>';
-        Object.keys(data.referrerCounts).forEach(ref => {
-            referrerHtml += `<li>${ref}: ${data.referrerCounts[ref]}</li>`;
+        let referrerHtml = '<h3>Authorization Analysis</h3><ul>';
+        Object.keys(data.authorizationCounts).forEach(ref => {
+            referrerHtml += `<li>${ref}: ${data.authorizationCounts[ref]}</li>`;
         });
         referrerHtml += '</ul>';
 
         $('#httpHeadersAnalysis').html(userAgentHtml + referrerHtml);
-    }
-
-    function renderRequestParamsPayloadAnalysis(data) {
-        const analysisHtml = `
-            <h3>Injection Attempts: ${data.injectionAttempts}</h3>
-            <h3>Data Format Issues: ${data.dataFormatIssues}</h3>
-        `;
-        $('#requestParamsPayloadAnalysis').html(analysisHtml);
     }
 
     function renderGeoLocationRequests(data) {
@@ -361,23 +271,6 @@ $(document).ready(function () {
         });
         geoHtml += '</ul>';
         $('#geoLocationRequests').html(geoHtml);
-    }
-
-    function renderAuthPatterns(data) {
-        const authHtml = `
-            <h3>Token Issues: ${data.tokenIssues}</h3>
-            <h3>Access Control Issues: ${data.accessControlIssues}</h3>
-        `;
-        $('#authPatterns').html(authHtml);
-    }
-
-    function renderErrorResponseAnalysis(data) {
-        let errorHtml = '<ul>';
-        Object.keys(data).forEach(status => {
-            errorHtml += `<li>${status}: ${data[status]}</li>`;
-        });
-        errorHtml += '</ul>';
-        $('#errorResponseAnalysis').html(errorHtml);
     }
 
     function renderClientBehaviorAnalysis(data) {
@@ -423,5 +316,159 @@ $(document).ready(function () {
         doc.save('log_insights.pdf');
     });
 
+    loadLogs();
+
+
+
+});
+
+
+$(document).ready(function () {
+    function loadLogs() {
+        const logs = JSON.parse(localStorage.getItem('logs'));
+        if (logs) {
+            processLogs(logs);
+        } else {
+            console.error('Nessun log trovato in localStorage.');
+        }
+    }
+
+    function processLogs(logs) {
+        const totalLogs = logs.length;
+        const uniqueIPs = new Set(logs.map(log => log.clientIPAddress)).size;
+        const targetedEndpoints = new Set(logs.map(log => log.requestURL)).size;
+
+        $('#totalLogs').text(totalLogs);
+        $('#uniqueIPs').text(uniqueIPs);
+        $('#targetedEndpoints').text(targetedEndpoints);
+
+        renderJWTTokenAttempts(logs);
+        renderXSSAttempts(logs);
+        renderCommandExecutions(logs);
+        renderAdminPageAccessAttempts(logs);
+    }
+
+    function renderJWTTokenAttempts(logs) {
+        const jwtAttempts = logs.filter(log => log.requestURL.includes('auth/token'));
+        const ipAttempts = {};
+
+        jwtAttempts.forEach(attempt => {
+            const IP = attempt.clientIPAddress || 'Unknown';
+            if (attempt.queryParameters.includes("username") && attempt.queryParameters.includes("password")){
+                const username = attempt.queryParameters.split("\n")[0].substring(9).trim() || 'Unknown';
+                const password = attempt.queryParameters.split("\n")[1].substring(9).trim() || 'Unknown';
+
+                if (!ipAttempts[IP]) {
+                    ipAttempts[IP] = {};
+                }
+
+                const userPassKey = `${username}:${password}`;
+                if (!ipAttempts[IP][userPassKey]) {
+                    ipAttempts[IP][userPassKey] = 0;
+                }
+                ipAttempts[IP][userPassKey]++;
+            }
+
+        });
+
+        let html = '<ul>';
+        for (const [IP, attempts] of Object.entries(ipAttempts)) {
+            html += `<li>IP: ${IP}<ul>`;
+            for (const [userPassKey, count] of Object.entries(attempts)) {
+                const [username, password] = userPassKey.split(':');
+                html += `<li>Username: ${username}, Password: ${password}, Attempts: ${count}</li>`;
+            }
+            html += `</ul></li>`;
+        }
+        html += '</ul>';
+
+        $('#jwtTokenAttempts').html(html);
+    }
+
+    function renderXSSAttempts(logs) {
+        const xssAttempts = logs.filter(log => log.queryParameters && log.queryParameters.includes('<script>') && log.queryParameters.includes('</script>'));
+        const ipAttempts = {};
+
+        xssAttempts.forEach(attempt => {
+            const IP = attempt.clientIPAddress || 'Unknown';
+            const script = attempt.queryParameters.match(/<script>(.*?)<\/script>/)[1] || 'Unknown';
+
+            if (!ipAttempts[IP]) {
+                ipAttempts[IP] = {};
+            }
+
+            if (!ipAttempts[IP][script]) {
+                ipAttempts[IP][script] = 0;
+            }
+            ipAttempts[IP][script]++;
+        });
+
+        let html = '<ul>';
+        for (const [IP, scripts] of Object.entries(ipAttempts)) {
+            html += `<li>IP: ${IP}<ul>`;
+            for (const [script, count] of Object.entries(scripts)) {
+                html += `<li>Script: ${script}, Attempts: ${count}</li>`;
+            }
+            html += `</ul></li>`;
+        }
+        html += '</ul>';
+
+        $('#xssAttempts').html(html);
+    }
+
+    function renderCommandExecutions(logs) {
+        const commandExecutions = logs.filter(log => log.requestURL.includes('command-exec') && log.queryParameters.includes('command'));
+        const ipAttempts = {};
+
+        commandExecutions.forEach(exec => {
+            const IP = exec.clientIPAddress || 'Unknown';
+            const command = exec.queryParameters.split("command: ")[1] || 'Unknown';
+
+            if (!ipAttempts[IP]) {
+                ipAttempts[IP] = {};
+            }
+
+            if (!ipAttempts[IP][command]) {
+                ipAttempts[IP][command] = 0;
+            }
+            ipAttempts[IP][command]++;
+        });
+
+        let html = '<ul>';
+        for (const [IP, commands] of Object.entries(ipAttempts)) {
+            html += `<li>IP: ${IP}<ul>`;
+            for (const [command, count] of Object.entries(commands)) {
+                html += `<li>Command: ${command}, Attempts: ${count}</li>`;
+            }
+            html += `</ul></li>`;
+        }
+        html += '</ul>';
+
+        $('#commandExecutions').html(html);
+    }
+
+    function renderAdminPageAccessAttempts(logs) {
+        const adminAccessAttempts = logs.filter(log => log.requestURL.includes('admin/login') && log.queryParameters.includes("error"));
+        const ipAttempts = {};
+
+        adminAccessAttempts.forEach(attempt => {
+            const IP = attempt.clientIPAddress || 'Unknown';
+            if (!ipAttempts[IP]) {
+                ipAttempts[IP] = 0;
+            }
+            ipAttempts[IP]++;
+        });
+
+        let html = '<ul>';
+        for (const [IP, count] of Object.entries(ipAttempts)) {
+            html += `<li>IP: ${IP}, Attempts: ${count}</li>`;
+        }
+        html += '</ul>';
+
+        $('#invalidAdminPageAccessAttempts').html(html);
+    }
+
+
+    // Load logs when document is ready
     loadLogs();
 });
