@@ -1,5 +1,8 @@
 let targetedEndpointsChart; // Variabile globale per il grafico dei targeted endpoints
 let temporalPatternsChart; // Variabile globale per il grafico dei pattern temporali
+let totalUniqueIps;
+let countIps = 0;
+let geoLocString = ""
 
 $(document).ready(function () {
 
@@ -93,7 +96,6 @@ function processLogs(logs) {
     const httpHeadersAnalysisUA = analyzeHTTPHeadersUA(logs);
     const httpHeadersAnalysisAuth = analyzeHTTPHeadersAuth(logs);
 
-    const geoLocationRequests = analyzeGeoLocation(logs);
     const clientBehaviorAnalysis = analyzeClientBehavior(logs);
 
     renderAttackPatternsChart(attackPatterns);
@@ -102,13 +104,14 @@ function processLogs(logs) {
     renderTemporalPatternsChart(temporalPatterns);
     renderHTTPHeadersAnalysisUA(httpHeadersAnalysisUA);
     renderHTTPHeadersAnalysisAuth(httpHeadersAnalysisAuth);
-    renderGeoLocationRequests(geoLocationRequests);
     renderClientBehaviorAnalysis(clientBehaviorAnalysis);
 
     renderJWTTokenAttempts(logs);
     renderXSSAttempts(logs);
     renderCommandExecutions(logs);
     renderAdminPageAccessAttempts(logs);
+    analyzeGeoLocation(logs);
+
 }
 
 
@@ -252,20 +255,51 @@ function analyzeHTTPHeadersAuth(logs, limit = 10) {
 }
 
 function analyzeGeoLocation(logs) {
-    const geoCounts = {};
-
+    const uniqueIPs = new Set();
     logs.forEach(log => {
-        const geoLocation = getGeoLocationFromIP(log.clientIPAddress);
-        geoCounts[geoLocation] = (geoCounts[geoLocation] || 0) + 1;
+        if (!isLocalIP(log.clientIPAddress) && !uniqueIPs.has(log.clientIPAddress)) {
+            uniqueIPs.add(log.clientIPAddress);
+        }
     });
 
-    return geoCounts;
+    countIps = 0;
+    totalUniqueIps = uniqueIPs.size;
+    if (totalUniqueIps > 0) {
+        uniqueIPs.forEach(ip => {
+            getGeoLocationFromIP(ip);
+        });
+    }
 }
 
-function getGeoLocationFromIP(ip) {
-    // Dummy function, implement actual geolocation logic
-    return "Unknown";
+function isLocalIP(ip) {
+    return ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.') || ip.startsWith('0:0');
 }
+
+
+function getGeoLocationFromIP(ip) {
+    $.ajax({
+        type: 'GET',
+        url: '/api/getGeoLocation',
+        method: 'GET',
+        contentType: 'application/json',
+        data: { ip: ip },
+        success: function(data) {
+            console.log('Geolocation data for IP', ip, ':', data);
+            let geoString
+            if (data.country_name === "-") {
+                geoString = `${data.ip}  -  Undefined`;
+            }
+            else {
+                geoString = `${data.ip}  -  ${data.country_name}, ${data.region_name}, ${data.city_name} - Lat: ${data.latitude}, Long: ${data.longitude}`;
+            }
+            renderGeoLocationRequests(geoString);
+        },
+        error: function(xhr, status, error) {
+            console.error('Errore nella richiesta di geolocalizzazione per IP', ip, ':', error);
+        }
+    });
+}
+
 
 function analyzeClientBehavior(logs, limit = 10) {
     const sessionCounts = {};
@@ -418,14 +452,20 @@ function renderHTTPHeadersAnalysisAuth(data) {
 
 
 function renderGeoLocationRequests(data) {
-    let geoHtml = '<ul>';
-    Object.keys(data).forEach(location => {
-        geoHtml += `<li>${location}: ${data[location]}</li>`;
-    });
-    geoHtml += '</ul>';
-    $('#geoLocationRequests').html(geoHtml);
+    if (countIps === 0) {
+        geoLocString += `<ul>`
+    }
+    geoLocString+=`<li>${data}</li>`
+    countIps++;
+    if (countIps === totalUniqueIps) {
+        geoLocString+=`<ul>`
+        insertGeoLocationHtml(geoLocString)
+    }
 }
 
+function insertGeoLocationHtml(data) {
+    $('#geoLocationRequests').html(data)
+}
 function renderClientBehaviorAnalysis(data) {
     let behaviorHtml = '<ul>';
     Object.keys(data).forEach(session => {
