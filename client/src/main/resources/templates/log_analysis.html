@@ -45,7 +45,9 @@
     </div>
 
     <div class="dashboard-section">
-        <h2>Targeted Endpoints (Top 10)</h2>
+        <h2>Targeted Endpoints</h2>
+        <label for="limitendpoints"></label><input type="number" name="limitendpoints" id="limitendpoints" value="10" onchange="updateTargetedEndpoints(this.value)">
+
         <canvas id="targetedEndpointsChart"></canvas>
     </div>
 
