@@ -49,3 +49,31 @@ canvas {
 #backButton:hover, #downloadPDFButton:hover {
     background-color: #0056b3;
 }
+
+.wrapped-text {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+input[type="number"] {
+    width: 100px;
+    padding: 8px 12px;
+    margin-left: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    color: #333;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+input[type="number"]:hover {
+    border-color: #007bff;
+    background-color: #eef7ff;
+}
+
+input[type="number"]:focus {
+    border-color: #0056b3;
+    background-color: #e1f0ff;
+    outline: none;
+}

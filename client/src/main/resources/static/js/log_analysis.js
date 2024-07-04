@@ -409,12 +409,13 @@ function renderHTTPHeadersAnalysisUA(data) {
 function renderHTTPHeadersAnalysisAuth(data) {
     let authorizationHtml = '<ul>';
     Object.entries(data).forEach(([auth, count]) => {
-        authorizationHtml += `<li>${auth}: ${count}</li>`;
+        authorizationHtml += `<li class="wrapped-text">${auth}: ${count}</li>`;
     });
     authorizationHtml += '</ul>';
 
     $('#httpHeadersAnalysisAuth').html(authorizationHtml);
 }
+
 
 function renderGeoLocationRequests(data) {
     let geoHtml = '<ul>';

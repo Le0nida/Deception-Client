@@ -49,7 +49,7 @@
 
     <div class="dashboard-section">
         <h2>Targeted Endpoints</h2>
-        <label for="limitendpoints">Limit: </label><input type="number" name="limitendpoints" id="limitendpoints" value="10">
+        <label for="limitendpoints">Limit: </label><input type="number" name="limitendpoints" id="limitendpoints" value="10" min="1">
         <canvas id="targetedEndpointsChart"></canvas>
     </div>
 
@@ -70,22 +70,22 @@
 
     <div class="dashboard-section">
         <h2>Invalid Admin Page Access Attempts</h2>
-        <label for="limitAdminPageAccessAttempts">Limit: </label><input type="number" name="limitAdminPageAccessAttempts" id="limitAdminPageAccessAttempts" value="10">
+        <label for="limitAdminPageAccessAttempts">Limit: </label><input type="number" name="limitAdminPageAccessAttempts" id="limitAdminPageAccessAttempts" value="10" min="1">
         <div id="invalidAdminPageAccessAttempts"></div>
     </div>
 
     <div class="dashboard-section">
         <h2>Suspicious IP Addresses</h2>
-        <label for="limitsuspiciousips">Limit: </label><input type="number" name="limitsuspiciousips" id="limitsuspiciousips" value="10">
+        <label for="limitsuspiciousips">Limit: </label><input type="number" name="limitsuspiciousips" id="limitsuspiciousips" value="10" min="1">
         <div id="suspiciousIPsList"></div>
     </div>
 
     <div class="dashboard-section">
         <h2>Temporal Patterns</h2>
         <label for="temporalGroupBy"></label><select id="temporalGroupBy">
-            <option value="hour">Hour</option>
-            <option value="day">Day</option>
-        </select>
+        <option value="hour">Hour</option>
+        <option value="day">Day</option>
+    </select>
 
         <canvas id="temporalPatternsChart"></canvas>
     </div>
@@ -93,11 +93,11 @@
     <div class="dashboard-section">
         <h2>HTTP Headers Analysis</h2>
         <h3>User-Agent Analysis</h3>
-        <label for="limitHTTPHeadersUA">Limit: </label><input type="number" name="limitHTTPHeadersUA" id="limitHTTPHeadersUA" value="10">
+        <label for="limitHTTPHeadersUA">Limit: </label><input type="number" name="limitHTTPHeadersUA" id="limitHTTPHeadersUA" value="10" min="1">
         <div id="httpHeadersAnalysisUA"></div>
 
         <h3>Authorization Analysis</h3>
-        <label for="limitHTTPHeadersAuth">Limit: </label><input type="number" name="limitHTTPHeadersAuth" id="limitHTTPHeadersAuth" value="10">
+        <label for="limitHTTPHeadersAuth">Limit: </label><input type="number" name="limitHTTPHeadersAuth" id="limitHTTPHeadersAuth" value="10" min="1">
         <div id="httpHeadersAnalysisAuth"></div>
     </div>
 
@@ -108,8 +108,7 @@
 
     <div class="dashboard-section">
         <h2>Client Session Analysis</h2>
-        <label for="limitsessions">Limit: </label><input type="number" name="limitsessions" id="limitsessions" value="10">
-
+        <label for="limitsessions">Limit: </label><input type="number" name="limitsessions" id="limitsessions" value="10" min="1">
         <div id="clientBehaviorAnalysis"></div>
     </div>
 
