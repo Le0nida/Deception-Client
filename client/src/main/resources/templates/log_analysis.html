@@ -68,6 +68,7 @@
 
     <div class="dashboard-section">
         <h2>Invalid Admin Page Access Attempts</h2>
+        <label for="limitAdminPageAccessAttempts">Limit: </label><input type="number" name="limitAdminPageAccessAttempts" id="limitAdminPageAccessAttempts" value="10" onchange="updateInvalidAdminPageAccessAttempts(this.value)">
         <div id="invalidAdminPageAccessAttempts"></div>
     </div>
 
@@ -89,7 +90,13 @@
 
     <div class="dashboard-section">
         <h2>HTTP Headers Analysis</h2>
-        <div id="httpHeadersAnalysis"></div>
+        <h3>User-Agent Analysis</h3>
+        <label for="limitHTTPHeadersUA">Limit: </label><input type="number" name="limitHTTPHeadersUA" id="limitHTTPHeadersUA" value="10" onchange="updateHTTPHeadersAnalysisUA(this.value)">
+        <div id="httpHeadersAnalysisUA"></div>
+
+        <h3>Authorization Analysis</h3>
+        <label for="limitHTTPHeadersAuth">Limit: </label><input type="number" name="limitHTTPHeadersAuth" id="limitHTTPHeadersAuth" value="10" onchange="updateHTTPHeadersAnalysisAuth(this.value)">
+        <div id="httpHeadersAnalysisAuth"></div>
     </div>
 
     <div class="dashboard-section">
