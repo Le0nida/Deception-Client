@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.19/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/common.css">
     <link rel="stylesheet" type="text/css" href="/css/log_analysis.css">
     <script src="/js/log_analysis.js"></script>
@@ -73,7 +75,7 @@
     </div>
 
     <div class="dashboard-section">
-        <h2>Suspicious IP Addresses (Top 10)</h2>
+        <h2>Suspicious IP Addresses</h2>
         <label for="limitsuspiciousips">Limit: </label><input type="number" name="limitsuspiciousips" id="limitsuspiciousips" value="10">
         <div id="suspiciousIPsList"></div>
     </div>
