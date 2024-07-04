@@ -1,50 +1,7 @@
 let targetedEndpointsChart; // Variabile globale per il grafico
 let temporalPatternsChart; // Variabile globale per il grafico dei pattern temporali
 
-
 $(document).ready(function () {
-    function loadLogs() {
-        const logs = JSON.parse(localStorage.getItem('logs'));
-        if (logs) {
-            processLogs(logs);
-        } else {
-            console.error('Nessun log trovato in localStorage.');
-        }
-    }
-
-    function processLogs(logs) {
-        const totalLogs = logs.length;
-        const uniqueIPs = new Set(logs.map(log => log.clientIPAddress)).size;
-        const targetedEndpoints = new Set(logs.map(log => log.requestURL)).size;
-
-        $('#totalLogs').text(totalLogs);
-        $('#uniqueIPs').text(uniqueIPs);
-        $('#targetedEndpoints').text(targetedEndpoints);
-
-        const attackPatterns = calculateAttackPatterns(logs);
-        const targetedEndpointsData = calculateTargetedEndpoints(logs, 10);
-        const suspiciousIPs = calculateSuspiciousIPs(logs, 10);
-        const temporalPatterns = calculateTemporalPatterns(logs);
-        const httpHeadersAnalysisUA = analyzeHTTPHeadersUA(logs);
-        const httpHeadersAnalysisAuth = analyzeHTTPHeadersAuth(logs);
-
-        const geoLocationRequests = analyzeGeoLocation(logs);
-        const clientBehaviorAnalysis = analyzeClientBehavior(logs);
-
-        renderAttackPatternsChart(attackPatterns);
-        renderTargetedEndpointsChart(targetedEndpointsData);
-        renderSuspiciousIPsList(suspiciousIPs);
-        renderTemporalPatternsChart(temporalPatterns);
-        renderHTTPHeadersAnalysisUA(httpHeadersAnalysisUA);
-        renderHTTPHeadersAnalysisAuth(httpHeadersAnalysisAuth);
-        renderGeoLocationRequests(geoLocationRequests);
-        renderClientBehaviorAnalysis(clientBehaviorAnalysis);
-
-        renderJWTTokenAttempts(logs);
-        renderXSSAttempts(logs);
-        renderCommandExecutions(logs);
-        renderAdminPageAccessAttempts(logs);
-    }
 
     // Button functions
     $('#backButton').on('click', function () {
@@ -85,9 +42,14 @@ $(document).ready(function () {
         updateTemporalPatterns(groupBy);
     });
 
-    $('#limitHTTPHeaders').on('change', function() {
+    $('#limitHTTPHeadersUA').on('change', function() {
         const limit = parseInt($(this).val());
-        updateHTTPHeadersAnalysis(limit);
+        updateHTTPHeadersAnalysisUA(limit);
+    });
+
+    $('#limitHTTPHeadersAuth').on('change', function() {
+        const limit = parseInt($(this).val());
+        updateHTTPHeadersAnalysisAuth(limit);
     });
 
     $('#limitAdminPageAccessAttempts').on('change', function() {
@@ -95,9 +57,63 @@ $(document).ready(function () {
         updateInvalidAdminPageAccessAttempts(limit);
     });
 
-    loadLogs();
+    $('#limitendpoints').on('change', function() {
+        const limit = parseInt($(this).val());
+        updateTargetedEndpoints(limit);
+    });
 
+    $('#limitsuspiciousips').on('change', function() {
+        const limit = parseInt($(this).val());
+        updateSuspiciousIPs(limit);
+    });
+
+    $('#limitsessions').on('change', function() {
+        const limit = parseInt($(this).val());
+        updateSessions(limit);
+    });
+
+    loadLogs();
 });
+
+function loadLogs() {
+    const logs = JSON.parse(localStorage.getItem('logs'));
+    if (logs) {
+        processLogs(logs);
+    } else {
+        console.error('Nessun log trovato in localStorage.');
+    }
+}
+
+function processLogs(logs) {
+    $('#totalLogs').text(logs.length);
+    $('#uniqueIPs').text(new Set(logs.map(log => log.clientIPAddress)).size);
+    $('#targetedEndpoints').text(new Set(logs.map(log => log.requestURL)).size);
+
+    const attackPatterns = calculateAttackPatterns(logs);
+    const targetedEndpointsData = calculateTargetedEndpoints(logs);
+    const suspiciousIPs = calculateSuspiciousIPs(logs);
+    const temporalPatterns = calculateTemporalPatterns(logs);
+    const httpHeadersAnalysisUA = analyzeHTTPHeadersUA(logs);
+    const httpHeadersAnalysisAuth = analyzeHTTPHeadersAuth(logs);
+
+    const geoLocationRequests = analyzeGeoLocation(logs);
+    const clientBehaviorAnalysis = analyzeClientBehavior(logs);
+
+    renderAttackPatternsChart(attackPatterns);
+    renderTargetedEndpointsChart(targetedEndpointsData);
+    renderSuspiciousIPsList(suspiciousIPs);
+    renderTemporalPatternsChart(temporalPatterns);
+    renderHTTPHeadersAnalysisUA(httpHeadersAnalysisUA);
+    renderHTTPHeadersAnalysisAuth(httpHeadersAnalysisAuth);
+    renderGeoLocationRequests(geoLocationRequests);
+    renderClientBehaviorAnalysis(clientBehaviorAnalysis);
+
+    renderJWTTokenAttempts(logs);
+    renderXSSAttempts(logs);
+    renderCommandExecutions(logs);
+    renderAdminPageAccessAttempts(logs);
+}
+
 
 // Calculating data functions
 function calculateAttackPatterns(logs) {
@@ -136,7 +152,7 @@ function calculateAttackPatterns(logs) {
     };
 }
 
-function calculateTargetedEndpoints(logs, limit) {
+function calculateTargetedEndpoints(logs, limit = 10) {
     const endpointCounts = {};
 
     logs.forEach(log => {
@@ -160,8 +176,7 @@ function calculateTargetedEndpoints(logs, limit) {
     };
 }
 
-
-function calculateSuspiciousIPs(logs, limit) {
+function calculateSuspiciousIPs(logs, limit = 10) {
     const ipCounts = {};
 
     logs.forEach(log => {
@@ -172,15 +187,13 @@ function calculateSuspiciousIPs(logs, limit) {
         }
     });
 
-    const sortedIPs = Object.entries(ipCounts)
+    return Object.entries(ipCounts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, limit)
         .reduce((acc, [ip, count]) => {
             acc[ip] = count;
             return acc;
         }, {});
-
-    return sortedIPs;
 }
 
 function calculateTemporalPatterns(logs, groupBy = 'hour') {
@@ -207,7 +220,6 @@ function calculateTemporalPatterns(logs, groupBy = 'hour') {
     return patterns;
 }
 
-
 function analyzeHTTPHeadersUA(logs, limit = 10) {
     const userAgentCounts = {};
 
@@ -216,16 +228,13 @@ function analyzeHTTPHeadersUA(logs, limit = 10) {
         userAgentCounts[userAgent] = (userAgentCounts[userAgent] || 0) + 1;
     });
 
-    // Sort and limit the results
-    const sortedUserAgents = Object.entries(userAgentCounts)
+    return Object.entries(userAgentCounts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, limit)
         .reduce((obj, [key, value]) => {
             obj[key] = value;
             return obj;
         }, {});
-
-    return sortedUserAgents;
 }
 
 function analyzeHTTPHeadersAuth(logs, limit = 10) {
@@ -236,16 +245,13 @@ function analyzeHTTPHeadersAuth(logs, limit = 10) {
         authorizationCounts[authorization] = (authorizationCounts[authorization] || 0) + 1;
     });
 
-    // Sort and limit the results
-    const sortedAuthorizations = Object.entries(authorizationCounts)
+    return Object.entries(authorizationCounts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, limit)
         .reduce((obj, [key, value]) => {
             obj[key] = value;
             return obj;
         }, {});
-
-    return sortedAuthorizations;
 }
 
 function analyzeGeoLocation(logs) {
@@ -273,12 +279,10 @@ function analyzeClientBehavior(logs, limit = 10) {
     });
 
     const sortedSessions = Object.entries(sessionCounts).sort((a, b) => b[1] - a[1]);
-    const topSessions = sortedSessions.slice(0, limit).reduce((obj, [key, value]) => {
+    return sortedSessions.slice(0, limit).reduce((obj, [key, value]) => {
         obj[key] = value;
         return obj;
     }, {});
-
-    return topSessions;
 }
 
 
@@ -342,7 +346,6 @@ function renderTargetedEndpointsChart(data) {
     });
 }
 
-
 function renderSuspiciousIPsList(data) {
     const list = $('#suspiciousIPsList');
     list.empty();
@@ -395,7 +398,6 @@ function renderTemporalPatternsChart(data, groupBy = 'hour') {
     });
 }
 
-
 function renderHTTPHeadersAnalysisUA(data) {
     let userAgentHtml = '<ul>';
     Object.entries(data).forEach(([ua, count]) => {
@@ -416,7 +418,6 @@ function renderHTTPHeadersAnalysisAuth(data) {
 
     $('#httpHeadersAnalysisAuth').html(authorizationHtml);
 }
-
 
 function renderGeoLocationRequests(data) {
     let geoHtml = '<ul>';
@@ -535,7 +536,7 @@ function renderCommandExecutions(logs) {
     $('#commandExecutions').html(html);
 }
 
-function renderAdminPageAccessAttempts(logs, limit = 10) {
+function renderAdminPageAccessAttempts(logs) {
     const adminAccessAttempts = logs.filter(log => log.requestURL.includes('admin/login') && log.queryParameters.includes("error"));
     const ipAttempts = {};
 
@@ -557,6 +558,7 @@ function renderAdminPageAccessAttempts(logs, limit = 10) {
 }
 
 
+// Update functions
 function updateTargetedEndpoints(limit) {
     const logs = JSON.parse(localStorage.getItem('logs'));
     if (logs) {
@@ -587,7 +589,6 @@ function updateTemporalPatterns(groupBy) {
     }
 }
 
-
 function updateSessions(limit) {
     const logs = JSON.parse(localStorage.getItem('logs'));
     if (logs) {
@@ -601,7 +602,7 @@ function updateSessions(limit) {
 function updateInvalidAdminPageAccessAttempts(limit) {
     const logs = JSON.parse(localStorage.getItem('logs'));
     if (logs) {
-        renderAdminPageAccessAttempts(logs, limit);
+        renderAdminPageAccessAttempts(logs);
     } else {
         console.error('Nessun log trovato in localStorage.');
     }

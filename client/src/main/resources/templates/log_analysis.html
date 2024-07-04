@@ -47,7 +47,7 @@
 
     <div class="dashboard-section">
         <h2>Targeted Endpoints</h2>
-        <label for="limitendpoints">Limit: </label><input type="number" name="limitendpoints" id="limitendpoints" value="10" onchange="updateTargetedEndpoints(this.value)">
+        <label for="limitendpoints">Limit: </label><input type="number" name="limitendpoints" id="limitendpoints" value="10">
         <canvas id="targetedEndpointsChart"></canvas>
     </div>
 
@@ -68,13 +68,13 @@
 
     <div class="dashboard-section">
         <h2>Invalid Admin Page Access Attempts</h2>
-        <label for="limitAdminPageAccessAttempts">Limit: </label><input type="number" name="limitAdminPageAccessAttempts" id="limitAdminPageAccessAttempts" value="10" onchange="updateInvalidAdminPageAccessAttempts(this.value)">
+        <label for="limitAdminPageAccessAttempts">Limit: </label><input type="number" name="limitAdminPageAccessAttempts" id="limitAdminPageAccessAttempts" value="10">
         <div id="invalidAdminPageAccessAttempts"></div>
     </div>
 
     <div class="dashboard-section">
         <h2>Suspicious IP Addresses (Top 10)</h2>
-        <label for="limitsuspiciousips">Limit: </label><input type="number" name="limitsuspiciousips" id="limitsuspiciousips" value="10" onchange="updateSuspiciousIPs(this.value)">
+        <label for="limitsuspiciousips">Limit: </label><input type="number" name="limitsuspiciousips" id="limitsuspiciousips" value="10">
         <div id="suspiciousIPsList"></div>
     </div>
 
@@ -91,11 +91,11 @@
     <div class="dashboard-section">
         <h2>HTTP Headers Analysis</h2>
         <h3>User-Agent Analysis</h3>
-        <label for="limitHTTPHeadersUA">Limit: </label><input type="number" name="limitHTTPHeadersUA" id="limitHTTPHeadersUA" value="10" onchange="updateHTTPHeadersAnalysisUA(this.value)">
+        <label for="limitHTTPHeadersUA">Limit: </label><input type="number" name="limitHTTPHeadersUA" id="limitHTTPHeadersUA" value="10">
         <div id="httpHeadersAnalysisUA"></div>
 
         <h3>Authorization Analysis</h3>
-        <label for="limitHTTPHeadersAuth">Limit: </label><input type="number" name="limitHTTPHeadersAuth" id="limitHTTPHeadersAuth" value="10" onchange="updateHTTPHeadersAnalysisAuth(this.value)">
+        <label for="limitHTTPHeadersAuth">Limit: </label><input type="number" name="limitHTTPHeadersAuth" id="limitHTTPHeadersAuth" value="10">
         <div id="httpHeadersAnalysisAuth"></div>
     </div>
 
@@ -106,7 +106,7 @@
 
     <div class="dashboard-section">
         <h2>Client Session Analysis</h2>
-        <label for="limitsessions">Limit: </label><input type="number" name="limitsessions" id="limitsessions" value="10" onchange="updateSessions(this.value)">
+        <label for="limitsessions">Limit: </label><input type="number" name="limitsessions" id="limitsessions" value="10">
 
         <div id="clientBehaviorAnalysis"></div>
     </div>
