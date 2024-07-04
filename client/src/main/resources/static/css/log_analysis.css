@@ -55,6 +55,7 @@ canvas {
     white-space: pre-wrap;
 }
 
+select,
 input[type="number"] {
     width: 100px;
     padding: 8px 12px;
@@ -76,4 +77,31 @@ input[type="number"]:focus {
     border-color: #0056b3;
     background-color: #e1f0ff;
     outline: none;
+}
+
+
+ul {
+    list-style-type: none;
+    padding-left: 1.2em;
+}
+
+li {
+    position: relative;
+    padding-left: 1em;
+    margin-top: 0.5em;
+}
+
+li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #FF5733;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.bold {
+    font-weight: bold;
 }

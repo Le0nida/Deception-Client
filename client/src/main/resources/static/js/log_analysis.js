@@ -287,10 +287,10 @@ function getGeoLocationFromIP(ip) {
             console.log('Geolocation data for IP', ip, ':', data);
             let geoString
             if (data.country_name === "-") {
-                geoString = `${data.ip}  -  Undefined`;
+                geoString = `${data.ip}  -  <span class="italic">Undefined</span>`;
             }
             else {
-                geoString = `${data.ip}  -  ${data.country_name}, ${data.region_name}, ${data.city_name} - Lat: ${data.latitude}, Long: ${data.longitude}`;
+                geoString = `${data.ip}  -  <span class="bold">${data.country_name}</span>, ${data.region_name}, ${data.city_name} - Lat: ${data.latitude}, Long: ${data.longitude}`;
             }
             renderGeoLocationRequests(geoString);
         },
@@ -382,7 +382,7 @@ function renderSuspiciousIPsList(data) {
     list.empty();
     const ul = $('<ul></ul>');
     Object.entries(data).forEach(([ip, count]) => {
-        ul.append(`<li>${ip}: ${count} attempts</li>`);
+        ul.append(`<li>${ip}  -  <span class="italic">${count} attempts</span></li>`);
     });
     list.append(ul);
 }
@@ -432,7 +432,7 @@ function renderTemporalPatternsChart(data, groupBy = 'hour') {
 function renderHTTPHeadersAnalysisUA(data) {
     let userAgentHtml = '<ul>';
     Object.entries(data).forEach(([ua, count]) => {
-        userAgentHtml += `<li>${ua}: ${count}</li>`;
+        userAgentHtml += `<li>${ua}  -  <span class="italic">${count} attempts</span></li>`;
     });
     userAgentHtml += '</ul>';
 
@@ -443,7 +443,7 @@ function renderHTTPHeadersAnalysisUA(data) {
 function renderHTTPHeadersAnalysisAuth(data) {
     let authorizationHtml = '<ul>';
     Object.entries(data).forEach(([auth, count]) => {
-        authorizationHtml += `<li class="wrapped-text">${auth}: ${count}</li>`;
+        authorizationHtml += `<li class="wrapped-text">${auth}  -  <span class="italic">${count} attempts</li>`;
     });
     authorizationHtml += '</ul>';
 
@@ -469,7 +469,7 @@ function insertGeoLocationHtml(data) {
 function renderClientBehaviorAnalysis(data) {
     let behaviorHtml = '<ul>';
     Object.keys(data).forEach(session => {
-        behaviorHtml += `<li>Session ${session}: ${data[session]}</li>`;
+        behaviorHtml += `<li>Session ${session}  -  <span class="italic">${data[session]} attempts</span></li>`;
     });
     behaviorHtml += '</ul>';
     $('#clientBehaviorAnalysis').html(behaviorHtml);
@@ -500,10 +500,10 @@ function renderJWTTokenAttempts(logs) {
 
     let html = '<ul>';
     for (const [IP, attempts] of Object.entries(ipAttempts)) {
-        html += `<li>IP: ${IP}<ul>`;
+        html += `<li><span class="bold">${IP}</span><ul>`;
         for (const [userPassKey, count] of Object.entries(attempts)) {
             const [username, password] = userPassKey.split(':');
-            html += `<li>Username: ${username}, Password: ${password}, Attempts: ${count}</li>`;
+            html += `<li>Username: ${username}, Password: ${password}, <span class="italic">${count} attempts</span></li>`;
         }
         html += `</ul></li>`;
     }
@@ -532,9 +532,9 @@ function renderXSSAttempts(logs) {
 
     let html = '<ul>';
     for (const [IP, scripts] of Object.entries(ipAttempts)) {
-        html += `<li>IP: ${IP}<ul>`;
+        html += `<li><span class="bold">${IP}</span><ul>`;
         for (const [script, count] of Object.entries(scripts)) {
-            html += `<li>Script: ${script}, Attempts: ${count}</li>`;
+            html += `<li>Script: ${script}  -  <span class="italic">${count} attempts</span></li>`;
         }
         html += `</ul></li>`;
     }
@@ -563,9 +563,9 @@ function renderCommandExecutions(logs) {
 
     let html = '<ul>';
     for (const [IP, commands] of Object.entries(ipAttempts)) {
-        html += `<li>IP: ${IP}<ul>`;
+        html += `<li><span class="bold">${IP}</span><ul>`;
         for (const [command, count] of Object.entries(commands)) {
-            html += `<li>Command: ${command}, Attempts: ${count}</li>`;
+            html += `<li>Command: ${command}  -  <span class="italic">${count} attempts</span></li>`;
         }
         html += `</ul></li>`;
     }
@@ -588,7 +588,7 @@ function renderAdminPageAccessAttempts(logs) {
 
     let html = '<ul>';
     for (const [IP, count] of Object.entries(ipAttempts)) {
-        html += `<li>IP: ${IP}, Attempts: ${count}</li>`;
+        html += `<li>${IP}  -  <span class="italic">${count} attempts</span></li>`;
     }
     html += '</ul>';
 
