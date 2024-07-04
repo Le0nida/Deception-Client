@@ -1,4 +1,4 @@
-let targetedEndpointsChart; // Variabile globale per il grafico
+let targetedEndpointsChart; // Variabile globale per il grafico dei targeted endpoints
 let temporalPatternsChart; // Variabile globale per il grafico dei pattern temporali
 
 $(document).ready(function () {
@@ -11,364 +11,28 @@ $(document).ready(function () {
     $('#downloadPDFButton').on('click', function () {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-
         const logs = JSON.parse(localStorage.getItem('logs'));
 
         // Title
         doc.setFontSize(18);
         doc.text('Deception Log Insights', 10, 22);
 
-        // Overview Metrics
+        // Render PDF sections
         let yOffset = renderOverviewMetrics(doc);
-
-        // Attack Patterns Chart
         yOffset = renderChartToPDF(doc, 'Attack Patterns', 'attackPatternsChart', 10, yOffset);
-
-        // Temporal Patterns Chart
         yOffset = renderTemporalPatternsChartToPDF(doc, 'Temporal Patterns', 'temporalPatternsChart', 10, yOffset);
-
-        // Targeted Endpoints Chart
         yOffset = renderChartToPDF(doc, 'Targeted Endpoints', 'targetedEndpointsChart', 10, yOffset);
-
-        // Suspicious IP Addresses List
         yOffset = renderListToPDF(doc, 'Suspicious IP Addresses', 'suspiciousIPsList', 10, yOffset);
-
-        // Geo-Location Requests
         yOffset = renderListToPDF(doc, 'Geo-Location of Requests', 'geoLocationRequests', 10, yOffset);
-
-        // JWT Token Attempts
-        yOffset = renderJWTTokenAttempts(doc, logs, 10, yOffset);
-
-        // XSS Attempts
-        yOffset = renderXSSAttempts(doc, logs, 10, yOffset);
-
-        // Command Executions
-        yOffset = renderCommandExecutions(doc, logs, 10, yOffset);
-
-        // Client Session Analysis
+        yOffset = renderJWTTokenAttemptsToPDF(doc, logs, 10, yOffset);
+        yOffset = renderXSSAttemptsToPDF(doc, logs, 10, yOffset);
+        yOffset = renderCommandExecutionsToPDF(doc, logs, 10, yOffset);
         yOffset = renderListToPDF(doc, 'Client Session Analysis', 'clientBehaviorAnalysis', 10, yOffset);
-
-        // HTTP Headers Analysis
-        yOffset = renderHTTPHeadersAnalysisToPDF(doc, 'HTTP Headers Analysis', 10, yOffset);
+        renderHTTPHeadersAnalysisToPDF(doc, 'HTTP Headers Analysis', 10, yOffset);
 
         // Save the PDF
         doc.save('log_insights.pdf');
     });
-
-    function renderJWTTokenAttempts(doc, logs, xPos, yPos) {
-        const jwtAttempts = logs.filter(log => log.requestURL.includes('auth/token'));
-        const ipAttempts = {};
-
-        jwtAttempts.forEach(attempt => {
-            const IP = attempt.clientIPAddress || 'Unknown';
-            if (attempt.queryParameters.includes("username") && attempt.queryParameters.includes("password")) {
-                const username = attempt.queryParameters.split("\n")[0].substring(9).trim() || 'Unknown';
-                const password = attempt.queryParameters.split("\n")[1].substring(9).trim() || 'Unknown';
-
-                if (!ipAttempts[IP]) {
-                    ipAttempts[IP] = {};
-                }
-
-                const userPassKey = `${username}:${password}`;
-                if (!ipAttempts[IP][userPassKey]) {
-                    ipAttempts[IP][userPassKey] = 0;
-                }
-                ipAttempts[IP][userPassKey]++;
-            }
-        });
-
-        doc.setFontSize(14);
-        doc.text("JWT Token Attempts", xPos, yPos);
-        doc.setFontSize(10);
-
-        let y = yPos + 10;
-        for (const [IP, attempts] of Object.entries(ipAttempts)) {
-            doc.text(`IP: ${IP}`, xPos, y);
-            y += 7;
-            for (const [userPassKey, count] of Object.entries(attempts)) {
-                const [username, password] = userPassKey.split(':');
-                doc.text(`Username: ${username}, Password: ${password}, Attempts: ${count}`, xPos + 10, y);
-                y += 5;
-            }
-            y += 10;
-        }
-
-        const pageHeight = doc.internal.pageSize.height;
-        const currentY = y + 10; // Adjust the final position
-
-        if (currentY > pageHeight - 50) {
-            doc.addPage();
-            return 20; // Start from the top of the new page
-        } else {
-            return currentY + 10; // Add padding for the next content
-        }
-    }
-
-
-    function renderXSSAttempts(doc, logs, xPos, yPos) {
-        const xssAttempts = logs.filter(log => log.queryParameters && log.queryParameters.includes('<script>') && log.queryParameters.includes('</script>'));
-        const ipAttempts = {};
-
-        xssAttempts.forEach(attempt => {
-            const IP = attempt.clientIPAddress || 'Unknown';
-            const script = attempt.queryParameters.match(/<script>(.*?)<\/script>/)[1] || 'Unknown';
-
-            if (!ipAttempts[IP]) {
-                ipAttempts[IP] = {};
-            }
-
-            if (!ipAttempts[IP][script]) {
-                ipAttempts[IP][script] = 0;
-            }
-            ipAttempts[IP][script]++;
-        });
-
-        doc.setFontSize(14);
-        doc.text("XSS Attempts", xPos, yPos);
-        doc.setFontSize(10);
-
-        let y = yPos + 10;
-        for (const [IP, scripts] of Object.entries(ipAttempts)) {
-            doc.text(`IP: ${IP}`, xPos, y);
-            y += 7;
-            for (const [script, count] of Object.entries(scripts)) {
-                doc.text(`Script: ${script}, Attempts: ${count}`, xPos + 10, y);
-                y += 5;
-            }
-            y += 10;
-        }
-
-        const pageHeight = doc.internal.pageSize.height;
-        const currentY = y + 10; // Adjust the final position
-
-        if (currentY > pageHeight - 50) {
-            doc.addPage();
-            return 20; // Start from the top of the new page
-        } else {
-            return currentY + 10; // Add padding for the next content
-        }
-    }
-
-
-    function renderCommandExecutions(doc, logs, xPos, yPos) {
-        const commandExecutions = logs.filter(log => log.requestURL.includes('command-exec') && log.queryParameters.includes('command'));
-        const ipAttempts = {};
-
-        commandExecutions.forEach(exec => {
-            const IP = exec.clientIPAddress || 'Unknown';
-            const command = exec.queryParameters.split("command: ")[1] || 'Unknown';
-
-            if (!ipAttempts[IP]) {
-                ipAttempts[IP] = {};
-            }
-
-            if (!ipAttempts[IP][command]) {
-                ipAttempts[IP][command] = 0;
-            }
-            ipAttempts[IP][command]++;
-        });
-
-        doc.setFontSize(14);
-        doc.text("Command Executions Attempts", xPos, yPos);
-        doc.setFontSize(10);
-        let y = yPos + 10;
-        for (const [IP, commands] of Object.entries(ipAttempts)) {
-            doc.text(`IP: ${IP}`, xPos, y);
-            y += 7;
-            for (const [command, count] of Object.entries(commands)) {
-                doc.text(`Command: ${command.replace("\n", "")}, Attempts: ${count}`, xPos + 10, y);
-                y += 5;
-            }
-            y += 10;
-        }
-
-        const pageHeight = doc.internal.pageSize.height;
-        const currentY = y + 10; // Adjust the final position
-
-        if (currentY > pageHeight - 50) {
-            doc.addPage();
-            return 20; // Start from the top of the new page
-        } else {
-            return currentY + 10; // Add padding for the next content
-        }
-    }
-
-    function renderOverviewMetrics(doc) {
-        doc.setFontSize(16);
-        doc.text('Overview', 10, 40);
-
-        const totalLogs = $('#totalLogs').text();
-        const uniqueIPs = $('#uniqueIPs').text();
-        const targetedEndpoints = $('#targetedEndpoints').text();
-
-        doc.setFontSize(12);
-        doc.text(`Total Logs: ${totalLogs}`, 10, 50);
-        doc.text(`Unique IPs: ${uniqueIPs}`, 10, 57);
-        doc.text(`Targeted Endpoints: ${targetedEndpoints}`, 10, 64);
-
-        // Check if content exceeds the page height and add a new page if necessary
-        const pageHeight = doc.internal.pageSize.height;
-        const currentY = doc.autoTable.previous.finalY || 80; // Starting yOffset
-
-        if (currentY > pageHeight - 20) {
-            doc.addPage();
-            return 20; // Start from the top of the new page
-        } else {
-            return currentY; // Add padding for the next content
-        }
-    }
-
-    function renderChartToPDF(doc, title, chartId, xPos, yPos) {
-        doc.setFontSize(14);
-        doc.text(title, xPos, yPos);
-
-        const canvas = document.getElementById(chartId);
-        const imgData = canvas.toDataURL('image/png');
-        if (chartId === "targetedEndpointsChart") {
-            doc.addImage(imgData, 'PNG', xPos + 15, yPos + 25, 170, 170);
-        }
-        else {
-            doc.addImage(imgData, 'PNG', xPos + 15, yPos + 10, 160, 60);
-        }
-
-        // Check if content exceeds the page height and add a new page if necessary
-        const pageHeight = doc.internal.pageSize.height;
-        const currentY = doc.autoTable.previous.finalY || yPos + 80; // Starting yOffset
-
-        if (currentY > pageHeight - 20 || chartId === "targetedEndpointsChart") {
-            doc.addPage();
-            return 20; // Start from the top of the new page
-        } else {
-            return currentY + 10; // Add padding for the next content
-        }
-    }
-
-    function renderListToPDF(doc, title, listId, xPos, yPos) {
-        doc.setFontSize(14);
-        doc.text(title, xPos, yPos);
-
-        doc.setFontSize(10);
-        let y = yPos + 10;
-        $(`#${listId} ul li`).each(function () {
-            doc.text($(this).text(), xPos, y);
-            y += 7;
-        });
-
-        // Check if content exceeds the page height and add a new page if necessary
-        const pageHeight = doc.internal.pageSize.height;
-        const currentY = doc.autoTable.previous.finalY || y + 10; // Starting yOffset
-
-        if (currentY > pageHeight - 50) {
-            doc.addPage();
-            return 20; // Start from the top of the new page
-        } else {
-            return currentY + 10; // Add padding for the next content
-        }
-    }
-
-// Function to render the Temporal Patterns chart with zoom to the PDF and return the new yOffset
-    function renderTemporalPatternsChartToPDF(doc, title, chartId, xPos, yPos) {
-        doc.setFontSize(14);
-        doc.text(title, xPos, yPos);
-
-        const canvas = document.getElementById(chartId);
-        const imgData = canvas.toDataURL('image/png');
-
-        // Adjust size and position to fit within the page
-        const width = 180;
-        const height = 100;
-        const offsetY = 10;
-
-        doc.addImage(imgData, 'PNG', xPos, yPos + offsetY, width, height, '', 'FAST');
-
-        // Check if content exceeds the page height and add a new page if necessary
-        const pageHeight = doc.internal.pageSize.height;
-        const currentY = doc.autoTable.previous.finalY || yPos + 120; // Starting yOffset
-
-        if (currentY > pageHeight - 20) {
-            doc.addPage();
-            return 20; // Start from the top of the new page
-        } else {
-            return currentY + 120; // Add padding for the next content
-        }
-    }
-
-// Function to render HTTP Headers Analysis in the PDF and return the new yOffset
-    function renderHTTPHeadersAnalysisToPDF(doc, title, xPos, yPos) {
-        doc.setFontSize(14);
-        doc.text(title, xPos, yPos);
-
-        const userAgentData = "httpHeadersAnalysisUA";
-        const authData = "httpHeadersAnalysisAuth";
-
-        doc.setFontSize(12);
-        doc.text('User-Agent Analysis:', xPos, yPos + 10);
-        doc.setFontSize(10);
-
-        let y = yPos + 17
-        $(`#${userAgentData} ul li`).each(function () {
-            let text = $(this).text();
-
-            // Divide il testo in righe basate sulla larghezza massima disponibile (180)
-            let textLines = doc.splitTextToSize(text, 180);
-
-            // Stampa ciascuna riga del testo
-            textLines.forEach(function (line) {
-                doc.text(line, xPos, y);
-                y += 7; // Spaziatura tra le righe
-            });
-
-        });
-
-        // Calcola la posizione Y corrente e verifica se è necessaria una nuova pagina
-        const pageHeight = y;
-        const textHeight = y; // Altezza del testo dell'User-Agent
-
-        let currentY = yPos + 30 + textHeight + 10; // 30 (dall'inizio del titolo) + altezza del testo + padding
-
-        // Verifica se il contenuto supera l'altezza della pagina e aggiungi una nuova pagina se necessario
-        if (currentY > pageHeight - 50) {
-            doc.addPage();
-            yPos = 20; // Resetta la posizione Y per iniziare dalla cima della nuova pagina
-        } else {
-            yPos = currentY; // Aggiorna la posizione Y corrente
-        }
-
-        // Aggiungi la sezione sull'autenticazione
-        doc.setFontSize(12);
-        doc.text('Authentication Analysis:', xPos, yPos + 10);
-        doc.setFontSize(10);
-
-        y = yPos + 17
-        $(`#${authData} ul li`).each(function () {
-            let text = $(this).text();
-
-            // Divide il testo in righe basate sulla larghezza massima disponibile (180)
-            let textLines = doc.splitTextToSize(text, 180);
-
-            // Stampa ciascuna riga del testo
-            textLines.forEach(function (line) {
-                doc.text(line, xPos, y);
-                y += 7; // Spaziatura tra le righe
-            });
-
-        });
-        // Calcola la nuova posizione Y e verifica se è necessaria una nuova pagina
-        const authTextHeight = y // Altezza del testo dell'autenticazione
-        currentY = yPos + 30 + authTextHeight + 10; // 30 (dall'inizio del titolo) + altezza del testo + padding
-
-        // Verifica nuovamente se è necessaria una nuova pagina
-        if (currentY > pageHeight - 50) {
-            doc.addPage();
-            yPos = 20; // Resetta la posizione Y per iniziare dalla cima della nuova pagina
-        } else {
-            yPos = currentY; // Aggiorna la posizione Y corrente
-        }
-
-        // Restituisci la posizione Y finale per il successivo contenuto
-        return yPos + 20; // Aggiungi un margine per il contenuto successivo
-    }
-
 
     $('#temporalGroupBy').on('change', function() {
         const groupBy = $(this).val();
@@ -959,4 +623,198 @@ function updateHTTPHeadersAnalysisAuth(limit) {
     } else {
         console.error('Nessun log trovato in localStorage.');
     }
+}
+
+
+// PDF functions
+function renderOverviewMetrics(doc) {
+    doc.setFontSize(16);
+    doc.text('Overview', 10, 40);
+
+    const totalLogs = $('#totalLogs').text();
+    const uniqueIPs = $('#uniqueIPs').text();
+    const targetedEndpoints = $('#targetedEndpoints').text();
+
+    doc.setFontSize(12);
+    doc.text(`Total Logs: ${totalLogs}`, 10, 50);
+    doc.text(`Unique IPs: ${uniqueIPs}`, 10, 57);
+    doc.text(`Targeted Endpoints: ${targetedEndpoints}`, 10, 64);
+
+    const pageHeight = doc.internal.pageSize.height;
+    const currentY = doc.autoTable.previous.finalY || 80;
+    return (currentY > pageHeight - 20) ? (doc.addPage(), 20) : currentY;
+}
+
+function renderChartToPDF(doc, title, chartId, xPos, yPos) {
+    doc.setFontSize(14);
+    doc.text(title, xPos, yPos);
+
+    const canvas = document.getElementById(chartId);
+    const imgData = canvas.toDataURL('image/png');
+    const imgWidth = (chartId === "targetedEndpointsChart") ? 170 : 160;
+    const imgHeight = (chartId === "targetedEndpointsChart") ? 170 : 60;
+    const offsetY = (chartId === "targetedEndpointsChart") ? 25 : 10;
+
+    doc.addImage(imgData, 'PNG', xPos + 15, yPos + offsetY, imgWidth, imgHeight);
+
+    const pageHeight = doc.internal.pageSize.height;
+    const currentY = doc.autoTable.previous.finalY || yPos + 80;
+    return (currentY > pageHeight - 20 || chartId === "targetedEndpointsChart") ? (doc.addPage(), 20) : currentY + 10;
+}
+
+function renderListToPDF(doc, title, listId, xPos, yPos) {
+    doc.setFontSize(14);
+    doc.text(title, xPos, yPos);
+
+    doc.setFontSize(10);
+    let y = yPos + 10;
+    $(`#${listId} ul li`).each(function () {
+        doc.text($(this).text(), xPos, y);
+        y += 7;
+    });
+
+    const pageHeight = doc.internal.pageSize.height;
+    const currentY = doc.autoTable.previous.finalY || y + 10;
+    return (currentY > pageHeight - 50) ? (doc.addPage(), 20) : currentY + 10;
+}
+
+function renderJWTTokenAttemptsToPDF(doc, logs, xPos, yPos) {
+    const jwtAttempts = logs.filter(log => log.requestURL.includes('auth/token'));
+    const ipAttempts = processLogsAttempts(jwtAttempts, 'queryParameters', ["username", "password"]);
+
+    doc.setFontSize(14);
+    doc.text("JWT Token Attempts", xPos, yPos);
+    doc.setFontSize(10);
+
+    let y = yPos + 10;
+    for (const [IP, attempts] of Object.entries(ipAttempts)) {
+        doc.text(`IP: ${IP}`, xPos, y);
+        y += 7;
+        for (const [userPassKey, count] of Object.entries(attempts)) {
+            const [username, password] = userPassKey.split(':');
+            doc.text(`Username: ${username}, Password: ${password}, Attempts: ${count}`, xPos + 10, y);
+            y += 5;
+        }
+        y += 10;
+    }
+
+    const pageHeight = doc.internal.pageSize.height;
+    const currentY = y + 10;
+    return (currentY > pageHeight - 50) ? (doc.addPage(), 20) : currentY + 10;
+}
+
+function renderXSSAttemptsToPDF(doc, logs, xPos, yPos) {
+    const xssAttempts = logs.filter(log => log.queryParameters && log.queryParameters.includes('<script>') && log.queryParameters.includes('</script>'));
+    const ipAttempts = processLogsAttempts(xssAttempts, 'queryParameters', ["<script>", "</script>"]);
+
+    doc.setFontSize(14);
+    doc.text("XSS Attempts", xPos, yPos);
+    doc.setFontSize(10);
+
+    let y = yPos + 10;
+    for (const [IP, scripts] of Object.entries(ipAttempts)) {
+        doc.text(`IP: ${IP}`, xPos, y);
+        y += 7;
+        for (const [script, count] of Object.entries(scripts)) {
+            doc.text(`Script: ${script}, Attempts: ${count}`, xPos + 10, y);
+            y += 5;
+        }
+        y += 10;
+    }
+
+    const pageHeight = doc.internal.pageSize.height;
+    const currentY = y + 10;
+    return (currentY > pageHeight - 50) ? (doc.addPage(), 20) : currentY + 10;
+}
+
+function renderCommandExecutionsToPDF(doc, logs, xPos, yPos) {
+    const commandExecutions = logs.filter(log => log.requestURL.includes('command-exec') && log.queryParameters.includes('command'));
+    const ipAttempts = processLogsAttempts(commandExecutions, 'queryParameters', ["command: "]);
+
+    doc.setFontSize(14);
+    doc.text("Command Executions Attempts", xPos, yPos);
+    doc.setFontSize(10);
+
+    let y = yPos + 10;
+    for (const [IP, commands] of Object.entries(ipAttempts)) {
+        doc.text(`IP: ${IP}`, xPos, y);
+        y += 7;
+        for (const [command, count] of Object.entries(commands)) {
+            doc.text(`Command: ${command.replace("\n", "")}, Attempts: ${count}`, xPos + 10, y);
+            y += 5;
+        }
+        y += 10;
+    }
+
+    const pageHeight = doc.internal.pageSize.height;
+    const currentY = y + 10;
+    return (currentY > pageHeight - 50) ? (doc.addPage(), 20) : currentY + 10;
+}
+
+function renderTemporalPatternsChartToPDF(doc, title, chartId, xPos, yPos) {
+    doc.setFontSize(14);
+    doc.text(title, xPos, yPos);
+
+    const canvas = document.getElementById(chartId);
+    const imgData = canvas.toDataURL('image/png');
+    const width = 180;
+    const height = 100;
+    const offsetY = 10;
+
+    doc.addImage(imgData, 'PNG', xPos, yPos + offsetY, width, height, '', 'FAST');
+
+    const pageHeight = doc.internal.pageSize.height;
+    const currentY = doc.autoTable.previous.finalY || yPos + 120;
+    return (currentY > pageHeight - 20) ? (doc.addPage(), 20) : currentY + 120;
+}
+
+function renderHTTPHeadersAnalysisToPDF(doc, title, xPos, yPos) {
+    doc.setFontSize(14);
+    doc.text(title, xPos, yPos);
+
+    const userAgentData = "httpHeadersAnalysisUA";
+    const authData = "httpHeadersAnalysisAuth";
+
+    doc.setFontSize(12);
+    doc.text('User-Agent Analysis:', xPos, yPos + 10);
+    doc.setFontSize(10);
+
+    let y = renderTextLinesToPDF(doc, $(`#${userAgentData} ul li`), xPos, yPos + 17);
+    y = checkPageOverflow(doc, y, doc.internal.pageSize.height);
+
+    doc.setFontSize(12);
+    doc.text('Authentication Analysis:', xPos, y + 10);
+    doc.setFontSize(10);
+
+    y = renderTextLinesToPDF(doc, $(`#${authData} ul li`), xPos, y + 17);
+    return checkPageOverflow(doc, y, doc.internal.pageSize.height) + 20;
+}
+
+function renderTextLinesToPDF(doc, elements, xPos, yPos) {
+    let y = yPos;
+    elements.each(function () {
+        const textLines = doc.splitTextToSize($(this).text(), 180);
+        textLines.forEach(function (line) {
+            doc.text(line, xPos, y);
+            y += 7;
+        });
+    });
+    return y;
+}
+
+function checkPageOverflow(doc, y, pageHeight) {
+    return (y > pageHeight - 50) ? (doc.addPage(), 20) : y;
+}
+
+function processLogsAttempts(logs, param, keys) {
+    const attempts = {};
+    logs.forEach(log => {
+        const IP = log.clientIPAddress || 'Unknown';
+        const [username, password] = keys.map(key => (log[param].includes(key) ? log[param].split("\n")[0].substring(key.length).trim() : 'Unknown'));
+        if (!attempts[IP]) attempts[IP] = {};
+        const userPassKey = `${username}:${password}`;
+        if (!attempts[IP][userPassKey]) attempts[IP][userPassKey] = 0;
+        attempts[IP][userPassKey]++;
+    });
+    return attempts;
 }
