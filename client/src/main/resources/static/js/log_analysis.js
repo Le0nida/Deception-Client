@@ -229,7 +229,7 @@ function getGeoLocationFromIP(ip) {
     return "Unknown";
 }
 
-function analyzeClientBehavior(logs) {
+function analyzeClientBehavior(logs, limit = 10) {
     const sessionCounts = {};
 
     logs.forEach(log => {
@@ -237,7 +237,13 @@ function analyzeClientBehavior(logs) {
         sessionCounts[sessionID] = (sessionCounts[sessionID] || 0) + 1;
     });
 
-    return sessionCounts;
+    const sortedSessions = Object.entries(sessionCounts).sort((a, b) => b[1] - a[1]);
+    const topSessions = sortedSessions.slice(0, limit).reduce((obj, [key, value]) => {
+        obj[key] = value;
+        return obj;
+    }, {});
+
+    return topSessions;
 }
 
 
@@ -535,6 +541,17 @@ function updateTemporalPatterns(groupBy) {
     if (logs) {
         const temporalPatternsData = calculateTemporalPatterns(logs, groupBy);
         renderTemporalPatternsChart(temporalPatternsData, groupBy);
+    } else {
+        console.error('Nessun log trovato in localStorage.');
+    }
+}
+
+
+function updateSessions(limit) {
+    const logs = JSON.parse(localStorage.getItem('logs'));
+    if (logs) {
+        const clientBehaviorAnalysis = analyzeClientBehavior(logs, limit);
+        renderClientBehaviorAnalysis(clientBehaviorAnalysis);
     } else {
         console.error('Nessun log trovato in localStorage.');
     }
