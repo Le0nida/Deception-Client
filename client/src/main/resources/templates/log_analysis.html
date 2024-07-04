@@ -7,6 +7,7 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1"></script>
     <link rel="stylesheet" type="text/css" href="/css/common.css">
     <link rel="stylesheet" type="text/css" href="/css/log_analysis.css">
     <script src="/js/log_analysis.js"></script>
@@ -46,8 +47,7 @@
 
     <div class="dashboard-section">
         <h2>Targeted Endpoints</h2>
-        <label for="limitendpoints"></label><input type="number" name="limitendpoints" id="limitendpoints" value="10" onchange="updateTargetedEndpoints(this.value)">
-
+        <label for="limitendpoints">Limit: </label><input type="number" name="limitendpoints" id="limitendpoints" value="10" onchange="updateTargetedEndpoints(this.value)">
         <canvas id="targetedEndpointsChart"></canvas>
     </div>
 
@@ -73,11 +73,17 @@
 
     <div class="dashboard-section">
         <h2>Suspicious IP Addresses (Top 10)</h2>
+        <label for="limitsuspiciousips">Limit: </label><input type="number" name="limitsuspiciousips" id="limitsuspiciousips" value="10" onchange="updateSuspiciousIPs(this.value)">
         <div id="suspiciousIPsList"></div>
     </div>
 
     <div class="dashboard-section">
         <h2>Temporal Patterns</h2>
+        <label for="temporalGroupBy"></label><select id="temporalGroupBy">
+            <option value="hour">Hour</option>
+            <option value="day">Day</option>
+        </select>
+
         <canvas id="temporalPatternsChart"></canvas>
     </div>
 

@@ -1,4 +1,5 @@
 let targetedEndpointsChart; // Variabile globale per il grafico
+let temporalPatternsChart; // Variabile globale per il grafico dei pattern temporali
 
 
 $(document).ready(function () {
@@ -22,7 +23,7 @@ $(document).ready(function () {
 
         const attackPatterns = calculateAttackPatterns(logs);
         const targetedEndpointsData = calculateTargetedEndpoints(logs, 10);
-        const suspiciousIPs = calculateSuspiciousIPs(logs);
+        const suspiciousIPs = calculateSuspiciousIPs(logs, 10);
         const temporalPatterns = calculateTemporalPatterns(logs);
         const httpHeadersAnalysis = analyzeHTTPHeaders(logs);
         const geoLocationRequests = analyzeGeoLocation(logs);
@@ -75,6 +76,12 @@ $(document).ready(function () {
 
         doc.save('log_insights.pdf');
     });
+
+    $('#temporalGroupBy').on('change', function() {
+        const groupBy = $(this).val();
+        updateTemporalPatterns(groupBy);
+    });
+
 
     loadLogs();
 
@@ -142,33 +149,52 @@ function calculateTargetedEndpoints(logs, limit) {
 }
 
 
-function calculateSuspiciousIPs(logs) {
+function calculateSuspiciousIPs(logs, limit) {
     const ipCounts = {};
 
     logs.forEach(log => {
-        const clientIPAddress = log.clientIPAddress || 'Unknown';
-        ipCounts[clientIPAddress] = (ipCounts[clientIPAddress] || 0) + 1;
+        if (ipCounts[log.clientIPAddress]) {
+            ipCounts[log.clientIPAddress]++;
+        } else {
+            ipCounts[log.clientIPAddress] = 1;
+        }
     });
 
-    return Object.keys(ipCounts).sort((a, b) => ipCounts[b] - ipCounts[a]).slice(0, 10); // Top 10 frequent IPs
+    const sortedIPs = Object.entries(ipCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, limit)
+        .reduce((acc, [ip, count]) => {
+            acc[ip] = count;
+            return acc;
+        }, {});
+
+    return sortedIPs;
 }
 
-function calculateTemporalPatterns(logs) {
-    const dateCounts = {};
+function calculateTemporalPatterns(logs, groupBy = 'hour') {
+    const patterns = {};
 
     logs.forEach(log => {
-        const date = new Date(log.timestamp).toLocaleDateString();
-        dateCounts[date] = (dateCounts[date] || 0) + 1;
+        const date = new Date(log.timestamp);
+        let key;
+        if (groupBy === 'hour') {
+            key = `${date.toDateString()} ${date.getHours()}:00`;
+        } else if (groupBy === 'day') {
+            key = date.toDateString();
+        } else {
+            key = date.toISOString();
+        }
+
+        if (patterns[key]) {
+            patterns[key]++;
+        } else {
+            patterns[key] = 1;
+        }
     });
 
-    const labels = Object.keys(dateCounts);
-    const data = Object.values(dateCounts);
-
-    return {
-        labels: labels,
-        data: data
-    };
+    return patterns;
 }
+
 
 function analyzeHTTPHeaders(logs) {
     const userAgentCounts = {};
@@ -276,38 +302,58 @@ function renderTargetedEndpointsChart(data) {
 }
 
 
-function renderSuspiciousIPsList(ips) {
-    let suspiciousIPsHtml = '<ul>';
-    ips.forEach(ip => {
-        suspiciousIPsHtml += `<li>${ip}</li>`;
+function renderSuspiciousIPsList(data) {
+    const list = $('#suspiciousIPsList');
+    list.empty();
+    const ul = $('<ul></ul>');
+    Object.entries(data).forEach(([ip, count]) => {
+        ul.append(`<li>${ip}: ${count} attempts</li>`);
     });
-    suspiciousIPsHtml += '</ul>';
-    $('#suspiciousIPsList').html(suspiciousIPsHtml);
+    list.append(ul);
 }
 
-function renderTemporalPatternsChart(data) {
+function renderTemporalPatternsChart(data, groupBy = 'hour') {
     const ctx = document.getElementById('temporalPatternsChart').getContext('2d');
-    new Chart(ctx, {
+    if (temporalPatternsChart) {
+        temporalPatternsChart.destroy(); // Distruggi il grafico esistente prima di crearne uno nuovo
+    }
+    temporalPatternsChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: data.labels,
+            labels: Object.keys(data),
             datasets: [{
-                label: 'Number of Logs',
-                data: data.data,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
+                label: `Logs per ${groupBy}`,
+                data: Object.values(data),
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1,
+                fill: true
             }]
         },
         options: {
+            responsive: true,
             scales: {
                 y: {
                     beginAtZero: true
+                }
+            },
+            plugins: {
+                zoom: {
+                    zoom: {
+                        wheel: {
+                            enabled: true
+                        },
+                        pinch: {
+                            enabled: true
+                        },
+                        mode: 'x'
+                    }
                 }
             }
         }
     });
 }
+
 
 function renderHTTPHeadersAnalysis(data) {
     let userAgentHtml = '<h3>User-Agent Analysis</h3><ul>';
@@ -469,6 +515,26 @@ function updateTargetedEndpoints(limit) {
     if (logs) {
         const targetedEndpointsData = calculateTargetedEndpoints(logs, limit);
         renderTargetedEndpointsChart(targetedEndpointsData);
+    } else {
+        console.error('Nessun log trovato in localStorage.');
+    }
+}
+
+function updateSuspiciousIPs(limit) {
+    const logs = JSON.parse(localStorage.getItem('logs'));
+    if (logs) {
+        const suspiciousIPsData = calculateSuspiciousIPs(logs, limit);
+        renderSuspiciousIPsList(suspiciousIPsData);
+    } else {
+        console.error('Nessun log trovato in localStorage.');
+    }
+}
+
+function updateTemporalPatterns(groupBy) {
+    const logs = JSON.parse(localStorage.getItem('logs'));
+    if (logs) {
+        const temporalPatternsData = calculateTemporalPatterns(logs, groupBy);
+        renderTemporalPatternsChart(temporalPatternsData, groupBy);
     } else {
         console.error('Nessun log trovato in localStorage.');
     }
