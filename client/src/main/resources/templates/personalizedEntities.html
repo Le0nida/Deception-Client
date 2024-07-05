@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Specification</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script th:src="@{/js/personalizedEntities.js}"></script>
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/personalizedEntities.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #entityList {
+            margin-top: 20px;
+        }
+
+        .entity {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        .dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dialog input, .dialog select {
+            margin-bottom: 10px;
+        }
+
+        .dialog input[type="text"] {
+            width: calc(100% - 120px);
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="title">
+        <h1>API Specification</h1>
+        <h3>Building of personalized entities </h3>
+    </div>
+
+    <div>
+        <p>
+            In this section you can create your own <b>personalized entities</b>, based on the data types available on
+            the Mockaroo website. You can
+        </p>
+    </div>
+
+    <div class="button-container">
+        <button id="reset">Reset</button>
+        <button id="continue">Continue</button>
+    </div>
+
+    <div class="form-section">
+
+        <div id="entityList">
+            <h3>List of entities</h3>
+        </div>
+        <button id="createEntityBtn">Create Custom Entity</button>
+    </div>
+
+    <div id="footer">
+        <section>
+            <div><span>Username: </span><span id="username" class="username" th:text="${username}"></span></div>
+            <form th:action="@{/}" method="get">
+                <input type="submit" value="Home"/>
+            </form>
+        </section>
+    </div>
+</div>
+
+
+<div id="entityDialog" class="dialog">
+    <h2>Nuova Entità</h2>
+    <label for="entityName">Nome Entità:</label>
+    <input type="text" id="entityName" required>
+    <div id="fieldsContainer">
+        <div class="fieldRow">
+            <label>
+                <input type="text" class="fieldName" placeholder="Nome Campo" required>
+            </label>
+            <label>
+                <select class="fieldType">
+                    <option th:each="item : ${mockarooDataTypes}" th:value="${item}" th:text="${item}"></option>
+                </select>
+            </label>
+        </div>
+    </div>
+    <button id="closeDialog">Close</button>
+    <button id="addFieldBtn">Aggiungi Campo</button>
+    <button id="saveEntityBtn">Save</button>
+</div>
+
+</body>
+</html>

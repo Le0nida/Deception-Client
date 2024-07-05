@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cybersec.deception.client.services.EntitiesService;
 import cybersec.deception.client.services.PersistenceService;
+import cybersec.deception.client.utils.MockarooDataType;
 import cybersec.deception.client.utils.Utils;
 import cybersec.deception.model.*;
 import cybersec.deception.client.services.YamlBuilderService;
@@ -105,6 +106,16 @@ public class MainController {
                     return "schemaDefinition";
                 } else {
                     model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
+                    return "errorpage";
+                }
+            }
+            case "personalizedEntities" -> {
+                List<String> pojos = (List<String>) requestBody.get("pojos");
+                session.setAttribute("selectedPojos", pojos);
+                if (Collections.list(session.getAttributeNames()).stream().anyMatch(name -> name.startsWith("currentPojo"))) {
+                    return "personalizedEntities";
+                } else {
+                    model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
                     return "errorpage";
                 }
             }
@@ -248,6 +259,16 @@ public class MainController {
         }
 
         return "pojoBuilding";
+    }
+
+    // 1.2.x - definizione entità personalizzate
+    @GetMapping("/personalizedEntities")
+    public String personalizedEntities(Model model, HttpSession session) {
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
+        model.addAttribute("mockarooDataTypes", MockarooDataType.getAllDisplayNames());
+        return "personalizedEntities";
     }
 
     // 1.3 - definizione dello schema di sicurezza

@@ -100,7 +100,7 @@ function handleContinueButton() {
 
     // Creare un oggetto con i dati da inviare
     const data = {
-        step: 'sec',
+        step: 'personalizedEntities',
         pojos: pojos
     };
 
@@ -110,7 +110,7 @@ function handleContinueButton() {
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: function (response) {
-            window.location.href = 'securityScheme'
+            window.location.href = 'personalizedEntities'
         },
         error: function (error) {
             console.error('Error:', error);
