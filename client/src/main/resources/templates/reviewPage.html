@@ -20,7 +20,7 @@
            <button id="validate">Validate</button>
            <button id="download">Download</button>
            <button id="save">Save</button>
-           <button id="generate">Generate Server</button>
+           <button id="continue">Continue</button>
        </div>
 
        <div class="form-section">
@@ -36,23 +36,6 @@
                </form>
            </section>
        </div>
-   </div>
-
-   <div id="page-cover"></div>
-   <div id="dialogimport" class="dialog">
-       <h2>Server generation</h2>
-       <p>
-           A Spring server will be generated based on the defined OpenAPI specification. A <i>.zip</i> file containing the server project (to allow for modification) and its corresponding <b>Dockerfile</b> will be provided.
-       </p>
-
-       <p>
-           Additionally, it's possible to define a <b>database</b> upon which the endpoint responses will be based. Only default methods will be automatically implemented for interaction with the database. Other methods will be marked as <i>partially implemented</i>, and a list of these will be provided.
-           <br>
-           If no database is used, endpoint responses will be generated randomly.
-       </p>
-
-       <button onclick="generateServer(true)">Generate with DB</button>
-       <button id="withoutDB" onclick="generateServer(false)">Generate without DB</button>
    </div>
 </body>
 </html>

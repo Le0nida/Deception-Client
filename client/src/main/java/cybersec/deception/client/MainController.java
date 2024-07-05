@@ -375,6 +375,11 @@ public class MainController {
         return ResponseEntity.ok("Error");
     }
 
+    //1.6 (EXTRA) - extra features
+    @GetMapping("/extraFeatures")
+    public String extraFeatures() {
+        return "extraFeatures";
+    }
 
 
     // Metodi di utilità -----------------------------------------------------------------------------------------------

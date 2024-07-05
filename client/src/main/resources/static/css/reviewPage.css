@@ -25,7 +25,3 @@
 .button-container #validate:hover {
     background-color: rgba(229, 113, 113, 0.86);
 }
-
-#withoutDB {
-    background-color: rgb(173, 173, 173);
-}

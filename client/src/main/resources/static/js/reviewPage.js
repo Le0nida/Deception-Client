@@ -1,8 +1,22 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    $('#generate').click(function() {
-        $('#dialogimport').show();
-        $('body').addClass('dialog-open');
+    $('#continue').click(function() {
+        //$('#dialogimport').show();
+        //$('body').addClass('dialog-open');
+
+        $.ajax({
+            type: 'POST',
+            url: '/extraFeatures',
+            contentType: 'application/json',
+            data: document.getElementById("yamlContent").textContent,
+            success: function(response) {
+                window.location.href = response
+            },
+            error: function(error) {
+                console.error('Error: ', error);
+                alert("Error while proceeding to the next step")
+            }
+        });
     });
 
     // Chiudi la dialog se si clicca al di fuori di essa
@@ -84,69 +98,4 @@ function saveYamlFile() {
             }
         });
     }
-}
-
-function generateServer(useDb) {
-
-    const userInput = prompt("Insert a base path for your Api (default /api)")
-    if (userInput !== null) {
-        if (userInput.startsWith("/")) {
-            userInput.substring(1)
-        }
-        if (userInput.endsWith("/")) {
-            userInput.substring(userInput.length-1)
-        }
-    }
-
-    const userInputDocs = prompt("Do you want swagger-ui docs (y/n)? (default yes)")
-    let docs = true;
-    if (userInputDocs !== null) {
-        if (userInputDocs.endsWith("n")) {
-            docs = false;
-        }
-    }
-    $('#dialogimport').hide();
-    $('body').removeClass('dialog-open');
-
-    const data = {
-        persistence: useDb,
-        basePath: userInput || '',
-        docs: docs
-    };
-
-    $.ajax({
-        type: 'POST',
-        url: 'generateServer',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        xhrFields: {
-            responseType: 'blob' // Imposta il tipo di risposta come Blob
-        },
-        success: function (response) {
-            // Crea un oggetto URL per il Blob
-            const blobURL = URL.createObjectURL(response);
-
-            // Crea un link HTML per il download del file
-            const link = document.createElement('a');
-            link.href = blobURL;
-            link.download = 'restApiServer.zip'; // Nome del file da scaricare
-            link.style.display = 'none';
-
-            // Aggiungi il link al documento HTML
-            document.body.appendChild(link);
-
-            // Simula un clic sul link per avviare il download
-            link.click();
-
-            // Rimuovi il link dal documento
-            document.body.removeChild(link);
-
-            // Rilascia l'URL oggetto per il Blob
-            URL.revokeObjectURL(blobURL);
-        },
-        error: function (error) {
-            console.error('Error: ', error);
-            alert("Error while generating the server")
-        }
-    });
 }

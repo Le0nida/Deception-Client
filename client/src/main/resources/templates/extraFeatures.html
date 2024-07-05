@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <title>API Specification</title>
+    <script th:src="@{/js/utils.js}"></script>
+    <script th:src="@{/js/extraFeatures.js}"></script>
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/extraFeatures.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 5px;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="title">
+        <h1>API Specification</h1>
+        <h3>Definition of extra features</h3>
+    </div>
+
+    <div>
+        <p>
+            In this page, you can add <strong>extra functionalities</strong> to the Rest API Server that will be generated.
+        </p>
+    </div>
+
+    <div class="button-container">
+        <button id="reset">Reset</button>
+        <button id="generate">Generate Server</button>
+    </div>
+
+    <div class="form-container">
+        <div class="form-section">
+            <h2>JWT Authentication</h2>
+            <p>
+                Allows the insertion of JWT authentication on desired paths. Username and password must be specified to obtain the token.
+                <br>
+                Multiple paths can be specified using the syntax <i>"/path/**"</i>.
+            </p>
+            <label for="jwtPaths">Paths:</label>
+            <input type="text" id="jwtPaths" name="jwtPaths" placeholder="e.g., /user/**">
+        </div>
+
+        <div class="form-section">
+            <h2>Admin Pages</h2>
+            <p>
+                Allows the insertion of administration pages for user and server parameter management, in addition to the ability to view system logs. Obviously, all this data is fake, and the attacker cannot make harmful changes. It is necessary to enter a username and password to access the page.
+                <br>
+                <strong>N.B.</strong> It is advisable to set a not too complex password so that an attacker, through brute force or dictionary attack, will eventually gain access (wasting time and resources in the process).
+            </p>
+            <label for="adminUser">Username:</label>
+            <input type="text" id="adminUser" name="adminUser" placeholder="e.g., username">
+
+            <label for="adminPass">Password:</label>
+            <input type="text" id="adminPass" name="adminPass" placeholder="e.g., password">
+        </div>
+
+        <div class="form-section">
+            <h2>Sessions Management</h2>
+            <p>
+                Enables session management, invalidating it after a certain time interval and blocking multiple sessions from the same user.
+            </p>
+            <label for="session">Activate Session:</label>
+            <input type="checkbox" id="session" name="session" value="false">
+        </div>
+
+        <div class="form-section">
+            <h2>Vulnerable Endpoints</h2>
+            <p>
+                Allows the insertion of vulnerable endpoints that will appear to attackers as remnants of older versions. This includes endpoints that allow SQL Injection, Cross-Site Scripting, Remote Command Execution, and Directory Traversal (which obviously do not cause real damage to the system).
+            </p>
+            <label for="vuln">Activate Vulnerable Endpoints:</label>
+            <input type="checkbox" id="vuln" name="vuln" value="false">
+        </div>
+
+        <div class="form-section">
+            <h2>Not Authorized pages</h2>
+            <p>
+                Allows specifying fake paths that will redirect to a fake NOT AUTHORIZED page. <br>
+                Multiple paths can be specified using the syntax <i>"/path/**"</i>.
+            </p>
+            <label for="notAuthPaths">Paths:</label>
+            <input type="text" id="notAuthPaths" name="notAuthPaths" placeholder="e.g., /passwords/**">
+        </div>
+    </div>
+    <div id="footer">
+        <section>
+            <div><span>Username: </span><span id="username" class="username" th:text="${username}"></span></div>
+            <form th:action="@{/}" method="get">
+                <input type="submit" value="Home"/>
+            </form>
+        </section>
+    </div>
+</div>
+<div id="page-cover"></div>
+<div id="dialogimport" class="dialog">
+    <h2>Server generation</h2>
+    <p>
+        A Spring server will be generated based on the defined OpenAPI specification. A <i>.zip</i> file containing the server project (to allow for modification) and its corresponding <b>Dockerfile</b> will be provided.
+    </p>
+
+    <p>
+        Additionally, it's possible to define a <b>database</b> upon which the endpoint responses will be based. Only default methods will be automatically implemented for interaction with the database. Other methods will be marked as <i>partially implemented</i>, and a list of these will be provided.
+        <br>
+        If no database is used, endpoint responses will be generated randomly.
+    </p>
+
+    <button onclick="generateServer(true)">Generate with DB</button>
+    <button id="withoutDB" onclick="generateServer(false)">Generate without DB</button>
+</div>
+</body>
+</html>

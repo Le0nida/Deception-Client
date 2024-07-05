@@ -92,6 +92,13 @@ public class InnerController {
         return ResponseEntity.ok("reviewPage");
     }
 
+    // Salva in sessione il file yaml
+    @PostMapping("/extraFeatures")
+    public ResponseEntity<String> setTags(@RequestBody String data, HttpSession session) {
+        session.setAttribute("reviewedFinalYaml", data);
+        return ResponseEntity.ok("extraFeatures");
+    }
+
     // Import & Save - OpenApi specification
     // L'import corrisponde alla funzionalità 3 nel Main Controller
     @PostMapping("/setSpecification")
