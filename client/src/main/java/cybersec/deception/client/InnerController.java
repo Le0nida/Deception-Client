@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cybersec.deception.client.services.PersistenceService;
 import cybersec.deception.client.utils.Utils;
 import cybersec.deception.client.utils.ZipUtils;
-import cybersec.deception.model.SecurityConfig;
 import cybersec.deception.model.ServerBuildResponse;
 import cybersec.deception.model.apispecification.Tag;
 import cybersec.deception.model.logmodel.LogRequest;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -198,10 +196,8 @@ public class InnerController {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-        ResponseEntity<LogResponse> response = restTemplate.postForEntity(data.get("urlLog"), requestEntity, LogResponse.class);
 
-
-        return response;
+        return restTemplate.postForEntity(data.get("urlLog"), requestEntity, LogResponse.class);
     }
 
     // Visualizzazione pagina insights

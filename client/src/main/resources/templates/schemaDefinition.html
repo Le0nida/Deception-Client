@@ -34,7 +34,9 @@
         <p>Before proceeding, it is mandatory to select at least one entity. You must open the details of an entity before being able to select it.</p>
         <div th:each="item : ${checkboxList}">
             <button th:id="${item}" class="checkboxes" onclick="handleLabelClick(this.id, this)">Open</button>
-            <input th:id="${item}" type="checkbox" class="pojoparent" disabled/>
+            <label>
+                <input th:id="${item}" type="checkbox" class="pojoparent" disabled/>
+            </label>
             <label th:for="${item}" th:id="${item}" th:text="${item}" class="checkboxes"></label>
         </div>
     </div>

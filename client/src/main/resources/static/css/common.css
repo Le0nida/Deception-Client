@@ -91,9 +91,6 @@ body {
 .button-container #reset {
     background-color: rgba(229, 113, 113, 0.56);
 }
-.button-container #rest:hover {
-    background-color: rgba(229, 113, 113, 0.86);
-}
 
 .dialog {
     display: none;

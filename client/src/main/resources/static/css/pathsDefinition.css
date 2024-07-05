@@ -72,10 +72,6 @@
     margin-bottom: 5px;
 }
 
-.form-section .checkbox-label {
-    display: unset !important;
-}
-
 .valueBtnList button {
     padding: 5px 10px;
     font-size: 13px;
@@ -114,15 +110,6 @@ select {
 
 #operation-dialog-container {
     flex-grow: 1;
-}
-
-#operation-dialog-container  .operation-dialog{
-    flex-grow: 1;
-    display: flex;
-}
-
-#build-info-dialog {
-    max-height: 50%;
 }
 
 #operation-buttons {

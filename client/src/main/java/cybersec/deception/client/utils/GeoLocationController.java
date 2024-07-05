@@ -13,6 +13,7 @@ public class GeoLocationController {
     @Value("${ip2location.api.key}")
     private String apiKey;
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final String ip2LocationApiUrl = "https://api.ip2location.io/";
 
     @GetMapping("/api/getGeoLocation")

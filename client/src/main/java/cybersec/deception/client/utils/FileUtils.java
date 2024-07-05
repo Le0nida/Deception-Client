@@ -150,7 +150,7 @@ public class FileUtils {
         String riga;
         while (true) {
             try {
-                if (!((riga = reader.readLine()) != null)) break;
+                if ((riga = reader.readLine()) == null) break;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

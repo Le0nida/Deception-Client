@@ -80,76 +80,81 @@ public class MainController {
 
         String step = (String) requestBody.get("step");
 
-        if (step.equals("general")) {
-            if (!Utils.isNullOrEmpty(pojoList) || setPojos()) {
-                return "specificationInfos";
-            } else {
-                model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
-                return "errorpage";
-            }
-        } else if (step.equals("pojo")) {
-            if (requestBody.get("apiSpec") != null) {
-                // Creare un oggetto ObjectMapper
-                ObjectMapper objectMapper = new ObjectMapper();
-
-                // Convertire la stringa JSON in un oggetto ApiSpec
-                ApiSpec apiSpec = null;
-                try {
-                    apiSpec = objectMapper.readValue(requestBody.get("apiSpec").toString(), ApiSpec.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+        switch (step) {
+            case "general" -> {
+                if (!Utils.isNullOrEmpty(pojoList) || setPojos()) {
+                    return "specificationInfos";
+                } else {
+                    model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
+                    return "errorpage";
                 }
-                session.setAttribute("apiSpec", apiSpec);
-                return "schemaDefinition";
-            } else {
-                model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
-                return "errorpage";
             }
-        } else if (step.equals("sec")) {
-            List<String> pojos = (List<String>) requestBody.get("pojos");
+            case "pojo" -> {
+                if (requestBody.get("apiSpec") != null) {
+                    // Creare un oggetto ObjectMapper
+                    ObjectMapper objectMapper = new ObjectMapper();
 
-            session.setAttribute("selectedPojos", pojos);
-            if (Collections.list(session.getAttributeNames()).stream().anyMatch(name -> name.startsWith("currentPojo"))) {
-                return "securityScheme";
-            } else {
-                model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
-                return "errorpage";
-            }
-        } else if (step.equals("paths")) {
-            if (requestBody.get("securityScheme") !=  null) {
-                // Creare un oggetto ObjectMapper
-                ObjectMapper objectMapper = new ObjectMapper();
-
-                SecurityScheme securityScheme = null;
-                try {
-                    securityScheme = objectMapper.readValue(requestBody.get("securityScheme").toString(), SecurityScheme.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-                session.setAttribute("securityScheme", securityScheme);
-
-                if (requestBody.get("flowType") !=  null) {
-                    SecurityConfig securityConfig = new SecurityConfig();
-                    securityConfig.setFlowType(((String) requestBody.get("flowType")).toLowerCase());
-                    securityConfig.setClient_id((String) requestBody.get("clientId"));
-                    securityConfig.setClient_secret((String) requestBody.get("clientSecret"));
-                    securityConfig.setAuthorizationUri((String) requestBody.get("authUrl"));
-                    securityConfig.setTokenUri((String) requestBody.get("tokenUrl"));
-                    securityConfig.setPassword((String) requestBody.get("password"));
-                    securityConfig.setUsername((String) requestBody.get("username"));
-                    if (!securityScheme.getFlows().getAuthorizationCode().getScopes().isEmpty()) {
-                        securityConfig.setScopes(securityScheme.getFlows().getAuthorizationCode().getScopes().keySet().stream().toList());
+                    // Convertire la stringa JSON in un oggetto ApiSpec
+                    ApiSpec apiSpec = null;
+                    try {
+                        apiSpec = objectMapper.readValue(requestBody.get("apiSpec").toString(), ApiSpec.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
                     }
-                    session.setAttribute("securityConfig", securityConfig);
+                    session.setAttribute("apiSpec", apiSpec);
+                    return "schemaDefinition";
+                } else {
+                    model.addAttribute("currentError", "Non è stato possibile recuperare le informazioni JSON");
+                    return "errorpage";
                 }
+            }
+            case "sec" -> {
+                List<String> pojos = (List<String>) requestBody.get("pojos");
+                session.setAttribute("selectedPojos", pojos);
+                if (Collections.list(session.getAttributeNames()).stream().anyMatch(name -> name.startsWith("currentPojo"))) {
+                    return "securityScheme";
+                } else {
+                    model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
+                    return "errorpage";
+                }
+            }
+            case "paths" -> {
+                if (requestBody.get("securityScheme") != null) {
+                    // Creare un oggetto ObjectMapper
+                    ObjectMapper objectMapper = new ObjectMapper();
 
-                return "pathsDefinition";
-            } else {
-                model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
+                    SecurityScheme securityScheme = null;
+                    try {
+                        securityScheme = objectMapper.readValue(requestBody.get("securityScheme").toString(), SecurityScheme.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                    session.setAttribute("securityScheme", securityScheme);
+
+                    if (requestBody.get("flowType") != null) {
+                        SecurityConfig securityConfig = new SecurityConfig();
+                        securityConfig.setFlowType(((String) requestBody.get("flowType")).toLowerCase());
+                        securityConfig.setClient_id((String) requestBody.get("clientId"));
+                        securityConfig.setClient_secret((String) requestBody.get("clientSecret"));
+                        securityConfig.setAuthorizationUri((String) requestBody.get("authUrl"));
+                        securityConfig.setTokenUri((String) requestBody.get("tokenUrl"));
+                        securityConfig.setPassword((String) requestBody.get("password"));
+                        securityConfig.setUsername((String) requestBody.get("username"));
+                        if (!securityScheme.getFlows().getAuthorizationCode().getScopes().isEmpty()) {
+                            securityConfig.setScopes(securityScheme.getFlows().getAuthorizationCode().getScopes().keySet().stream().toList());
+                        }
+                        session.setAttribute("securityConfig", securityConfig);
+                    }
+
+                    return "pathsDefinition";
+                } else {
+                    model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
+                    return "errorpage";
+                }
+            }
+            default -> {
                 return "errorpage";
             }
-        } else {
-            return "errorpage";
         }
     }
 
@@ -369,8 +374,7 @@ public class MainController {
 
         RestTemplate restTemplate = new RestTemplate();
         try {
-            ResponseEntity<String> responseEntity = restTemplate.postForEntity(deamonUrl, requestEntity, String.class);
-            return responseEntity;
+            return restTemplate.postForEntity(deamonUrl, requestEntity, String.class);
         } catch (Exception e) {
             System.out.println("Errore durante la chiamata all'endpoint: " + e.getMessage());
         };

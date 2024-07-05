@@ -42,11 +42,6 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.inner-form-section {
-    display: flex;
-    flex-direction: row;
-}
-
 .form-section h2 {
     margin-top: 0;
 }

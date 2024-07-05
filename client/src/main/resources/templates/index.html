@@ -45,7 +45,7 @@
             <!-- Section 3 -->
             <section>
                 <button onclick="selezionaSpecifica()">Select specification</button>
-                <select id="entitySelect" name="entitySelect">
+                <label for="entitySelect"></label><select id="entitySelect" name="entitySelect">
                     <option value="">Select a specification</option>
                     <!-- Utilizza Thymeleaf per iterare sulla lista di entità nel model -->
                     <th:block th:each="entity : ${yamlFiles}">

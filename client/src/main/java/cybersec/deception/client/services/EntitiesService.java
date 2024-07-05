@@ -148,7 +148,6 @@ public class EntitiesService {
     public ResponseEntity<Map> retrieveAllEntities() {
         String otherProjectUrl = deamonPath + retrieveEntitiesApi;
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> responseEntity = restTemplate.getForEntity(otherProjectUrl, Map.class);
-        return responseEntity;
+        return restTemplate.getForEntity(otherProjectUrl, Map.class);
     }
 }
