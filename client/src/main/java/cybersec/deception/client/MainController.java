@@ -17,7 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
+import org.yaml.snakeyaml.Yaml;
 
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -377,7 +379,11 @@ public class MainController {
 
     //1.6 (EXTRA) - extra features
     @GetMapping("/extraFeatures")
-    public String extraFeatures() {
+    public String extraFeatures(Model model, HttpSession session) {
+        if (!loginCheck(model, session)) {
+            return REDIRECT;
+        }
+        model.addAttribute("reviewedPaths", yamlService.extractPaths((String) session.getAttribute("reviewedFinalYaml")));
         return "extraFeatures";
     }
 

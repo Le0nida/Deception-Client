@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -285,6 +286,22 @@ public class YamlBuilderService {
         } else {
             // Il YAML non rappresenta una mappa valida
             return yamlObject.toString();
+        }
+    }
+
+    public List<String> extractPaths(String yamlContent) {
+        Yaml yaml = new Yaml();
+        Object yamlObject = yaml.load(yamlContent);
+
+        if (yamlObject instanceof Map) {
+            // Cast dell'oggetto a una mappa
+            Map<String, Object> yamlMap = (Map<String, Object>) yamlObject;
+
+            Map<String, Object> paths = (Map<String, Object>) yamlMap.get("paths");
+            return new ArrayList<>(paths.keySet());
+        } else {
+            // Il YAML non rappresenta una mappa valida
+            return new ArrayList<>();
         }
     }
 
