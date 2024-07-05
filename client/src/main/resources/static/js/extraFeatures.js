@@ -43,6 +43,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     });
 
+    $('#reset').click(function () {
+        $('#jwtPaths').val('');
+        $('#adminUser').val('');
+        $('#adminPass').val('');
+        $('#notAuthPaths').val('');
+        $('#session').prop('checked', false)
+        $('#vuln').prop('checked', false)
+    });
+
+
     // Chiudi la dialog se si clicca al di fuori di essa
     $(document).mouseup(function(e) {
         const dialog = $('#dialogimport');
