@@ -20,7 +20,8 @@
 
     <div>
         <p>
-            In this page, you can add <strong>extra functionalities</strong> to the Rest API Server that will be generated.
+            In this page, you can add <strong>extra functionalities</strong> to the Rest API Server that will be
+            generated.
         </p>
     </div>
 
@@ -33,9 +34,11 @@
         <div class="form-section">
             <h2>JWT Authentication</h2>
             <p>
-                Allows the insertion of JWT authentication on desired paths. Username and password must be specified to obtain the token.
+                Allows the insertion of JWT authentication on desired paths. Username and password must be specified to
+                obtain the token.
                 <br>
-                Multiple paths can be specified using the followings syntax <i>"/path1/**, /path2, /path3/subpath"</i> (separated by comma).
+                Multiple paths can be specified using the followings syntax <i>"/path1/**, /path2, /path3/subpath"</i>
+                (separated by comma).
             </p>
             <div class="form-row">
                 <label for="jwtPaths">Paths:</label>
@@ -47,9 +50,13 @@
         <div class="form-section">
             <h2>Admin Pages</h2>
             <p>
-                Allows the insertion of administration pages for user and server parameter management, in addition to the ability to view system logs. Obviously, all this data is fake, and the attacker cannot make harmful changes. It is necessary to enter a username and password to access the page.
+                Allows the insertion of administration pages for user and server parameter management, in addition to
+                the ability to view system logs. Obviously, all this data is fake, and the attacker cannot make harmful
+                changes. It is necessary to enter a username and password to access the page.
                 <br>
-                <strong>N.B.</strong> It is advisable to set a not too complex password so that an attacker, through brute force or dictionary attack, will eventually gain access (wasting time and resources in the process).
+                <strong>N.B.</strong> It is advisable to set a not too complex password so that an attacker, through
+                brute force or dictionary attack, will eventually gain access (wasting time and resources in the
+                process).
             </p>
             <div class="form-row">
                 <label for="adminUser">Username:</label>
@@ -65,7 +72,8 @@
             <h2>Not Authorized pages</h2>
             <p>
                 Allows specifying fake paths that will redirect to a fake NOT AUTHORIZED page. <br>
-                Multiple paths can be specified using the followings syntax <i>"/path1/**, /path2, /path3/subpath"</i> (separated by comma).
+                Multiple paths can be specified using the followings syntax <i>"/path1/**, /path2, /path3/subpath"</i>
+                (separated by comma).
             </p>
             <div class="form-row">
                 <label for="notAuthPaths">Paths:</label>
@@ -77,7 +85,8 @@
             <div class="form-section">
                 <h2>Sessions Management</h2>
                 <p>
-                    Enables session management, invalidating it after a certain time interval and blocking multiple sessions from the same user.
+                    Enables session management, invalidating it after a certain time interval and blocking multiple
+                    sessions from the same user.
                     <br>
                     It is solely intended to increase the realism of the REST API Server.
                 </p>
@@ -90,9 +99,11 @@
             <div class="form-section">
                 <h2>Vulnerable Endpoints</h2>
                 <p>
-                    Allows the insertion of vulnerable endpoints that will appear to attackers as remnants of older versions.
+                    Allows the insertion of vulnerable endpoints that will appear to attackers as remnants of older
+                    versions.
                     <br>
-                    This includes endpoints that allow <i>SQL Injection, XSS, Remote Command Execution, and Directory Traversal</i> (which obviously do not cause real damages).
+                    This includes endpoints that allow <i>SQL Injection, XSS, Remote Command Execution, and Directory
+                    Traversal</i> (which obviously do not cause real damages).
                 </p>
                 <div class="form-row">
                     <label for="vuln">Activate Vulnerable Endpoints:</label>
@@ -112,7 +123,25 @@
 </div>
 
 <div id="page-cover"></div>
+<div id="dialogimport" class="dialog">
+    <h2>Server generation</h2>
+    <p>
+        A Spring server will be generated based on the defined OpenAPI specification. A <i>.zip</i> file containing the
+        server project (to allow for modification) and its corresponding <b>Dockerfile</b> will be provided.
+    </p>
 
+    <p>
+        Additionally, it's possible to define a <b>database</b> upon which the endpoint responses will be based. Only
+        default methods will be automatically implemented for interaction with the database. Other methods will be
+        marked as <i>partially implemented</i>, and a list of these will be provided.
+        <br>
+        If no database is used, endpoint responses will be generated randomly.
+    </p>
+
+    <button onclick="generateServer(true)">Generate with DB</button>
+    <button id="withoutDB" onclick="generateServer(false)">Generate without DB</button>
+
+</div>
 <div id="reviewedPathsDialog">
     <div class="dialog-title">Available Paths</div>
     <div class="dialog-content" id="reviewedPathsContent">
@@ -122,19 +151,5 @@
     </div>
     <button id="closeReviewedPathsDialog">Close</button>
 </div>
-
-<script>
-    $(document).ready(function() {
-        $('#showReviewedPaths').click(function() {
-            $('#page-cover').show();
-            $('#reviewedPathsDialog').show();
-        });
-
-        $('#closeReviewedPathsDialog').click(function() {
-            $('#reviewedPathsDialog').hide();
-            $('#page-cover').hide();
-        });
-    });
-</script>
 </body>
 </html>

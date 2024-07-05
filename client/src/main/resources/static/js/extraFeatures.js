@@ -1,8 +1,46 @@
+function validateFeatures() {
+    const jwtAuthPaths = $('#jwtPaths').val();
+    const adminUser = $('#adminUser').val();
+    const adminPass = $('#adminPass').val();
+    const notAuthPaths = $('#notAuthPaths').val();
+
+    // Validation checks
+    if ((adminUser && !adminPass) || (!adminUser && adminPass)) {
+        alert("Both admin username and password must be provided or neither.");
+        return false;
+    }
+
+    const pathRegex = /^\/[^,]+(\/[^,]*)*(\/\*\*)?(, \/[^,]+(\/[^,]*)*(\/\*\*)?)*$/;
+    if (jwtAuthPaths && !pathRegex.test(jwtAuthPaths)) {
+        alert("Invalid syntax in JWT Authentication paths.");
+        return false;
+    }
+
+    if (notAuthPaths && !pathRegex.test(notAuthPaths)) {
+        alert("Invalid syntax in Not Authorized paths.");
+        return false;
+    }
+    return true;
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 
-    $('#continue').click(function() {
-        $('#dialogimport').show();
-        $('body').addClass('dialog-open');
+    $('#showReviewedPaths').click(function () {
+        $('#page-cover').show();
+        $('#reviewedPathsDialog').show();
+    });
+
+    $('#closeReviewedPathsDialog').click(function () {
+        $('#reviewedPathsDialog').hide();
+        $('#page-cover').hide();
+    });
+
+    $('#generate').click(function() {
+        if (validateFeatures()) {
+            $('#dialogimport').show();
+            $('body').addClass('dialog-open');
+        }
+
     });
 
     // Chiudi la dialog se si clicca al di fuori di essa
@@ -39,10 +77,21 @@ function generateServer(useDb) {
     $('#dialogimport').hide();
     $('body').removeClass('dialog-open');
 
+    const jwtAuthPaths = $('#jwtPaths').val();
+    const adminUser = $('#adminUser').val();
+    const adminPass = $('#adminPass').val();
+    const notAuthPaths = $('#notAuthPaths').val();
+
     const data = {
         persistence: useDb,
         basePath: userInput || '',
-        docs: docs
+        docs: docs,
+        jwtAuthPaths: jwtAuthPaths,
+        adminCredentialsUser: adminUser,
+        adminCredentialsPass: adminPass,
+        notAuthPaths: notAuthPaths,
+        sessionBool: $('#session').is(':checked'),
+        vulnBool: $('#vuln').is(':checked')
     };
 
     $.ajax({
@@ -81,3 +130,4 @@ function generateServer(useDb) {
         }
     });
 }
+

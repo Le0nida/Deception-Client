@@ -48,6 +48,12 @@ public class InnerController {
         boolean useDb = (boolean) data.get("persistence");
         boolean docs = (boolean) data.get("docs");
         String basePath = (String) data.get("basePath");
+        boolean sessionBool = (boolean) data.get("sessionBool");
+        boolean vulnBool = (boolean) data.get("vulnBool");
+        String jwtAuthPaths = (String) data.get("jwtAuthPaths");
+        String notAuthPaths = (String) data.get("notAuthPaths");
+        String adminCredentialsUser = (String) data.get("adminCredentialsUser");
+        String adminCredentialsPass = (String) data.get("adminCredentialsPass");
 
         // Configura il corpo della richiesta
         Map<String, Object> requestBody = new HashMap<>();
@@ -65,6 +71,12 @@ public class InnerController {
             }
             requestBody.put("securityConfig", jsonString);
         }
+        requestBody.put("sessionBool", sessionBool);
+        requestBody.put("vulnBool", vulnBool);
+        requestBody.put("jwtAuthPaths", Utils.isNullOrEmpty(jwtAuthPaths) ? null : jwtAuthPaths);
+        requestBody.put("notAuthPaths", Utils.isNullOrEmpty(notAuthPaths) ? null : notAuthPaths);
+        requestBody.put("adminCredentialsUser", Utils.isNullOrEmpty(adminCredentialsUser) ? null : adminCredentialsUser);
+        requestBody.put("adminCredentialsPass", Utils.isNullOrEmpty(adminCredentialsPass) ? null : adminCredentialsPass);
 
         // Configura l'header della richiesta
         HttpHeaders headers = new HttpHeaders();

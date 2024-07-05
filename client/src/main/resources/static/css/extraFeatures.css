@@ -83,12 +83,7 @@ span {
 #closeReviewedPathsDialog:hover {
     background-color: rgb(224, 66, 66);
 }
-.button-container #ignore {
-    background-color: rgb(173, 173, 173);
-}
-.button-container #ignore:hover {
-    background-color: rgba(229, 223, 210, 0.56);
-}
+
 .inline-form-section {
     display: flex;
     flex-direction: row;
@@ -168,4 +163,10 @@ span {
 }
 .button-container #reset:hover {
     background-color: rgba(229, 113, 113, 0.86);
+}
+#withoutDB {
+    background-color: rgb(173, 173, 173);
+}
+#withoutDB:hover {
+    background-color: rgba(229, 223, 210, 0.56);
 }
