@@ -52,6 +52,7 @@ public class InnerController {
         String notAuthPaths = (String) data.get("notAuthPaths");
         String adminCredentialsUser = (String) data.get("adminCredentialsUser");
         String adminCredentialsPass = (String) data.get("adminCredentialsPass");
+        Map<String, Object> attributesMap = getRequestAttributes(session);
 
         // Configura il corpo della richiesta
         Map<String, Object> requestBody = new HashMap<>();
@@ -75,6 +76,7 @@ public class InnerController {
         requestBody.put("notAuthPaths", Utils.isNullOrEmpty(notAuthPaths) ? null : notAuthPaths);
         requestBody.put("adminCredentialsUser", Utils.isNullOrEmpty(adminCredentialsUser) ? null : adminCredentialsUser);
         requestBody.put("adminCredentialsPass", Utils.isNullOrEmpty(adminCredentialsPass) ? null : adminCredentialsPass);
+        requestBody.put("mockarooRequestsMap", attributesMap.isEmpty() ? null : attributesMap);
 
         // Configura l'header della richiesta
         HttpHeaders headers = new HttpHeaders();
@@ -204,5 +206,20 @@ public class InnerController {
     @GetMapping("/log_analysis")
     public String logs() {
         return "log_analysis";
+    }
+
+    private Map<String, Object> getRequestAttributes(HttpSession session) {
+        Map<String, Object> attributesMap = new HashMap<>();
+
+        Enumeration<String> attributeNames = session.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            String attributeName = attributeNames.nextElement();
+            if (attributeName.startsWith("request")) {
+                Object attributeValue = session.getAttribute(attributeName);
+                attributesMap.put(attributeName, attributeValue);
+            }
+        }
+
+        return attributesMap;
     }
 }

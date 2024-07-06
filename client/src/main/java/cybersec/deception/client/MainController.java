@@ -3,6 +3,7 @@ package cybersec.deception.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cybersec.deception.client.services.EntitiesService;
+import cybersec.deception.client.services.MockarooService;
 import cybersec.deception.client.services.PersistenceService;
 import cybersec.deception.client.utils.MockarooDataType;
 import cybersec.deception.client.utils.Utils;
@@ -18,9 +19,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
-import org.yaml.snakeyaml.Yaml;
+import org.thymeleaf.util.StringUtils;
 
-import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,14 +37,16 @@ public class MainController {
     private final YamlBuilderService yamlService;
     private final EntitiesService entitiesService;
     private final PersistenceService persistenceService;
+    private final MockarooService mockarooService;
     public static List<String> pojoList;
     public static Map<String, String> pojoMap;
 
     @Autowired
-    public MainController(YamlBuilderService yamlService, EntitiesService entitiesService, PersistenceService persistenceService) {
+    public MainController(YamlBuilderService yamlService, EntitiesService entitiesService, PersistenceService persistenceService, MockarooService mockarooService) {
         this.yamlService = yamlService;
         this.entitiesService = entitiesService;
         this.persistenceService = persistenceService;
+        this.mockarooService = mockarooService;
     }
 
     // HomePage
@@ -120,14 +122,26 @@ public class MainController {
                 }
             }
             case "sec" -> {
-                List<String> pojos = (List<String>) requestBody.get("pojos");
-                session.setAttribute("selectedPojos", pojos);
-                if (Collections.list(session.getAttributeNames()).stream().anyMatch(name -> name.startsWith("currentPojo"))) {
-                    return "securityScheme";
-                } else {
-                    model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
-                    return "errorpage";
+                List<String> pojos = (List<String>) session.getAttribute("selectedPojos");
+
+                // generazioen json di dati con Mockaroo
+                List<MockarooEntity> entities = mockarooService.parseEntities((String) requestBody.get("entities"));
+                for (MockarooEntity entity : entities) {
+                    try {
+                        java.net.http.HttpRequest request = mockarooService.buildRequest(entity);
+                        String jsonData = mockarooService.generateData(request);
+
+                        String capitalizedEntity = StringUtils.capitalize(entity.getName());
+
+                        pojos.add(capitalizedEntity);
+                        session.setAttribute("currentPojo" + capitalizedEntity, jsonData);
+                        session.setAttribute("request" + capitalizedEntity, request);
+                    } catch (Exception e) {
+                        model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
+                        return "errorpage";
+                    }
                 }
+                return "securityScheme";
             }
             case "paths" -> {
                 if (requestBody.get("securityScheme") != null) {
