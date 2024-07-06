@@ -1,14 +1,13 @@
 let entities = [];
 document.addEventListener("DOMContentLoaded", function() {
     $('#continue').click(function () {
-        handleContinueButton()
+        handleContinueButton();
     });
 
     $('#reset').click(function () {
         entities = [];
-        // TODO
+        document.getElementById('entityList').innerHTML = '<h3>List of entities</h3>'; // Reset entity list
     });
-
 
     document.getElementById('createEntityBtn').addEventListener('click', function() {
         document.getElementById('entityDialog').style.display = 'block';
@@ -18,14 +17,16 @@ document.addEventListener("DOMContentLoaded", function() {
         let fieldsContainer = document.getElementById('fieldsContainer');
         let newFieldRow = document.createElement('div');
         newFieldRow.className = 'fieldRow';
+
+        let optionsHtml = mockarooDataTypes.map(type => `<option value="${type}">${type}</option>`).join('');
+
         newFieldRow.innerHTML = `
-                <input type="text" class="fieldName" placeholder="Nome Campo" required>
-                <select class="fieldType">
-                    <option value="string">Stringa</option>
-                    <option value="number">Numero</option>
-                    <option value="date">Data</option>
-                </select>
-            `;
+            <input type="text" class="fieldName" placeholder="Nome Campo" required>
+            <select class="fieldType">
+                ${optionsHtml}
+            </select>
+        `;
+
         fieldsContainer.appendChild(newFieldRow);
     });
 
@@ -53,6 +54,9 @@ document.addEventListener("DOMContentLoaded", function() {
         closeDialog();
     });
 
+    document.getElementById('closeDialog').addEventListener('click', function() {
+        closeDialog();
+    });
 });
 
 function handleContinueButton() {
@@ -68,15 +72,14 @@ function handleContinueButton() {
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: function (response) {
-            window.location.href = 'securityScheme'
+            window.location.href = 'securityScheme';
         },
         error: function (error) {
             console.error('Error:', error);
-            alert("Error while proceeding to the next step")
+            alert("Error while proceeding to the next step");
         }
     });
 }
-
 
 function addEntityToList(entity) {
     let entityList = document.getElementById('entityList');
@@ -90,13 +93,11 @@ function closeDialog() {
     document.getElementById('entityDialog').style.display = 'none';
     document.getElementById('entityName').value = '';
     document.getElementById('fieldsContainer').innerHTML = `
-                <div class="fieldRow">
-                    <input type="text" class="fieldName" placeholder="Nome Campo" required>
-                    <select class="fieldType">
-                        <option value="string">Stringa</option>
-                        <option value="number">Numero</option>
-                        <option value="date">Data</option>
-                    </select>
-                </div>
-            `;
+        <div class="fieldRow">
+            <input type="text" class="fieldName" placeholder="Nome Campo" required>
+            <select class="fieldType">
+                ${mockarooDataTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
+            </select>
+        </div>
+    `;
 }

@@ -8,42 +8,6 @@
     <script th:src="@{/js/personalizedEntities.js}"></script>
     <link rel="stylesheet" type="text/css" href="/css/common.css">
     <link rel="stylesheet" type="text/css" href="/css/personalizedEntities.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        #entityList {
-            margin-top: 20px;
-        }
-
-        .entity {
-            padding: 10px;
-            border: 1px solid #ddd;
-            margin-bottom: 10px;
-        }
-
-        .dialog {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .dialog input, .dialog select {
-            margin-bottom: 10px;
-        }
-
-        .dialog input[type="text"] {
-            width: calc(100% - 120px);
-            margin-right: 10px;
-        }
-    </style>
 </head>
 <body>
 
@@ -66,7 +30,6 @@
     </div>
 
     <div class="form-section">
-
         <div id="entityList">
             <h3>List of entities</h3>
         </div>
@@ -82,7 +45,6 @@
         </section>
     </div>
 </div>
-
 
 <div id="entityDialog" class="dialog">
     <h2>Nuova Entità</h2>
@@ -104,6 +66,12 @@
     <button id="addFieldBtn">Aggiungi Campo</button>
     <button id="saveEntityBtn">Save</button>
 </div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const mockarooDataTypes = /*[[${mockarooDataTypes}]]*/ [];
+    /*]]>*/
+</script>
 
 </body>
 </html>

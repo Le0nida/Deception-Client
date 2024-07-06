@@ -1,0 +1,133 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+#entityList {
+    margin-top: 20px;
+}
+
+.entity {
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.entity h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.entity ul {
+    padding-left: 20px;
+}
+
+.entity ul li {
+    list-style-type: circle;
+}
+
+.dialog {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    border-radius: 10px;
+}
+
+.dialog h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.dialog label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.dialog input, .dialog select {
+    margin-bottom: 10px;
+}
+
+.dialog input[type="text"] {
+    width: calc(100% - 120px);
+    margin-right: 10px;
+    height: 30px;
+    line-height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0 10px;
+}
+
+.dialog select {
+    height: 30px;
+    line-height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0 10px;
+}
+
+.fieldRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.fieldRow label {
+    flex: 1;
+}
+
+.fieldRow input[type="text"], .fieldRow select {
+    flex: 1;
+    margin-right: 10px;
+}
+
+#closeDialog, #addFieldBtn, #saveEntityBtn {
+    padding: 5px 10px;
+    font-size: 14px;
+    background-color: rgba(103, 145, 234, 0.56);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+}
+
+#closeDialog:hover, #addFieldBtn:hover, #saveEntityBtn:hover {
+    background-color: rgb(103, 145, 234);
+}
+
+.form-section {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 10px;
+    flex: 1;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+    background-color: #f5f7fa6e;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-section button {
+    padding: 5px 10px;
+    font-size: 14px;
+    background-color: rgba(103, 145, 234, 0.56);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+}
+
+.form-section button:hover {
+    background-color: rgb(103, 145, 234);
+}
