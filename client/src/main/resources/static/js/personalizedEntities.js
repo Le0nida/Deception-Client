@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
         let optionsHtml = mockarooDataTypes.map(type => `<option value="${type}">${type}</option>`).join('');
 
         newFieldRow.innerHTML = `
-            <input type="text" class="fieldName" placeholder="Nome Campo" required>
+            <input type="text" class="fieldName" placeholder="Field name" required>
             <select class="fieldType">
                 ${optionsHtml}
             </select>
@@ -94,7 +94,7 @@ function closeDialog() {
     document.getElementById('entityName').value = '';
     document.getElementById('fieldsContainer').innerHTML = `
         <div class="fieldRow">
-            <input type="text" class="fieldName" placeholder="Nome Campo" required>
+            <input type="text" class="fieldName" placeholder="Field name" required>
             <select class="fieldType">
                 ${mockarooDataTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
             </select>

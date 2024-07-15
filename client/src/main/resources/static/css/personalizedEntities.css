@@ -46,9 +46,21 @@ body {
     margin-bottom: 15px;
 }
 
-.dialog label {
-    display: block;
-    margin-bottom: 5px;
+
+#entNameDiv {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#entNameDiv label {
+    flex: 0 0 auto;
+    margin-right: 10px;
+    margin-bottom: 8px;
+}
+
+#entNameDiv input[type="text"] {
+    flex: 1;
 }
 
 .dialog input, .dialog select {
@@ -88,11 +100,11 @@ body {
     margin-right: 10px;
 }
 
-#closeDialog, #addFieldBtn, #saveEntityBtn {
+#addFieldBtn, #saveEntityBtn, #closeDialog {
     padding: 5px 10px;
     font-size: 14px;
     background-color: rgba(103, 145, 234, 0.56);
-    color: white;
+    color: #000000;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -100,7 +112,23 @@ body {
     margin-bottom: 10px;
 }
 
-#closeDialog:hover, #addFieldBtn:hover, #saveEntityBtn:hover {
+#saveEntityBtn {
+    background-color: rgba(103, 234, 110, 0.56);
+}
+
+#closeDialog {
+    background-color: rgba(234, 103, 103, 0.56);
+}
+
+#closeDialog:hover {
+    background-color: rgb(234, 103, 103);
+}
+
+#saveEntityBtn:hover {
+    background-color: rgb(103, 234, 110);
+}
+
+#addFieldBtn:hover {
     background-color: rgb(103, 145, 234);
 }
 
@@ -130,4 +158,14 @@ body {
 
 .form-section button:hover {
     background-color: rgb(103, 145, 234);
+}
+
+
+#fieldsContainer {
+    margin-top: 7px;
+    margin-bottom: 20px;
+}
+
+.fieldRow input {
+    margin-top: 20px;
 }

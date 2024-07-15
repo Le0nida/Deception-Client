@@ -14,13 +14,14 @@
 <div class="container">
     <div class="title">
         <h1>API Specification</h1>
-        <h3>Building of personalized entities </h3>
+        <h3>Building of custom entities </h3>
     </div>
 
     <div>
         <p>
-            In this section you can create your own <b>personalized entities</b>, based on the data types available on
-            the Mockaroo website. You can
+            In this section you can create your own <b>custom entities</b>, based on the data types available on
+            the Mockaroo website. You can learn more about the data types available directly on <a
+                href="https://www.mockaroo.com/">Mockaroo.com</a>.
         </p>
     </div>
 
@@ -47,23 +48,22 @@
 </div>
 
 <div id="entityDialog" class="dialog">
-    <h2>Nuova Entità</h2>
-    <label for="entityName">Nome Entità:</label>
-    <input type="text" id="entityName" required>
+    <h2>New Custom Entity</h2>
+    <div id="entNameDiv">
+        <label for="entityName">Entity Name:</label>
+        <input type="text" id="entityName" required>
+    </div>
+    <hr>
     <div id="fieldsContainer">
         <div class="fieldRow">
-            <label>
-                <input type="text" class="fieldName" placeholder="Nome Campo" required>
-            </label>
-            <label>
-                <select class="fieldType">
-                    <option th:each="item : ${mockarooDataTypes}" th:value="${item}" th:text="${item}"></option>
-                </select>
-            </label>
+            <input type="text" class="fieldName" placeholder="Field name" required>
+            <select class="fieldType">
+                <option th:each="item : ${mockarooDataTypes}" th:value="${item}" th:text="${item}"></option>
+            </select>
         </div>
     </div>
     <button id="closeDialog">Close</button>
-    <button id="addFieldBtn">Aggiungi Campo</button>
+    <button id="addFieldBtn">Add Field</button>
     <button id="saveEntityBtn">Save</button>
 </div>
 
