@@ -34,7 +34,7 @@
 
     <div class="form-section">
         <h3>List of entities</h3>
-        <p>Before proceeding, it is mandatory to select at least one entity. You must open the details of an entity before being able to select it.</p>
+        <p>You must open the details of an entity before being able to select it. The <i>User</i> entity is selected by default.</p>
         <div th:each="item : ${checkboxList}">
             <button th:id="${item}" class="checkboxes" onclick="handleLabelClick(this.id, this)">Open</button>
             <label>

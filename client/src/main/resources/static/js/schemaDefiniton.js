@@ -54,7 +54,7 @@ function handleLabelClick(label, btn) {
 
     const allLabels = document.querySelectorAll('input[type="checkbox"]');
     allLabels.forEach(l => {
-        if (l.id === label) {
+        if (l.id === label && label !== "User") {
             l.disabled = false;
         }
     });
