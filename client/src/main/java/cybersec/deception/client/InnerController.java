@@ -221,7 +221,7 @@ public class InnerController {
         while (attributeNames.hasMoreElements()) {
             String attributeName = attributeNames.nextElement();
             if (attributeName.startsWith("request")) {
-                String attributeValue = ((java.net.http.HttpRequest) session.getAttribute(attributeName)).uri().toString();
+                String attributeValue = (String) session.getAttribute(attributeName);
                 attributesMap.put(attributeName, attributeValue);
             }
         }

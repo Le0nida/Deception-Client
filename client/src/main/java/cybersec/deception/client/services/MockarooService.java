@@ -42,9 +42,7 @@ public class MockarooService {
         return entities;
     }
 
-    public HttpRequest buildRequest(MockarooEntity entity) throws Exception {
-        JSONArray schema = entity.fieldsToJson();
-
+    public HttpRequest buildRequest(JSONArray schema) throws Exception {
         return HttpRequest.newBuilder()
                 .uri(new URI("https://api.mockaroo.com/api/generate.json?key=b324d530&array=true&count=1"))
                 .header("Content-Type", "application/json")

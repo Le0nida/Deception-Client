@@ -11,6 +11,7 @@ import cybersec.deception.model.*;
 import cybersec.deception.client.services.YamlBuilderService;
 import cybersec.deception.model.apispecification.*;
 import jakarta.servlet.http.HttpSession;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -128,14 +129,15 @@ public class MainController {
                 List<MockarooEntity> entities = mockarooService.parseEntities((String) requestBody.get("entities"));
                 for (MockarooEntity entity : entities) {
                     try {
-                        java.net.http.HttpRequest request = mockarooService.buildRequest(entity);
+                        JSONArray schema = entity.fieldsToJson();
+                        java.net.http.HttpRequest request = mockarooService.buildRequest(schema);
                         String jsonData = mockarooService.generateData(request);
 
                         String capitalizedEntity = StringUtils.capitalize(entity.getName());
 
                         pojos.add(capitalizedEntity);
                         session.setAttribute("currentPojo" + capitalizedEntity, jsonData);
-                        session.setAttribute("request" + capitalizedEntity, request);
+                        session.setAttribute("request" + capitalizedEntity, schema.toString());
                     } catch (Exception e) {
                         model.addAttribute("currentError", "Non è stato possibile recuperare lo schema definito");
                         return "errorpage";
