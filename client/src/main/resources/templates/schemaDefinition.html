@@ -38,9 +38,9 @@
         <div th:each="item : ${checkboxList}">
             <button th:id="${item}" class="checkboxes" onclick="handleLabelClick(this.id, this)">Open</button>
             <label>
-                <input th:id="${item}" type="checkbox" class="pojoparent" disabled/>
+                <input th:id="${item}" type="checkbox" class="pojoparent" disabled th:checked="${item == 'User'}"/>
             </label>
-            <label th:for="${item}" th:id="${item}" th:text="${item}" class="checkboxes"></label>
+            <label th:for="${item}" th:id="${item}" th:text="${item}" th:checked="${item == 'User'}" th:disabled="${item == 'User'}" class="checkboxes"></label>
         </div>
     </div>
 
