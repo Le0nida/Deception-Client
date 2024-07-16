@@ -54,7 +54,7 @@ public class InnerController {
         String notAuthPaths = (String) data.get("notAuthPaths");
         String adminCredentialsUser = (String) data.get("adminCredentialsUser");
         String adminCredentialsPass = (String) data.get("adminCredentialsPass");
-        Map<String, Object> attributesMap = getRequestAttributes(session);
+        Map<String, String> attributesMap = getRequestAttributes(session);
 
         // Configura il corpo della richiesta
         Map<String, Object> requestBody = new HashMap<>();
@@ -214,14 +214,14 @@ public class InnerController {
         return "log_analysis";
     }
 
-    private Map<String, Object> getRequestAttributes(HttpSession session) {
-        Map<String, Object> attributesMap = new HashMap<>();
+    private Map<String, String> getRequestAttributes(HttpSession session) {
+        Map<String, String> attributesMap = new HashMap<>();
 
         Enumeration<String> attributeNames = session.getAttributeNames();
         while (attributeNames.hasMoreElements()) {
             String attributeName = attributeNames.nextElement();
             if (attributeName.startsWith("request")) {
-                Object attributeValue = session.getAttribute(attributeName);
+                String attributeValue = ((java.net.http.HttpRequest) session.getAttribute(attributeName)).uri().toString();
                 attributesMap.put(attributeName, attributeValue);
             }
         }
