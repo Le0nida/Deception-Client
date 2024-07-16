@@ -49,6 +49,8 @@ public class InnerController {
         boolean sessionBool = (boolean) data.get("sessionBool");
         boolean vulnBool = (boolean) data.get("vulnBool");
         String jwtAuthPaths = (String) data.get("jwtAuthPaths");
+        String jwtUser = (String) data.get("jwtUser");
+        String jwtPassword = (String) data.get("jwtPass");
         String notAuthPaths = (String) data.get("notAuthPaths");
         String adminCredentialsUser = (String) data.get("adminCredentialsUser");
         String adminCredentialsPass = (String) data.get("adminCredentialsPass");
@@ -73,6 +75,10 @@ public class InnerController {
         requestBody.put("sessionBool", sessionBool);
         requestBody.put("vulnBool", vulnBool);
         requestBody.put("jwtAuthPaths", Utils.isNullOrEmpty(jwtAuthPaths) ? null : jwtAuthPaths);
+        if (!Utils.isNullOrEmpty(jwtAuthPaths)){
+            requestBody.put("jwtUser", Utils.isNullOrEmpty(jwtUser) ? null : jwtUser);
+            requestBody.put("jwtPassword", Utils.isNullOrEmpty(jwtPassword) ? null : jwtPassword);
+        }
         requestBody.put("notAuthPaths", Utils.isNullOrEmpty(notAuthPaths) ? null : notAuthPaths);
         requestBody.put("adminCredentialsUser", Utils.isNullOrEmpty(adminCredentialsUser) ? null : adminCredentialsUser);
         requestBody.put("adminCredentialsPass", Utils.isNullOrEmpty(adminCredentialsPass) ? null : adminCredentialsPass);

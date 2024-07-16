@@ -1,10 +1,17 @@
 function validateFeatures() {
     const jwtAuthPaths = $('#jwtPaths').val();
+    const jwtUser = $('#jwtUser').val();
+    const jwtPass = $('#jwtPass').val();
     const adminUser = $('#adminUser').val();
     const adminPass = $('#adminPass').val();
     const notAuthPaths = $('#notAuthPaths').val();
 
     // Validation checks
+    if ((jwtUser && !jwtPass) || (!jwtUser && jwtPass)) {
+        alert("Both JWT username and password must be provided or neither.");
+        return false;
+    }
+
     if ((adminUser && !adminPass) || (!adminUser && adminPass)) {
         alert("Both admin username and password must be provided or neither.");
         return false;
@@ -45,6 +52,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $('#reset').click(function () {
         $('#jwtPaths').val('');
+        $('#jwtUser').val('');
+        $('#jwtPass').val('');
         $('#adminUser').val('');
         $('#adminPass').val('');
         $('#notAuthPaths').val('');
@@ -88,6 +97,8 @@ function generateServer(useDb) {
     $('body').removeClass('dialog-open');
 
     const jwtAuthPaths = $('#jwtPaths').val();
+    const jwtUser = $('#jwtUser').val();
+    const jwtPass = $('#jwtPass').val();
     const adminUser = $('#adminUser').val();
     const adminPass = $('#adminPass').val();
     const notAuthPaths = $('#notAuthPaths').val();
@@ -97,6 +108,8 @@ function generateServer(useDb) {
         basePath: userInput || '',
         docs: docs,
         jwtAuthPaths: jwtAuthPaths,
+        jwtUser: jwtUser,
+        jwtPass: jwtPass,
         adminCredentialsUser: adminUser,
         adminCredentialsPass: adminPass,
         notAuthPaths: notAuthPaths,

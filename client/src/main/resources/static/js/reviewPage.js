@@ -66,6 +66,7 @@ function validate() {
         data: JSON.stringify(data),
         success: function (response) {
             console.log(response)
+            alert(response)
         },
         error: function (error) {
             console.error('Error: ', error);
