@@ -36,7 +36,7 @@
         <h3>List of entities</h3>
         <p>You must open the details of an entity before being able to select it. The <i>User</i> entity is selected by default.</p>
         <div th:each="item : ${checkboxList}">
-            <button th:id="${item}" class="checkboxes" onclick="handleLabelClick(this.id, this)">Open</button>
+            <button th:id="${item}" class="checkboxes" onclick="handleLabelClick(this.id, this)"></button>
             <label>
                 <input th:id="${item}" type="checkbox" class="pojoparent" disabled th:checked="${item == 'User'}"/>
             </label>

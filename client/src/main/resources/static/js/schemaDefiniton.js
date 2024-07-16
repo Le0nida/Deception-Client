@@ -16,9 +16,11 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
+    const userButton = $('#User');
+    handleLabelClick('User', userButton, true)
 });
 
-function visualProcessing(currentLabel, btn) {
+function visualProcessing(currentLabel, btn, first) {
 
     // evidenzio l'elemento selezionato
     const allLabels = document.querySelectorAll('label[class="checkboxes"]');
@@ -48,9 +50,13 @@ function visualProcessing(currentLabel, btn) {
     else {
         btn.innerText = 'Close'
     }
+    if (first) {
+        btn.get(0).innerText = 'Close'
+        btn.get(0).innerHTML = 'Close'
+    }
 }
 
-function handleLabelClick(label, btn) {
+function handleLabelClick(label, btn, first = false) {
 
     const allLabels = document.querySelectorAll('input[type="checkbox"]');
     allLabels.forEach(l => {
@@ -81,7 +87,7 @@ function handleLabelClick(label, btn) {
         rightPanel.appendChild(iframe);
     }
 
-    visualProcessing(label, btn);
+    visualProcessing(label, btn, first);
 }
 
 function handleContinueButton() {
