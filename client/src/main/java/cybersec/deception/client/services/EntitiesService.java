@@ -86,7 +86,7 @@ public class EntitiesService {
             OAuthFlows o = scheme.getFlows();
             if (o != null && (o.getImplicit() != null || o.getAuthorizationCode() != null || o.getPassword() != null || o.getClientCredentials() != null)) {
                 yamlStringBuilder.append("      flows: ").append("\n");
-                if (o.getAuthorizationCode() != null) {
+                if (o.getAuthorizationCode() != null && !Utils.isNullOrEmpty(o.getAuthorizationCode().getAuthorizationUrl()) && !Utils.isNullOrEmpty(o.getAuthorizationCode().getScopes())) {
                     yamlStringBuilder.append("        authorizationCode: ").append("\n");
                     yamlStringBuilder.append("          authorizationUrl: ").append(o.getAuthorizationCode().getAuthorizationUrl()).append("\n");
                     yamlStringBuilder.append("          tokenUrl: ").append(o.getAuthorizationCode().getTokenUrl()).append("\n");
@@ -101,7 +101,7 @@ public class EntitiesService {
                     }
                 }
 
-                if (o.getImplicit() != null) {
+                if (o.getImplicit() != null && !Utils.isNullOrEmpty(o.getImplicit().getAuthorizationUrl()) && !Utils.isNullOrEmpty(o.getImplicit().getScopes())) {
                     yamlStringBuilder.append("        implicit: ").append("\n");
                     yamlStringBuilder.append("          authorizationUrl: ").append(o.getImplicit().getAuthorizationUrl()).append("\n");
                     if (!Utils.isNullOrEmpty(o.getImplicit().getRefreshUrl())) {
@@ -114,7 +114,7 @@ public class EntitiesService {
                         }
                     }
                 }
-                if (o.getPassword() != null) {
+                if (o.getPassword() != null && !Utils.isNullOrEmpty(o.getPassword().getTokenUrl()) && !Utils.isNullOrEmpty(o.getPassword().getScopes())) {
                     yamlStringBuilder.append("        password: ").append("\n");
                     yamlStringBuilder.append("          tokenUrl: ").append(o.getPassword().getTokenUrl()).append("\n");
                     if (!Utils.isNullOrEmpty(o.getPassword().getRefreshUrl())) {
@@ -127,7 +127,7 @@ public class EntitiesService {
                         }
                     }
                 }
-                if (o.getClientCredentials() != null) {
+                if (o.getClientCredentials() != null && !Utils.isNullOrEmpty(o.getClientCredentials().getTokenUrl()) && !Utils.isNullOrEmpty(o.getClientCredentials().getScopes())) {
                     yamlStringBuilder.append("        clientCredentials: ").append("\n");
                     yamlStringBuilder.append("          tokenUrl: ").append(o.getClientCredentials().getTokenUrl()).append("\n");
                     if (!Utils.isNullOrEmpty(o.getClientCredentials().getRefreshUrl())) {
