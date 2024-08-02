@@ -183,6 +183,7 @@ public class InnerController {
     @PostMapping("/getLogs")
     public ResponseEntity<LogResponse> getLogs(@RequestBody Map<String, String> data) {
 
+        System.out.println("Received request with data: " + data);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -191,22 +192,34 @@ public class InnerController {
         ObjectMapper objectMapper = new ObjectMapper();
         LogRequest logRequest;
         try {
+            System.out.println("Attempting to convert logRequest from JSON");
             logRequest = objectMapper.readValue(data.get("logRequest"), LogRequest.class);
+            System.out.println("Converted logRequest: " + logRequest);
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+            return ResponseEntity.badRequest().body(null);
         }
+
         if (!Utils.isNullOrEmpty(logRequest.getFilter().getTimestamp())) {
+            System.out.println("Original timestamp: " + logRequest.getFilter().getTimestamp());
             String timestamp = LocalDateTime.parse(logRequest.getFilter().getTimestamp()).toString();
             logRequest.getFilter().setTimestamp(timestamp);
+            System.out.println("Formatted timestamp: " + timestamp);
         }
+
         HttpEntity<LogRequest> requestEntity = new HttpEntity<>(logRequest, headers);
+        System.out.println("Created HttpEntity with logRequest: " + requestEntity);
+
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
+        System.out.println("Sending POST request to URL: " + data.get("urlLog"));
+        ResponseEntity<LogResponse> response = restTemplate.postForEntity(data.get("urlLog"), requestEntity, LogResponse.class);
+        System.out.println("Received response: " + response);
 
-        return restTemplate.postForEntity(data.get("urlLog"), requestEntity, LogResponse.class);
+        return response;
     }
+
 
     // Visualizzazione pagina insights
     @GetMapping("/log_analysis")
